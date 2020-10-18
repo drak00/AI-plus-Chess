@@ -1,4 +1,4 @@
-![Alt text](misc/Chess.ong?raw=true "Title")
+!(misc/Chess.png?raw=true)
 # chess
 A chess platform for collaborative teaching with python 3.7.7 and pygame 1.9.6
 
