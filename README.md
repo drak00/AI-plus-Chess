@@ -1,4 +1,4 @@
-!(misc/Chess.png?raw=true)
+![Chess Board](/misc/Chess.png?raw=true)
 # chess
 A chess platform for collaborative teaching with python 3.7.7 and pygame 1.9.6
 
@@ -9,7 +9,9 @@ A chess platform for collaborative teaching with python 3.7.7 and pygame 1.9.6
 	```
 	conda create -n chess python=3
 	source activate chess
-	```
+	```[image_0]: ./misc/Chess.png
+2
+
 	- __Windows__: 
 	```
 	conda create --name chess python=3
