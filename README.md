@@ -1,3 +1,6 @@
+[//]: # (Image References)
+[image_0]: ./misc/Chess.png
+
 # chess
 A chess platform for collaborative teaching with python 3.7.7 and pygame 1.9.6
 
