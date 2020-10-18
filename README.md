@@ -1,6 +1,4 @@
-[//]: # (Image References)
-[image_0]: ./misc/Chess.png
-
+![Alt text](misc/Chess.ong?raw=true "Title")
 # chess
 A chess platform for collaborative teaching with python 3.7.7 and pygame 1.9.6
 
