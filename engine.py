@@ -3,11 +3,11 @@
 
 
 class Game_state():
-	
+
 	def __init__(self):
 		"""
 			The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
-			i.e a list of lists. Each element of the Matrix is a string of two characters 
+			i.e a list of lists. Each element of the Matrix is a string of two characters
 			representing the chess pieces in the order "type" + "colour"
 
 			light pawn = pl
@@ -55,13 +55,13 @@ class Game_state():
 
 		## FIX
 		if self.light_to_move: # if it's light's turn to move
-			
+
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
 					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
 						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
 
-		
+
 
 		##FIX
 		else: # if it's dark's turn to move
@@ -70,11 +70,11 @@ class Game_state():
 				for j in range(len(self.board[i])):
 					if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
 						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
- 
+
 
 	def get_bishop_moves(self, r, c, moves):
 
- 		"""
+		"""
 			calculates all possible bishop moves for a given colour (light or dark)
 			and appends them to a list
 
@@ -85,10 +85,25 @@ class Game_state():
 
 			return parameter(s):
 			None
- 		"""
+		"""
 
- 		##TODO
- 		pass
+		##TODO
+		if self.light_to_move:
+			direction = [(-1,-1), (1,1),(1,-1), (-1,1)] # possible direction
+			for d in direction:
+				for i in range(1,8):
+					rownum = r + d[0] * i
+					colnum = c + d[1] * i
+					if 0 <= rownum <8 and 0 <= colnum < 8: # making sure r and c on board
+						if self.board[rownum][colnum] == "  ":
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+						elif self.board[rownum][colnum][1] == "d": # capture enemy piece
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+							break
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
 
 
 	def get_knight_moves(self, r, c, moves):
@@ -164,12 +179,12 @@ class Move():
 	# map rows to ranks (revers of ranks to rows)
 	rows_to_ranks = {row:rank for rank, row in ranks_to_rows.items()}
 
-	# map files to columns 
+	# map files to columns
 	files_to_cols = {"a":0, "b":1, "c":2, "d":3,
 					"e":4, "f":5, "g":6, "h":7}
 
 	# map columns to files (revers of files to columns)
-	cols_to_files = {col:file for file, col in files_to_cols.items()} 
+	cols_to_files = {col:file for file, col in files_to_cols.items()}
 
 	def __init__(self, start_sq, end_sq, board):
 		"""
@@ -179,11 +194,11 @@ class Move():
 			input parameter(s):
 			start_sq --> (row, column) of piece to be moved (tuple)
 			end_square --> (row, column) of move destination on the board (tuple)
-			board --> board object referencing current state of the board (class Game_state) 
+			board --> board object referencing current state of the board (class Game_state)
 		"""
 		self.start_row = start_sq[0] # row location of piece to be moved
 		self.start_col = start_sq[1] # column location of piece to be moved
-		self.end_row = end_sq[0] # intended row destination of piece to be moved 
+		self.end_row = end_sq[0] # intended row destination of piece to be moved
 		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
 		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
 		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
@@ -241,5 +256,3 @@ class Move():
 			operator overloading for printing Move objects
 		"""
 		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
-
-
