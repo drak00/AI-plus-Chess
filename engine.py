@@ -107,12 +107,25 @@ class Game_state():
 
 	def get_knight_moves(self, r, c, moves):
  		##TODO
- 		pass
+	    pass
 
 
 	def get_king_moves(self, r, c, moves):
  		##TODO
- 		pass
+		if self.light_to_move: # if it's light's turn to move
+			for i in range(len(self.board)):
+				for j in range(len(self.board[i])):
+					#if square in any direction is empty or has an opponent, move to square or move to capture
+					if (i == r-1 or i == r or i == r+1) and ((j == c+1) or (j == c-1) or j == c) and ((self.board[i][j] == "  ") or (self.board[i][j][1] == "d")):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list 
+		
+		else: #dark turn to move 
+			for i in range(len(self.board)):
+				for j in range(len(self.board[i])):
+					#if square in any direction is empty or has an opponent, move to square or move to capture
+					if (i == r-1 or i == r or i == r+1) and ((j == c+1) or (j == c-1) or j == c) and ((self.board[i][j] == "  ") or (self.board[i][j][1] == "l")):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list 
+    
 
 
 	def get_rook_moves(self, r, c, moves):
