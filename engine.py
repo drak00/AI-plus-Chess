@@ -58,8 +58,15 @@ class Game_state():
 			
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
+					#first pawn move: move one or two hops if next two rows on same column are empty
+					if (i == r-2) and (j == c) and  (r == 6) and (self.board[i][j] == "  "):
 						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					#subsequent pawn moves: one hop foward if square on foward row on same column is empty
+					if (i == r-1) and (j == c) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), (self.board)))
+					#Move to capture opponent pawn: move to next row on column to the left or column to the right to capture opponent
+					if (i == r-1) and ((j == c+1) or (j == c-1)) and (self.board[i][j][1] == "d"):
+						moves.append(Move((r, c), (i, j), (self.board)))
 
 		
 
@@ -68,9 +75,16 @@ class Game_state():
 
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
- 
+					#first pawn move: move one or two hops if next two rows on same column are empty
+					if (i == r+2) and (j == c) and  (r == 1) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					#subsequent pawn moves: one hop foward if square on foward row on same column is empty
+					if (i == r+1) and (j == c) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), (self.board)))
+					#Move to capture opponent pawn: move to next row on column to the left or column to the right to capture opponent
+					if (i == r+1) and ((j == c+1) or (j == c-1)) and (self.board[i][j][1] == "l"):
+						moves.append(Move((r, c), (i, j), (self.board)))
+
 
 	def get_bishop_moves(self, r, c, moves):
 
