@@ -97,8 +97,48 @@ class Game_state():
 
 
 	def get_king_moves(self, r, c, moves):
- 		##TODO
- 		pass
+        
+ 		 if self.light_to_move:
+              
+              b = r-1
+              if r == 7:
+                 f = 2   
+              else: f=3 
+             
+              for i in range(f):
+                    if self.board[b+i][c-1] == "  " or self.board[b+i][c-1][1] == "d": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (b+i, c-1), self.board))
+                        
+              for i in range(f):
+                    if self.board[b+i][c] == "  " or self.board[b+i][c][1] == "d": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (b+i, c), self.board)) 
+                        
+              if c != 7:
+                 
+                for i in range(f):
+                    if self.board[b+i][c+1] == "  " or self.board[b+i][c+1][1] == "d": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (b+i, c+1), self.board))           
+         else:
+             b = c-1
+             
+             if c == 7:
+                 f = 2    
+             else: f=3
+             
+             if r != 0:
+                for i in range(f):
+                    if self.board[r-1][b+i] == "  " or self.board[r-1][b+i][1] == "l": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (r-1, b+i), self.board))
+                        
+             for i in range(f):
+                    if self.board[r][b+i] == "  " or self.board[r][b+i][1] == "l": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (r, b+i), self.board)) 
+                        
+             if r != 7:
+               for i in range(f):
+                    if self.board[r+1][b+i] == "  " or self.board[r+1][b+i][1] == "l": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (r+1, b+i), self.board)) 
+
 
 
 	def get_rook_moves(self, r, c, moves):
