@@ -107,7 +107,22 @@ class Game_state():
 
 
 	def get_queen_moves(self, r, c, moves):
+		"""
+					Calculates all possible queen moves for a given color (light or dark)
+					based on bishop and rook moves.
+
+					input parameter(s):
+					r     --> starting row (int)
+					c     --> starting colum (int)
+					moves --> possible moves container (list)
+
+					return parameter(s):
+					None
+				"""
 		##TODO
+		self.get_bishop_moves(r, c, moves)
+		self.get_rook_moves(r, c, moves)
+
 		pass
 
 
