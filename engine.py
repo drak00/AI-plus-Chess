@@ -97,48 +97,63 @@ class Game_state():
 
 
 	def get_king_moves(self, r, c, moves):
-        
- 		 if self.light_to_move:
-              
-              b = r-1
-              if r == 7:
+         """
+			Calculates all possible pawn moves for a given color (light or dark)
+			and appends them to a list
+
+			input parameter(s):
+			r     --> starting row (int)
+			c     --> starting colum (int)
+			moves --> possible moves container (list)
+
+			return parameter(s):
+			None
+		"""
+         ##TODO
+         if self.light_to_move:
+             if r == 7:#make sure that the moves does not exceed the lenght of the board
                  f = 2   
-              else: f=3 
+             else: f = 3 
              
-              for i in range(f):
-                    if self.board[b+i][c-1] == "  " or self.board[b+i][c-1][1] == "d": # if square is empty or square has opponent's piece
-                        moves.append(Move((r, c), (b+i, c-1), self.board))
+             if c != 0:
+                 for i in range(f):#check valid moves one column behind the current column
+                        if self.board[r-1+i][c-1] == "  " or self.board[r-1+i][c-1][1] == "d" and self.board[r-1+i][c-1][0] != "k":
+                            moves.append(Move((r, c), (r-1+i, c-1), self.board))
                         
-              for i in range(f):
-                    if self.board[b+i][c] == "  " or self.board[b+i][c][1] == "d": # if square is empty or square has opponent's piece
-                        moves.append(Move((r, c), (b+i, c), self.board)) 
+             for i in range(f):#check valid moves on the current column
+                    if self.board[r-1+i][c] == "  " or self.board[r-1+i][c][1] == "d" and self.board[r-1+i][c][0] != "k": 
+                        moves.append(Move((r, c), (r-1+i, c), self.board)) 
                         
-              if c != 7:
-                 
-                for i in range(f):
-                    if self.board[b+i][c+1] == "  " or self.board[b+i][c+1][1] == "d": # if square is empty or square has opponent's piece
-                        moves.append(Move((r, c), (b+i, c+1), self.board))           
+             if c != 7:    
+               for i in range(f):#check valid moves one column after the current column
+                    if self.board[r-1+i][c+1] == "  " or self.board[r-1+i][c+1][1] == "d" and  self.board[r-1+i][c+1][0] != "k": 
+                        moves.append(Move((r, c), (r-1+i, c+1), self.board))           
          else:
-             b = c-1
              
              if c == 7:
                  f = 2    
              else: f=3
              
+             b = c-1#start a colmn behind   
              if r != 0:
                 for i in range(f):
-                    if self.board[r-1][b+i] == "  " or self.board[r-1][b+i][1] == "l": # if square is empty or square has opponent's piece
-                        moves.append(Move((r, c), (r-1, b+i), self.board))
+                    if self.board[r-1][b+i] == "  " or self.board[r-1][b+i][1] == "l" and  self.board[r-1][b+i][0] != "k": 
+                        if b+i<0:
+                            continue
+                        else:moves.append(Move((r, c), (r-1, b+i), self.board))
                         
              for i in range(f):
-                    if self.board[r][b+i] == "  " or self.board[r][b+i][1] == "l": # if square is empty or square has opponent's piece
-                        moves.append(Move((r, c), (r, b+i), self.board)) 
+                    if self.board[r][b+i] == "  " or self.board[r][b+i][1] == "l" and  self.board[r][b+i][0] != "k":
+                        if b+i<0:
+                            continue
+                        else:moves.append(Move((r, c), (r, b+i), self.board)) 
                         
              if r != 7:
                for i in range(f):
-                    if self.board[r+1][b+i] == "  " or self.board[r+1][b+i][1] == "l": # if square is empty or square has opponent's piece
-                        moves.append(Move((r, c), (r+1, b+i), self.board)) 
-
+                    if self.board[r+1][b+i] == "  " or self.board[r+1][b+i][1] == "l" and  self.board[r+1][b+i][0] != "k":
+                        if b+i<0:
+                            continue
+                        else:moves.append(Move((r, c), (r+1, b+i), self.board)) 
 
 
 	def get_rook_moves(self, r, c, moves):
