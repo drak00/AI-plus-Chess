@@ -120,6 +120,8 @@ class Game_state():
 
 					# subsequent move			
 					else:
+						if r == 7:
+							break
 						if self.board[r+1][c] != "  ": # if blocked
 							pawn_attack('d')
 							break
@@ -153,9 +155,8 @@ class Game_state():
 
 
 	def get_king_moves(self, r, c, moves):
- 		##TODO
- 		pass
-
+		##TODO
+		pass
 
 	def get_rook_moves(self, r, c, moves):
  		##TODO
