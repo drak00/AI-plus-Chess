@@ -89,22 +89,37 @@ class Game_state():
 
 		##TODO
 		if self.light_to_move:
-			direction = [(-1,-1), (1,1),(1,-1), (-1,1)] # possible direction
+			direction = ((-1,-1), (+1,+1), (+1,-1), (-1,+1)) # possible direction
 			for d in direction:
-				for i in range(1,8):
+				for i in range(1,len(self.board)):
 					rownum = r + d[0] * i
 					colnum = c + d[1] * i
-					if 0 <= rownum <8 and 0 <= colnum < 8: # making sure r and c on board
-						if self.board[rownum][colnum] == "  ":
+					if (0 <= rownum < len(self.board)) and (0 <= colnum < len(self.board)): # making sure r and c on board
+						if self.board[rownum][colnum] == "  ": # if square is empty
 							moves.append(Move((r,c), (rownum,colnum), (self.board)))
-						elif self.board[rownum][colnum][1] == "d": # capture enemy piece
+						elif self.board[rownum][colnum][1] == "d": # if square has opponent piece
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+							break 
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
+		else:
+			direction = ((-1,-1), (+1,+1), (+1,-1), (-1,+1)) # possible direction
+			for d in direction:
+				for i in range(1,len(self.board)):
+					rownum = r + d[0] * i
+					colnum = c + d[1] * i
+					if (0 <= rownum < len(self.board)) and (0 <= colnum < len(self.board)): # making sure r and c on board
+						if self.board[rownum][colnum] == "  ": # if square is empty
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+						elif self.board[rownum][colnum][1] == "l": # if square has opponent piece
 							moves.append(Move((r,c), (rownum,colnum), (self.board)))
 							break
 						else:
 							break # when ally piece encountered
 					else:
 						break # when off the board
-
 
 	def get_knight_moves(self, r, c, moves):
  		##TODO
