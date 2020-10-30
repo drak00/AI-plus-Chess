@@ -23,17 +23,17 @@ class Game_state():
 
 		self.board = [
 
-			["bd", "nd", "rd", "qd", "kd", "rd", "nd", "bd"],
+			["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
 			["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
-			["bl", "nl", "rl", "ql", "kl", "rl", "nl", "bl"]]
+			["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"]]
 
 		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
-		self.move_log = []        # keeps a log of all moves made withing a game
+		self.move_log = []        # keeps a log of all moves made within a game
 		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
 						"q":self.get_queen_moves, "k":self.get_king_moves, \
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
