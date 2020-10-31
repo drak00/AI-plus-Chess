@@ -96,67 +96,62 @@ class Game_state():
  		pass
 
 
-	def get_king_moves(self, r, c, moves):
-         """
-			Calculates all possible kings moves for a given color (light or dark)
-			and appends them to a list
+    def get_kings_moves(self, r, c, moves):
+        """Calculates all possible kings moves for a given color (light or dark)
+                and appends them to a list
 
-			input parameter(s):
-			r     --> starting row (int)
-			c     --> starting colum (int)
-			moves --> possible moves container (list)
+                input parameter(s):
+                r     --> starting row (int)
+                c     --> starting colum (int)
+                moves --> possible moves container (list)
 
-			return parameter(s):
-			None
-		"""
-         ##TODO
-         if self.light_to_move:
-             if r == 7:#change the iteration of the for loop to make sure moves does'nt exceed board
-                 f = 2   
-             else: f = 3 
-             
-             if c != 0:#do not run if we are in the first column
-                 for i in range(f):#check valid moves one column behind the current column
-                        if self.board[r-1+i][c-1] == "  " or self.board[r-1+i][c-1][1] == "d":
-                            moves.append(Move((r, c), (r-1+i, c-1), self.board))
-                        
-             for i in range(f):#check valid moves on the current column
-                    if self.board[r-1+i][c] == "  " or self.board[r-1+i][c][1] == "d":  
-                        moves.append(Move((r, c), (r-1+i, c), self.board)) 
-                        
-             if c != 7:#do not run if we are in the last column    
-               for i in range(f):#check valid moves one column after the current column
-                    if self.board[r-1+i][c+1] == "  " or self.board[r-1+i][c+1][1] == "d": 
-                        moves.append(Move((r, c), (r-1+i, c+1), self.board))           
-         else:
-             
-             if c == 7:#change the iteration of the for loop to make sure moves does'nt exceed board
-                 f = 2    
-             else: f=3
-             
-             b = c-1#start a column behind   
-             if r != 0:#do not run if we are in the first row
-                for i in range(f):#check for valid moves a row behind the current row
-                    if self.board[r-1][b+i] == "  " or self.board[r-1][b+i][1] == "l": 
-                        if b+i<0:
+                return parameter(s):
+                None
+            """
+        if self.light_to_move:  # when it is light turn to play
+            if r == 7:  # change the iteration of the loop to assert that move does'nt exceed board
+                f = 2
+            else:
+                f = 3
+            if c != 0:
+                for i in range(f):  # check valid moves one column befor the current column
+                    if self.board[r - 1 + i][c - 1] == "  " or self.board[r - 1 + i][c - 1][1] == "d":
+                        moves.append(Move((r, c), (r - 1 + i, c - 1), self.board))
+            for i in range(f):  # check valid moves on the current column
+                if self.board[r - 1 + i][c] == "  " or self.board[r - 1 + i][c][1] == "d":
+                    moves.append(Move((r, c), (r - 1 + i, c), self.board))
+            if c != 7:
+                for i in range(f):  # check valid moves a column after the current column
+                    if self.board[r - 1 + i][c + 1] == "  " or self.board[r - 1 + i][c + 1][1] == "d":
+                        moves.append(Move((r, c), (r - 1 + i, c + 1), self.board))
+        else:  # if darks turn to play
+            if c == 7:  # change the iteration of the loop to assert that move does'nt exceed board
+                f = 2
+            else:
+                f = 3
+            b = c - 1  # start a column behind the current column
+            if r != 0:
+                for i in range(f):  # check valid moves one row before the current column
+                    if self.board[r - 1][b + i] == "  " or self.board[r - 1][b + i][1] == "l":
+                        if b + i < 0:
                             continue
-                        else:moves.append(Move((r, c), (r-1, b+i), self.board))
-                        
-             for i in range(f):#check for valid moves in the current row
-                    if self.board[r][b+i] == "  " or self.board[r][b+i][1] == "l":
-                        if b+i<0:
+                        else:
+                            moves.append(Move((r, c), (r - 1, b + i), self.board))
+            for i in range(f):  # check valid moves in the current row
+                if self.board[r][b + i] == "  " or self.board[r][b + i][1] == "l":
+                    if b + i < 0:
+                        continue
+                    else:
+                        moves.append(Move((r, c), (r, b + i), self.board))
+            if r != 7:
+                for i in range(f):  # check valid moves one row after the current row
+                    if self.board[r + 1][b + i] == "  " or self.board[r + 1][b + i][1] == "l":
+                        if b + i < 0:
                             continue
-                        else:moves.append(Move((r, c), (r, b+i), self.board)) 
-                        
-             if r != 7:#do not run if we are in the last row
-               for i in range(f):#check for valid moves a row after the current row
-                    if self.board[r+1][b+i] == "  " or self.board[r+1][b+i][1] == "l":
-                        if b+i<0:
-                            continue
-                        else:moves.append(Move((r, c), (r+1, b+i), self.board)) 
+                        else:
+                            moves.append(Move((r, c), (r + 1, b + i), self.board))
 
-
-	def get_rook_moves(self, r, c, moves):
+    def get_rook_moves(self, r, c, moves):
  		##TODO
  		pass
 
