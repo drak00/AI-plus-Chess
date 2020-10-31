@@ -58,7 +58,16 @@ class Game_state():
 			
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
+					# if square is empty and in front of pawn and it is the pawn's first move
+					if ((i == r-2) and (j == c) ) and (r == 6) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					
+					# if square is empty and in front of pawn
+					if ((i == r-1) and (j == c) ) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					
+					# if square is diagonal to pawn and has an opponent piece
+					if ((i == r-1) and (j == c+1 or j == c-1) and (self.board[i][j][1] == "d")):
 						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
 
 		
