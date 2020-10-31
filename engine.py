@@ -118,6 +118,19 @@ class Game_state():
 
 
     def get_rook_moves(self, r, c, moves):
+        
+         """
+            calculates all possible rook moves for a given colour (light or dark)
+            and appends them to a list
+
+            input parameters:
+            r     --> starting row (int)
+            c     --> starting column (int)
+            moves --> posiible moves container (list)
+
+            return parameter(s):
+            None
+         """
          direction = (-1, 1) # possible direction
          
          if self.light_to_move:
@@ -151,7 +164,9 @@ class Game_state():
                             break # when ally piece encountered
                     else:
                         break # when off the board
-         else: #if it's dark's turn to move
+        
+         #if it's dark's turn to move
+         else: 
             for d in direction:
                 #rows
                 for i in range(1,len(self.board)):
