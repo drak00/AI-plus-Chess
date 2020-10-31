@@ -3,11 +3,11 @@
 
 
 class Game_state():
-	
+
 	def __init__(self):
 		"""
 			The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
-			i.e a list of lists. Each element of the Matrix is a string of two characters 
+			i.e a list of lists. Each element of the Matrix is a string of two characters
 			representing the chess pieces in the order "type" + "colour"
 
 			light pawn = pl
@@ -55,40 +55,27 @@ class Game_state():
 
 		## FIX
 		if self.light_to_move: # if it's light's turn to move
-			
+
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					#first pawn move: move one or two hops if next two rows on same column are empty
-					if (i == r-2) and (j == c) and  (r == 6) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
-					#subsequent pawn moves: one hop foward if square on foward row on same column is empty
-					if (i == r-1) and (j == c) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), (self.board)))
-					#Move to capture opponent pawn: move to next row on column to the left or column to the right to capture opponent
-					if (i == r-1) and ((j == c+1) or (j == c-1)) and (self.board[i][j][1] == "d"):
-						moves.append(Move((r, c), (i, j), (self.board)))
+					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
+						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
 
-		
+
 
 		##FIX
 		else: # if it's dark's turn to move
 
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					#first pawn move: move one or two hops if next two rows on same column are empty
-					if (i == r+2) and (j == c) and  (r == 1) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
-					#subsequent pawn moves: one hop foward if square on foward row on same column is empty
-					if (i == r+1) and (j == c) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), (self.board)))
-					#Move to capture opponent pawn: move to next row on column to the left or column to the right to capture opponent
-					if (i == r+1) and ((j == c+1) or (j == c-1)) and (self.board[i][j][1] == "l"):
-						moves.append(Move((r, c), (i, j), (self.board)))
+					if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
+						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
+
 
 
 	def get_bishop_moves(self, r, c, moves):
 
- 		"""
+		"""
 			calculates all possible bishop moves for a given colour (light or dark)
 			and appends them to a list
 
@@ -99,11 +86,42 @@ class Game_state():
 
 			return parameter(s):
 			None
- 		"""
+		"""
 
- 		##TODO
- 		pass
+		##TODO
+		direction = ((-1,-1), (1,1), (1,-1), (-1,1)) # possible  Bishop direction
+		if self.light_to_move: # light piece turn to move
+			for d in direction:
+				for i in range(1,len(self.board)):
+					rownum = r + d[0] * i
+					colnum = c + d[1] * i
+					if (0 <= rownum < len(self.board)) and (0 <= colnum < len(self.board)): # making sure r and c on board
+						if self.board[rownum][colnum] == "  ": # if square is empty
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+						elif self.board[rownum][colnum][1] == "d": # if square has opponent piece
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+							break
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
 
+
+		else: # Dark piece turn to move
+			for d in direction:
+				for i in range(1,len(self.board)):
+					rownum = r + d[0] * i
+					colnum = c + d[1] * i
+					if (0 <= rownum < len(self.board)) and (0 <= colnum < len(self.board)): # making sure r and c on board
+						if self.board[rownum][colnum] == "  ": # if square is empty
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+						elif self.board[rownum][colnum][1] == "l": # if square has opponent piece
+							moves.append(Move((r,c), (rownum,colnum), (self.board)))
+							break
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
 
 	def get_knight_moves(self, r, c, moves):
  		##TODO
@@ -207,12 +225,12 @@ class Move():
 	# map rows to ranks (revers of ranks to rows)
 	rows_to_ranks = {row:rank for rank, row in ranks_to_rows.items()}
 
-	# map files to columns 
+	# map files to columns
 	files_to_cols = {"a":0, "b":1, "c":2, "d":3,
 					"e":4, "f":5, "g":6, "h":7}
 
 	# map columns to files (revers of files to columns)
-	cols_to_files = {col:file for file, col in files_to_cols.items()} 
+	cols_to_files = {col:file for file, col in files_to_cols.items()}
 
 	def __init__(self, start_sq, end_sq, board):
 		"""
@@ -222,11 +240,11 @@ class Move():
 			input parameter(s):
 			start_sq --> (row, column) of piece to be moved (tuple)
 			end_square --> (row, column) of move destination on the board (tuple)
-			board --> board object referencing current state of the board (class Game_state) 
+			board --> board object referencing current state of the board (class Game_state)
 		"""
 		self.start_row = start_sq[0] # row location of piece to be moved
 		self.start_col = start_sq[1] # column location of piece to be moved
-		self.end_row = end_sq[0] # intended row destination of piece to be moved 
+		self.end_row = end_sq[0] # intended row destination of piece to be moved
 		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
 		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
 		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
@@ -284,5 +302,3 @@ class Move():
 			operator overloading for printing Move objects
 		"""
 		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
-
-
