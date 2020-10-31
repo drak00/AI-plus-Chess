@@ -58,9 +58,16 @@ class Game_state():
 			
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					#if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
+					#	moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					if ((i == r-2) and (j == c) and (r==6) and (self.board[i][j] == "  ")):
+						moves.append(Move((r, c), (i, j), self.board))
 
+					if ((i == r-1) and (j == c) and (self.board[i][j] == "  ")):
+						moves.append(Move((r, c), (i, j), self.board))
+
+					if ((i == r-1) and (j == c+1 or j==c-1) and (self.board[i][j][1] == "d")):
+						moves.append(Move((r, c), (i, j), self.board))
 		
 
 		##FIX
@@ -68,9 +75,17 @@ class Game_state():
 
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
- 
+					#if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
+					#	moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
+					if ((i == r+2) and (j == c) and (r==1) and (self.board[i][j] == "  ")):
+						moves.append(Move((r, c), (i, j), self.board))
+
+					if ((i == r+1) and (j == c) and (self.board[i][j] == "  ")):
+						moves.append(Move((r, c), (i, j), self.board))
+
+					if ((i == r+1) and (j == c+1 or j==c-1) and (self.board[i][j][1] == "l")):
+						moves.append(Move((r, c), (i, j), self.board))
+
 
 	def get_bishop_moves(self, r, c, moves):
 
@@ -102,8 +117,56 @@ class Game_state():
 
 
 	def get_rook_moves(self, r, c, moves):
- 		##TODO
- 		pass
+		if self.light_to_move: # if it's light's turn to move
+			squares = ("  ", "pd")
+			squs = ("rd", "kd", "bd", "qd", "nd")
+		
+			for i in range(len(self.board)):
+				for j in range(len(self.board[i])):
+					# first rook move: if rook is at row 7 and in the same coloum square is empty or square has opponent's piece
+					if ((r == 7) and self.board[i][j] in squares):
+						if ((i == r + (i-r)) and j == c):
+						# create a move object and append to moves
+							moves.append(Move((r, c), (i, j), self.board))
+							break
+						
+					# if rook is at row 0 - 6 and square is empty or square has opponent's piece
+					if r < 7:
+						if (((i == r + (i-r)) and j == c) or ((j == c + (j-c)) and i == r)) and (self.board[i][j] in squares):
+							# create a move object and append to moves
+							moves.append(Move((r, c), (i, j), self.board))
+
+					# if rook is not at row 7 and tuple "squs" is on the same coloumn
+					if (self.board[i][j] in squs) and r != 7:
+						if (((i == r + (i-r)) and j == c) or ((j == c + (j-c)) and i == r)):
+							# create a move object and append to moves
+							moves.append(Move((r, c), (i, j), self.board))
+		
+		else:
+			squs = ("rl", "kl", "bl", "ql", "nl")
+			sqr = ("pl", "  ")
+			
+			for i in range(len(self.board)):
+				for j in range(len(self.board[i])):
+					
+					# first rook move: if rook(dark) is at row 0 and in the same coloum square is empty or square has opponent's piece
+					if ((r == 0) and self.board[i][j] in sqr):
+						if ((i == r + (i-r)) and j == c):
+						# create a move object and append to moves
+							moves.append(Move((r, c), (i, j), self.board))
+							break
+					
+					# if rook is at row 1 - 6 and square is empty or square has opponent's piece
+					if r > 0:
+						if (((i == r + (i-r)) and j == c) or ((j == c + (j-c)) and i == r)) and (self.board[i][j] in sqr):
+							# create a move object and append to moves
+							moves.append(Move((r, c), (i, j), self.board))
+					
+					# if rook is not at row 0 and tuple "squs" is on the same coloumn
+					if (self.board[i][j] in squs and r != 0):
+						if ((i == r + (i-r)) and j == c) or ((j == c + (j-c)) and i == r):
+							# create a move object and append to moves
+							moves.append(Move((r, c), (i, j), self.board))
 
 
 	def get_queen_moves(self, r, c, moves):
