@@ -88,8 +88,8 @@ class Game_state():
 		"""
 
 		##TODO
+		direction = ((-1,-1), (1,1), (1,-1), (-1,1)) # possible direction
 		if self.light_to_move:
-			direction = ((-1,-1), (+1,+1), (+1,-1), (-1,+1)) # possible direction
 			for d in direction:
 				for i in range(1,len(self.board)):
 					rownum = r + d[0] * i
@@ -99,13 +99,12 @@ class Game_state():
 							moves.append(Move((r,c), (rownum,colnum), (self.board)))
 						elif self.board[rownum][colnum][1] == "d": # if square has opponent piece
 							moves.append(Move((r,c), (rownum,colnum), (self.board)))
-							break 
+							break
 						else:
 							break # when ally piece encountered
 					else:
 						break # when off the board
 		else:
-			direction = ((-1,-1), (+1,+1), (+1,-1), (-1,+1)) # possible direction
 			for d in direction:
 				for i in range(1,len(self.board)):
 					rownum = r + d[0] * i
