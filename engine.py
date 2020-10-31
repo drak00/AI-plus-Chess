@@ -49,6 +49,7 @@ class Game_state():
             c     --> starting colum (int)
             moves --> possible moves container (list)
 
+<<<<<<< HEAD
             return parameter(s):
             None
         """
@@ -243,6 +244,125 @@ class Game_state():
                     self.move_piece[self.board[i][j][0]](i, j, moves)
 
         return moves, turn
+=======
+		## FIX
+		if self.light_to_move: # if it's light's turn to move
+			
+			for i in range(len(self.board)):
+				for j in range(len(self.board[i])):
+					# if square is empty and in front of pawn and it is the pawn's first move
+					if ((i == r-2) and (j == c) ) and (r == 6) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					
+					# if square is empty and in front of pawn
+					if ((i == r-1) and (j == c) ) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					
+					# if square is diagonal to pawn and has an opponent piece
+					if ((i == r-1) and (j == c+1 or j == c-1) and (self.board[i][j][1] == "d")):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+
+		
+
+		##FIX
+		else: # if it's dark's turn to move
+
+			for i in range(len(self.board)):
+				for j in range(len(self.board[i])):
+					# if square is empty and in front of pawn and it is the pawn's first move
+					if ((i == r+2) and (j == c) ) and (r == 1) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					
+					# if square is empty and in front of pawn
+					if ((i == r+1) and (j == c) ) and (self.board[i][j] == "  "):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					
+					# if square is diagonal to pawn and has an opponent piece
+					if ((i == r+1) and (j == c+1 or j == c-1) and (self.board[i][j][1] == "l")):
+						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+
+
+	def get_bishop_moves(self, r, c, moves):
+
+ 		"""
+			calculates all possible bishop moves for a given colour (light or dark)
+			and appends them to a list
+
+			input parameters:
+			r     --> starting row (int)
+			c     --> starting column (int)
+			moves --> posiible moves container (list)
+
+			return parameter(s):
+			None
+ 		"""
+
+ 		##TODO
+ 		pass
+
+
+	def get_knight_moves(self, r, c, moves):
+ 		##TODO
+ 		pass
+
+
+	def get_king_moves(self, r, c, moves):
+ 		##TODO
+ 		pass
+
+
+	def get_rook_moves(self, r, c, moves):
+ 		##TODO
+ 		pass
+
+
+	def get_queen_moves(self, r, c, moves):
+		##TODO
+		pass
+
+
+	def make_move(self, move):
+		"""
+			moves pieces on the board
+		"""
+		self.board[move.start_row][move.start_col] = "  "
+		self.board[move.end_row][move.end_col] = move.piece_moved
+		self.move_log.append(move) # log move
+		self.light_to_move = not self.light_to_move # next player to move
+
+
+	def undo_move(self, look_ahead_mode = False):
+		"""
+			undoes last move
+		"""
+		if self.move_log:
+			last_move = self.move_log.pop()
+			self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
+			self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
+			self.light_to_move = not self.light_to_move
+
+			print("undoing ->", last_move.get_chess_notation())
+		else:
+			print("All undone!")
+
+
+	def get_valid_moves(self):
+		return self.get_possible_moves()
+
+
+	def get_possible_moves(self):
+
+		moves = []
+
+		turn = "l" if self.light_to_move else "d"
+
+		for i in range(len(self.board)):
+			for j in range(len(self.board[i])):
+				if self.board[i][j][1] == turn:
+					self.move_piece[self.board[i][j][0]](i, j, moves)
+
+		return moves, turn
+>>>>>>> 4c1bbe529eae03faf2eeeebb5ec81f2825beb3f3
 
 
 
