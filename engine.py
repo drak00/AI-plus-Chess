@@ -88,7 +88,7 @@ class Game_state():
 		"""
 
 		##TODO
-		direction = ((-1,-1), (1,1), (1,-1), (-1,1)) # possible direction
+		direction = ((-1,-1), (1,1), (1,-1), (-1,1)) # possible  Bishop direction
 		if self.light_to_move:
 			for d in direction:
 				for i in range(1,len(self.board)):
