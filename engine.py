@@ -89,7 +89,7 @@ class Game_state():
 
 		##TODO
 		direction = ((-1,-1), (1,1), (1,-1), (-1,1)) # possible  Bishop direction
-		if self.light_to_move:
+		if self.light_to_move: # light piece turn to move
 			for d in direction:
 				for i in range(1,len(self.board)):
 					rownum = r + d[0] * i
@@ -104,7 +104,9 @@ class Game_state():
 							break # when ally piece encountered
 					else:
 						break # when off the board
-		else:
+
+
+		else: # Dark piece turn to move
 			for d in direction:
 				for i in range(1,len(self.board)):
 					rownum = r + d[0] * i
