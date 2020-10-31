@@ -111,23 +111,35 @@ class Game_state():
 
 
 	def get_king_moves(self, r, c, moves):
+		"""
+			calculates all possible king moves for a given colour (light or dark)
+			and appends them to a list
+
+			input parameters:
+			r     --> starting row (int)
+			c     --> starting column (int)
+			moves --> posiible moves container (list)
+
+			return parameter(s):
+			None
+ 		"""
  		##TODO
 		rows = (r-1, r, r+1)
 		columns = (c+1, c, c-1)
 		if self.light_to_move: # if it's light's turn to move
-			box = ("  ", "d")
+			available_squares = (" ", "d") #if square is empty or has a dark piece
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
 					#if square in any direction is empty or has an opponent, move to square or move to capture
-					if (i in rows) and (j in columns) and (self.board[i][j][1] in box or self.board[i][j] in box):
+					if (i in rows) and (j in columns) and (self.board[i][j][1] in available_squares):
 						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list 
 		
 		else: #dark turn to move
-			box = ("  ", "l") 
+			available_squares = (" ", "l")  #if square is empty or has a light piece
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
 					#if square in any direction is empty or has an opponent, move to square or move to capture
-					if (i in rows) and (j in columns) and (self.board[i][j][1] in box or self.board[i][j] in box):
+					if (i in rows) and (j in columns) and (self.board[i][j][1] in available_squares):
 						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list 
     
 
