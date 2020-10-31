@@ -117,16 +117,16 @@ class Game_state():
              
              if c != 0:
                  for i in range(f):#check valid moves one column behind the current column
-                        if self.board[r-1+i][c-1] == "  " or self.board[r-1+i][c-1][1] == "d" and self.board[r-1+i][c-1][0] != "k":
+                        if self.board[r-1+i][c-1] == "  " or self.board[r-1+i][c-1][1] == "d":
                             moves.append(Move((r, c), (r-1+i, c-1), self.board))
                         
              for i in range(f):#check valid moves on the current column
-                    if self.board[r-1+i][c] == "  " or self.board[r-1+i][c][1] == "d" and self.board[r-1+i][c][0] != "k": 
+                    if self.board[r-1+i][c] == "  " or self.board[r-1+i][c][1] == "d":  
                         moves.append(Move((r, c), (r-1+i, c), self.board)) 
                         
              if c != 7:    
                for i in range(f):#check valid moves one column after the current column
-                    if self.board[r-1+i][c+1] == "  " or self.board[r-1+i][c+1][1] == "d" and  self.board[r-1+i][c+1][0] != "k": 
+                    if self.board[r-1+i][c+1] == "  " or self.board[r-1+i][c+1][1] == "d": 
                         moves.append(Move((r, c), (r-1+i, c+1), self.board))           
          else:
              
@@ -137,20 +137,20 @@ class Game_state():
              b = c-1#start a colmn behind   
              if r != 0:
                 for i in range(f):
-                    if self.board[r-1][b+i] == "  " or self.board[r-1][b+i][1] == "l" and  self.board[r-1][b+i][0] != "k": 
+                    if self.board[r-1][b+i] == "  " or self.board[r-1][b+i][1] == "l": 
                         if b+i<0:
                             continue
                         else:moves.append(Move((r, c), (r-1, b+i), self.board))
                         
              for i in range(f):
-                    if self.board[r][b+i] == "  " or self.board[r][b+i][1] == "l" and  self.board[r][b+i][0] != "k":
+                    if self.board[r][b+i] == "  " or self.board[r][b+i][1] == "l":
                         if b+i<0:
                             continue
                         else:moves.append(Move((r, c), (r, b+i), self.board)) 
                         
              if r != 7:
                for i in range(f):
-                    if self.board[r+1][b+i] == "  " or self.board[r+1][b+i][1] == "l" and  self.board[r+1][b+i][0] != "k":
+                    if self.board[r+1][b+i] == "  " or self.board[r+1][b+i][1] == "l":
                         if b+i<0:
                             continue
                         else:moves.append(Move((r, c), (r+1, b+i), self.board)) 
