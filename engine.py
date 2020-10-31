@@ -9,16 +9,12 @@ class Game_state():
 			The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
 			i.e a list of lists. Each element of the Matrix is a string of two characters 
 			representing the chess pieces in the order "type" + "colour"
-
 			light pawn = pl
 			dark pawn  = pd
-
 			light knight = nl
 			dark knight  = nd
 			e.t.c
-
 			empty board square = "  " ---> double empty space
-
 		"""
 
 		self.board = [
@@ -52,24 +48,79 @@ class Game_state():
 			return parameter(s):
 			None
 		"""
+		
+		def pawn_attack(pawn_type):
+			"""
+			The pawn attack in diagonal position against opponent piece
+	
+			"""
+			if pawn_type == 'l':
+				if c == 0 and self.board[r-1][c+1][1] == 'd':
+					return moves.append(Move((r, c), (r-1,c+1), self.board))			
+				elif c == 7 and self.board[r-1][c-1][1] == 'd':
+					return moves.append(Move((r, c), (r-1,c-1), self.board))
+				elif c not in [0,7]:
+					for i in range(-1, 2, 2):  # loops twice so j == -1 or 1 
+						if self.board[r - 1][c + i][1] == "d":  # if there's a dark piece is diagonal to it
+							return moves.append(Move((r, c), (r-1, c+i), self.board))  # create  move object and append to list
+					
+			elif pawn_type == 'd':
+				if c == 0 and self.board[r+1][c+1][1] == 'l':
+					return moves.append(Move((r, c), (r+1, c+1), self.board))
+				elif c == 7 and self.board[r+1][c-1][1] == 'l':
+					return moves.append(Move((r, c), (r+1, c-1), self.board))
+				elif c not in [0,7]:
+					for i in range(-1, 2, 2):  # loops twice so j == -1 or 1 
+						if self.board[r+1][c+i][1] == 'l':  # if there's a dark piece is diagonal to it
+							return moves.append(Move((r, c), (r+1, c+i), self.board))  # create  move object and append to list			
+			
 
 		## FIX
 		if self.light_to_move: # if it's light's turn to move
 			
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+					# first move
+					if r == 6:
+						for k in range(1,3):
+							if self.board[r-k][c] != "  ": #if it is blocked
+								pawn_attack('l')
+								break
+							else:
+								moves.append(Move((r, c), (r-k, c), self.board)) 
+								pawn_attack('l')
 
-		
+					# subsequent move			
+					else:
+						if self.board[r-1][c] != "  ": # if blocked
+							pawn_attack('l')
+							break
+						else:
+							moves.append(Move((r, c), (r-1, c), self.board))
+							pawn_attack('l')
 
 		##FIX
 		else: # if it's dark's turn to move
 
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
+					# first move
+					if r == 1:
+						for k in range(1,3):
+							if self.board[r+k][c] != "  ": # if blocked
+								pawn_attack('d')
+								break
+							else:
+								moves.append(Move((r, c), (r+k, c), self.board))
+								pawn_attack('d')	
+					# subsequent move			
+					else:
+						if self.board[r+1][c] != "  ": # if blocked
+							pawn_attack('d')
+							break
+						else:
+							moves.append(Move((r, c), (r+1, c), self.board))
+							pawn_attack('d')
  
 
 	def get_bishop_moves(self, r, c, moves):
@@ -77,12 +128,10 @@ class Game_state():
  		"""
 			calculates all possible bishop moves for a given colour (light or dark)
 			and appends them to a list
-
 			input parameters:
 			r     --> starting row (int)
 			c     --> starting column (int)
 			moves --> posiible moves container (list)
-
 			return parameter(s):
 			None
  		"""
@@ -175,7 +224,6 @@ class Move():
 		"""
 			A Move class abstracting all parameters needed
 			for moving chess pieces on the board
-
 			input parameter(s):
 			start_sq --> (row, column) of piece to be moved (tuple)
 			end_square --> (row, column) of move destination on the board (tuple)
@@ -191,10 +239,8 @@ class Move():
 	def get_chess_notation(self):
 		"""
 			creates a live commentary of pieces moved on the chess board during a game
-
 			input parameter(s):
 			None
-
 			return parameter(s)
 			commentary (string)
 		"""
@@ -206,11 +252,9 @@ class Move():
 	def get_rank_file(self, r, c):
 		"""
 			calls cols_to_file and rows_to_rank attributes
-
 			input parameter(s):
 			r --> row to be converted to rank (int)
 			c --> column to be converted to file (int)
-
 			return parameter(s):
 			"file" + "rank" (str)
 		"""
@@ -241,5 +285,3 @@ class Move():
 			operator overloading for printing Move objects
 		"""
 		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
-
-
