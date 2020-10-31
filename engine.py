@@ -125,7 +125,7 @@ class Game_state():
  		"""
  		##TODO
 		rows = (r-1, r, r+1)
-		columns = (c+1, c, c-1)
+		columns = (c-1, c, c+1)
 		if self.light_to_move: # if it's light's turn to move
 			available_squares = (" ", "d") #if square is empty or has a dark piece
 			for i in range(len(self.board)):
