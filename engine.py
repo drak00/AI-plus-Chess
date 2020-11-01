@@ -142,6 +142,17 @@ class Game_state():
 					and (self.board[i][j][1] in available_squares) ):
 
 					moves.append(Move((r, c), square, self.board)) # create a move object and append to list
+		
+
+		else: #if it's dark's turn to move
+			available_squares = (" ", "l") #squares the knight can move to
+
+			for square in squares:
+				i,j = square
+				if ( (0 <= i < len(self.board)) and (0 <= j < len(self.board))
+					and (self.board[i][j][1] in available_squares) ):
+
+					moves.append(Move((r, c), square, self.board)) # create a move object and append to list
 
 
 
