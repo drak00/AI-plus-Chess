@@ -19,14 +19,14 @@ class Game_state():
 
 		self.board = [
 
-			["bd", "nd", "rd", "qd", "kd", "rd", "nd", "bd"],
+			["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
 			["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
-			["bl", "nl", "rl", "ql", "kl", "rl", "nl", "bl"]]
+			["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"]]
 
 		self.light_to_move = True  # True = light's turn to play; False = dark's turn to play
 		self.move_log = []  # keeps a log of all moves made withing a game
@@ -34,6 +34,8 @@ class Game_state():
 						   "q": self.get_queen_moves, "k": self.get_king_moves, \
 						   "b": self.get_bishop_moves, "n": self.get_knight_moves}
 
+
+		
 	def get_pawn_moves(self, r, c, moves):
 		"""
 			Calculates all possible pawn moves for a given color (light or dark)
@@ -45,6 +47,8 @@ class Game_state():
 			return parameter(s):
 			None
 		"""
+		## FIX
+
 		if self.light_to_move: # if it's light's turn to move
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
@@ -59,24 +63,51 @@ class Game_state():
 						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
  
 	def get_bishop_moves(self, r, c, moves):
-
 		"""
-		   calculates all possible bishop moves for a given colour (light or dark)
-		   and appends them to a list
-		   input parameters:
-		   r     --> starting row (int)
-		   c     --> starting column (int)
-		   moves --> possible moves container (list)
-		   return parameter(s):
-		   None
-		"""
-
+			calculates all possible bishop moves for a given colour (light or dark)
+			and appends them to a list
+			input parameters:
+			r     --> starting row (int)
+			c     --> starting column (int)
+			moves --> posiible moves container (list)
+			return parameter(s):
+			None"""
 		##TODO
-		pass
-
-	def get_knight_moves(self, r, c, moves):
-		##TODO
-		pass
+		
+		if self.light_to_move:
+			direction = ((-1,-1),(-1,1),(1,-1),(1,1)) #4 directions
+			for d in direction:
+				for i in range(1, len(self.board)): #move bishop within the board
+					row = r + d[0] * i
+					col = c + d[1] * i
+					if 0 <= row < len(self.board) and 0 <= col < len(self.board): #check if it still on the board
+						endPiece = self.board[row][col]
+						if endPiece == "  ":#check to see if empty
+							moves.append(Move((r,c), (row, col), self.board))
+						elif endPiece[1] == "d":
+							moves.append(Move((r,c), (row, col), self.board))
+							break
+						else:
+							break
+					else:#outside board
+						break
+		else:
+			direction = ((1,-1),(1,1),(-1,-1),(-1,1)) #4 directions
+			for d in direction:
+				for i in range(1, len(self.board)): #move bishop within the board
+					row = r + d[0] * i
+					col = c + d[1] * i
+					if 0 <= row < len(self.board) and 0 <= col < len(self.board): #check if it still on the board
+						endPiece = self.board[row][col]
+						if endPiece == "  ":#check to see if empty
+							moves.append(Move((r,c), (row, col), self.board))
+						elif endPiece[1] == "l":
+							moves.append(Move((r,c), (row, col), self.board))
+							break
+						else:
+							break
+					else:#outside board
+						break
 
 	def get_king_moves(self, r, c, moves):
 
@@ -258,5 +289,5 @@ class Move():
 		"""
 			operator overloading for printing Move objects
 		"""
-		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
 
+		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
