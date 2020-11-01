@@ -19,14 +19,14 @@ class Game_state():
 
         self.board = [
 
-            ["rd", "nd", "bd", "qd", "kd", "bd", "nd", "pl"],
-            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-            ["pd", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-            ["  ", "  ", "pd", "  ", "  ", "  ", "  ", "  "],
-            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "pd"],
-            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "pl"],
-            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-            ["rl", "nl", "pd", "ql", "pd", "bl", "pd", "rl"]]
+            ["bd", "nd", "rd", "qd", "kd", "rd", "nd", "bd"],
+			["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
+			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+			["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
+			["bl", "nl", "rl", "ql", "kl", "rl", "nl", "bl"]]
 
         self.light_to_move = True  # True = light's turn to play; False = dark's turn to play
         self.move_log = []  # keeps a log of all moves made withing a game
@@ -45,6 +45,19 @@ class Game_state():
             return parameter(s):
             None
         """
+        if self.light_to_move: # if it's light's turn to move
+            for i in range(len(self.board)):
+                for j in range(len(self.board[i])):
+                    if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+
+		##FIX
+        else: # if it's dark's turn to move
+            for i in range(len(self.board)):
+                for j in range(len(self.board[i])):
+                    if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
+                        moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
+ 
     def get_bishop_moves(self, r, c, moves):
 
         """
