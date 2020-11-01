@@ -59,75 +59,73 @@ class Game_state():
 	
 			"""
 			if pawn_type == 'l':
-				if c == 0 and self.board[r-1][c+1][1] == 'd':
-					return moves.append(Move((r, c), (r-1,c+1), self.board))			
-				elif c == 7 and self.board[r-1][c-1][1] == 'd':
-					return moves.append(Move((r, c), (r-1,c-1), self.board))
-				elif c not in [0,7]:
-					for i in range(-1, 2, 2):  # loops twice so j == -1 or 1 
-						if self.board[r - 1][c + i][1] == "d":  # if there's a dark piece is diagonal to it
-							return moves.append(Move((r, c), (r-1, c+i), self.board))  # create  move object and append to list
+				if r != 0:
+					if c == 0 and self.board[r-1][c+1][1] == 'd':
+						moves.append(Move((r, c), (r-1,c+1), self.board))			
+					elif c == 7 and self.board[r-1][c-1][1] == 'd':
+						moves.append(Move((r, c), (r-1,c-1), self.board))
+					elif c not in [0,7]:
+						for i in range(-1, 2, 2):  # loops twice so j == -1 or 1
+							if self.board[r-1][c+i][1] == "d":  # if there's a dark piece is diagonal to it
+								moves.append(Move((r, c), (r-1, c+i), self.board))  # create  move object and append to list
+					
 					
 			elif pawn_type == 'd':
-				if c == 0 and self.board[r+1][c+1][1] == 'l':
-					return moves.append(Move((r, c), (r+1, c+1), self.board))
-				elif c == 7 and self.board[r+1][c-1][1] == 'l':
-					return moves.append(Move((r, c), (r+1, c-1), self.board))
-				elif c not in [0,7]:
-					for i in range(-1, 2, 2):  # loops twice so j == -1 or 1 
-						if self.board[r+1][c+i][1] == 'l':  # if there's a dark piece is diagonal to it
-							return moves.append(Move((r, c), (r+1, c+i), self.board))  # create  move object and append to list			
+				if r != 7:
+					if c == 0 and self.board[r+1][c+1][1] == 'l':
+						moves.append(Move((r, c), (r+1, c+1), self.board))
+					elif c == 7 and self.board[r+1][c-1][1] == 'l':
+						moves.append(Move((r, c), (r+1, c-1), self.board))
+					elif c not in [0,7]:
+						for i in range(-1, 2, 2):  # loops twice so j == -1 or 1
+							if self.board[r+1][c+i][1] == "l":  # if there's a dark piece is diagonal to it
+								moves.append(Move((r, c), (r+1, c+i), self.board))  # create  move object and append to list
+
 			
 
 		## FIX
 		if self.light_to_move: # if it's light's turn to move
 			
-			for i in range(len(self.board)):
-				for j in range(len(self.board[i])):
-					# first move
-					if r == 6:
-						for k in range(1,3):
-							if self.board[r-k][c] != "  ": # if blocked
-								pawn_attack('l')
-								break
-							else:
-								moves.append(Move((r, c), (r-k, c), self.board))
-								pawn_attack('l')
-
-					# subsequent move			
+			# first move
+			if r == 6:
+				for k in range(1,3):
+					if self.board[r-k][c] != "  ": # if blocked
+						pawn_attack('l')
+						break
 					else:
-						if self.board[r-1][c] != "  ": #if blocked
-							pawn_attack('l')
-							break
-						else:
-							moves.append(Move((r, c), (r-1, c), self.board))
-							pawn_attack('l')
+						moves.append(Move((r, c), (r-k, c), self.board))
+						pawn_attack('l')
+
+			# subsequent move			
+			else:
+				if self.board[r-1][c] != "  ": #if blocked
+					pawn_attack('l')
+				else:
+					moves.append(Move((r, c), (r-1, c), self.board))
+					pawn_attack('l')
 
 		##FIX
 		else: # if it's dark's turn to move
 
-			for i in range(len(self.board)):
-				for j in range(len(self.board[i])):
-					# first move
-					if r == 1:
-						for k in range(1,3):
-							if self.board[r+k][c] != "  ": # if blocked
-								pawn_attack('d')
-								break
-							else:
-								moves.append(Move((r, c), (r+k, c), self.board))
-								pawn_attack('d')
-
-					# subsequent move			
+			# first move
+			if r == 1:
+				for k in range(1,3):
+					if self.board[r+k][c] != "  ": # if blocked
+						pawn_attack('d')
+						break
 					else:
-						if r == 7:
-							break
-						if self.board[r+1][c] != "  ": # if blocked
-							pawn_attack('d')
-							break
-						else:
-							moves.append(Move((r, c), (r+1, c), self.board))
-							pawn_attack('d')
+						moves.append(Move((r, c), (r+k, c), self.board))
+						pawn_attack('d')
+
+			# subsequent move			
+			else:
+				if r == 7:
+					pass
+				elif self.board[r+1][c] != "  ": # if blocked
+					pawn_attack('d')
+				else:
+					moves.append(Move((r, c), (r+1, c), self.board))
+					pawn_attack('d')
  
 
 	def get_bishop_moves(self, r, c, moves):
