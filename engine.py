@@ -114,8 +114,35 @@ class Game_state():
 
 
 	def get_knight_moves(self, r, c, moves):
- 		##TODO
- 		pass
+
+		"""
+			calculates all possible knight moves for a given colour (light or dark)
+			and appends them to a list
+
+			input parameters:
+			r     --> starting row (int)
+			c     --> starting column (int)
+			moves --> posiible moves container (list)
+
+			return parameter(s):
+			None
+		"""
+		#possible squares for knight move
+		squares = (
+			(r+2,c+1), (r+2,c-1), (r-2,c+1), (r-2,c-1),
+			(r+1,c+2), (r+1,c-2), (r-1,c+2), (r-1,c-2)
+		)
+
+		if self.light_to_move: # if it's light's turn to move
+			available_squares = (" ", "d") #squares the knight can move to
+
+			for square in squares:
+				i,j = square
+				if ( (0 <= i < len(self.board)) and (0 <= j < len(self.board))
+					and (self.board[i][j][1] in available_squares) ):
+
+					moves.append(Move((r, c), square, self.board)) # create a move object and append to list
+
 
 
 	def get_king_moves(self, r, c, moves):
