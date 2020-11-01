@@ -13,9 +13,7 @@ class Game_state():
             light pawn = pl
             dark pawn  = pd
 
-            light knight = nl
-            dark knight  = nd
-            e.t.c
+
 
             empty board square = "  " ---> double empty space
 
@@ -37,9 +35,10 @@ class Game_state():
         self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
                         "q":self.get_queen_moves, "k":self.get_king_moves, \
                         "b":self.get_bishop_moves, "n":self.get_knight_moves}
-
-
+                        
+    
     def get_pawn_moves(self, r, c, moves):
+    
         """
             Calculates all possible pawn moves for a given color (light or dark)
             and appends them to a list
@@ -138,10 +137,8 @@ class Game_state():
          """
          direction = (-1, 1) # possible direction
          
-         if self.light_to_move:
+         if self.light_to_move: # if it's light's turn to move
             
-
-            # if it's light's turn to move
             for d in direction:
                 #rows
                 for i in range(1,len(self.board)):
