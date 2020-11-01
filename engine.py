@@ -59,7 +59,7 @@ class Game_state():
 			for i in range(len(self.board)):
 				for j in range(len(self.board[i])):
 					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
 
 
 
@@ -70,6 +70,7 @@ class Game_state():
 				for j in range(len(self.board[i])):
 					if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
 						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
+
 
 
 	def get_bishop_moves(self, r, c, moves):
@@ -88,49 +89,39 @@ class Game_state():
 		"""
 
 		##TODO
-		direction = ((-1,-1), (1,1), (1,-1), (-1,1)) # possible  Bishop direction
-		if self.light_to_move: # light piece turn to move
-			for d in direction:
-				for i in range(1,len(self.board)):
-					rownum = r + d[0] * i
-					colnum = c + d[1] * i
-					if (0 <= rownum < len(self.board)) and (0 <= colnum < len(self.board)): # making sure r and c on board
-						if self.board[rownum][colnum] == "  ": # if square is empty
-							moves.append(Move((r,c), (rownum,colnum), (self.board)))
-						elif self.board[rownum][colnum][1] == "d": # if square has opponent piece
-							moves.append(Move((r,c), (rownum,colnum), (self.board)))
-							break
-						else:
-							break # when ally piece encountered
-					else:
-						break # when off the board
-
-
-		else: # Dark piece turn to move
-			for d in direction:
-				for i in range(1,len(self.board)):
-					rownum = r + d[0] * i
-					colnum = c + d[1] * i
-					if (0 <= rownum < len(self.board)) and (0 <= colnum < len(self.board)): # making sure r and c on board
-						if self.board[rownum][colnum] == "  ": # if square is empty
-							moves.append(Move((r,c), (rownum,colnum), (self.board)))
-						elif self.board[rownum][colnum][1] == "l": # if square has opponent piece
-							moves.append(Move((r,c), (rownum,colnum), (self.board)))
-							break
-						else:
-							break # when ally piece encountered
-					else:
-						break # when off the board
+		pass
 
 	def get_knight_moves(self, r, c, moves):
  		##TODO
- 		pass
+	    pass
 
 
 	def get_king_moves(self, r, c, moves):
- 		##TODO
- 		pass
+		"""
+			calculates all possible king moves for a given colour (light or dark)
+			and appends them to a list
 
+			input parameters:
+			r     --> starting row (int)
+			c     --> starting column (int)
+			moves --> posiible moves container (list)
+
+			return parameter(s):
+			None
+ 		"""
+		##TODO
+		king_directions = ((-1, -1), (-1, 0),(-1, 1),(0, -1),(0, 1),(1, -1),(1, 0),(1, 1)) # all the possible directions a king piece can move
+		if self.light_to_move: # light piece's turn to move
+			friend_piece ="l" 
+		else: #dark piece's turn to move
+			friend_piece = "d"
+		for i in range(8):
+			row = r + king_directions[i][0]
+			column = c +  king_directions[i][1]
+			if 0<= row < 8 and 0 <= column < 8:
+				last_piece = self.board[row][column]
+				if last_piece[1] != friend_piece: 
+					moves.append(Move((r,c), (row, column), self.board))
 
 	def get_rook_moves(self, r, c, moves):
  		##TODO
