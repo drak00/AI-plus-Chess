@@ -53,8 +53,6 @@ class Game_state():
 			None
 		"""
 
-		board_size = len(self.board)
-
 		## FIX
 		if self.light_to_move: # if it's light's turn to move
 			
@@ -71,7 +69,7 @@ class Game_state():
 				moves.append(Move((r, c), (r-1, c-1), self.board)) # create a move object and append to list
 			
 			# if square on pawn's right diagonal has an opponent piece
-			if ((r-1 >= 0) and (c+1 < board_size)) and (self.board[r-1][c+1][1] == "d"):
+			if ((r-1 >= 0) and (c+1 < len(self.board))) and (self.board[r-1][c+1][1] == "d"):
 				moves.append(Move((r, c), (r-1, c+1), self.board)) # create a move object and append to list
 
 
@@ -83,15 +81,15 @@ class Game_state():
 				moves.append(Move((r, c), (r+2, c), self.board)) # create a move object and append to list
 			
 			# if square is empty and in front of pawn
-			if (r+1 < board_size) and (self.board[r+1][c] == "  "):
+			if (r+1 < len(self.board)) and (self.board[r+1][c] == "  "):
 				moves.append(Move((r, c), (r+1, c), self.board)) # create a move object and append to list
 			
 			# if square on pawn's left diagonal has an opponent piece
-			if ((r+1 < board_size) and (c-1 >= 0)) and (self.board[r+1][c-1][1] == "l"):
+			if ((r+1 < len(self.board)) and (c-1 >= 0)) and (self.board[r+1][c-1][1] == "l"):
 				moves.append(Move((r, c), (r+1, c-1), self.board)) # create a move object and append to list
 			
 			# if square on pawn's right diagonal has an opponent piece
-			if ((r+1 < board_size) and (c+1 < board_size)) and (self.board[r+1][c+1][1] == "l"):
+			if ((r+1 < len(self.board)) and (c+1 < len(self.board))) and (self.board[r+1][c+1][1] == "l"):
 				moves.append(Move((r, c), (r+1, c+1), self.board)) # create a move object and append to list
 
 
