@@ -205,11 +205,7 @@ def animate(move, screen, board, clock):
 		r, c = ((move.start_row + dr*frame/frame_count, move.start_col + dc*frame/frame_count))
 
 		# play sound 
-<<<<<<< HEAD
-		if not sound_played and ((abs(move.end_row - r) + abs(move.end_col - c))/max((move.end_row+move.end_col+0.01), (r+c+0.01))) < 0.4:
-=======
 		if not sound_played and ((abs(move.end_row - r) + abs(move.end_col - c))/max(abs(move.end_row+move.end_col + 0.01), abs(r+c + 0.01))) < 0.4:
->>>>>>> 6557486f6de89b66e5b86c5664758b2f503cd125
 			play_sound(move)
 			sound_played = True
 
