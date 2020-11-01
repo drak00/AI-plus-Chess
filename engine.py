@@ -226,8 +226,8 @@ class Game_state():
         return moves, turn
 
 
-
 class Move():
+
 
     # map ranks to rows
     ranks_to_rows = {"1":7, "2":6, "3":5, "4":4,
@@ -313,5 +313,4 @@ class Move():
             operator overloading for printing Move objects
         """
         return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
-
 
