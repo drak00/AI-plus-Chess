@@ -9,16 +9,12 @@ class Game_state():
 			The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
 			i.e a list of lists. Each element of the Matrix is a string of two characters 
 			representing the chess pieces in the order "type" + "colour"
-
 			light pawn = pl
 			dark pawn  = pd
-
 			light knight = nl
 			dark knight  = nd
 			e.t.c
-
 			empty board square = "  " ---> double empty space
-
 		"""
 
 		self.board = [
@@ -39,20 +35,18 @@ class Game_state():
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
 
 
+
+		
 	def get_pawn_moves(self, r, c, moves):
 		"""
 			Calculates all possible pawn moves for a given color (light or dark)
 			and appends them to a list
-
 			input parameter(s):
 			r     --> starting row (int)
 			c     --> starting colum (int)
 			moves --> possible moves container (list)
-
 			return parameter(s):
-			None
-		"""
-
+			None"""
 		## FIX
 		if self.light_to_move: # if it's light's turn to move
 			
@@ -73,22 +67,53 @@ class Game_state():
  
 
 	def get_bishop_moves(self, r, c, moves):
-
- 		"""
+		"""
 			calculates all possible bishop moves for a given colour (light or dark)
 			and appends them to a list
-
 			input parameters:
 			r     --> starting row (int)
 			c     --> starting column (int)
 			moves --> posiible moves container (list)
-
 			return parameter(s):
-			None
- 		"""
+			None"""
+		##TODO
+		
+		if self.light_to_move:
+			direction = ((-1,-1),(-1,1),(1,-1),(1,1)) #4 directions
+			for d in direction:
+				for i in range(1, len(self.board)): #move bishop within the board
+					row = r + d[0] * i
+					col = c + d[1] * i
+					if 0 <= row < len(self.board) and 0 <= col < len(self.board): #check if it still on the board
+						endPiece = self.board[row][col]
+						if endPiece == "  ":#check to see if empty
+							moves.append(Move((r,c), (row, col), self.board))
+						elif endPiece[1] == "d":
+							moves.append(Move((r,c), (row, col), self.board))
+							break
+						else:
+							break
+					else:#outside board
+						break
+		else:
+			direction = ((1,-1),(1,1),(-1,-1),(-1,1)) #4 directions
+			for d in direction:
+				for i in range(1, len(self.board)): #move bishop within the board
+					row = r + d[0] * i
+					col = c + d[1] * i
+					if 0 <= row < len(self.board) and 0 <= col < len(self.board): #check if it still on the board
+						endPiece = self.board[row][col]
+						if endPiece == "  ":#check to see if empty
+							moves.append(Move((r,c), (row, col), self.board))
+						elif endPiece[1] == "l":
+							moves.append(Move((r,c), (row, col), self.board))
+							break
+						else:
+							break
+					else:#outside board
+						break
 
- 		##TODO
- 		pass
+ 		
 
 
 	def get_knight_moves(self, r, c, moves):
@@ -175,7 +200,6 @@ class Move():
 		"""
 			A Move class abstracting all parameters needed
 			for moving chess pieces on the board
-
 			input parameter(s):
 			start_sq --> (row, column) of piece to be moved (tuple)
 			end_square --> (row, column) of move destination on the board (tuple)
@@ -191,10 +215,8 @@ class Move():
 	def get_chess_notation(self):
 		"""
 			creates a live commentary of pieces moved on the chess board during a game
-
 			input parameter(s):
 			None
-
 			return parameter(s)
 			commentary (string)
 		"""
@@ -206,11 +228,9 @@ class Move():
 	def get_rank_file(self, r, c):
 		"""
 			calls cols_to_file and rows_to_rank attributes
-
 			input parameter(s):
 			r --> row to be converted to rank (int)
 			c --> column to be converted to file (int)
-
 			return parameter(s):
 			"file" + "rank" (str)
 		"""
@@ -241,5 +261,3 @@ class Move():
 			operator overloading for printing Move objects
 		"""
 		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
-
-
