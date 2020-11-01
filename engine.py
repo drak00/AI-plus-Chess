@@ -53,41 +53,47 @@ class Game_state():
 			None
 		"""
 
+		board_size = len(self.board)
+
 		## FIX
 		if self.light_to_move: # if it's light's turn to move
 			
-			for i in range(len(self.board)):
-				for j in range(len(self.board[i])):
-					# if square is empty and in front of pawn and it is the pawn's first move
-					if ((i == r-2) and (j == c) ) and (r == 6) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
-					
-					# if square is empty and in front of pawn
-					if ((i == r-1) and (j == c) ) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
-					
-					# if square is diagonal to pawn and has an opponent piece
-					if ((i == r-1) and (j == c+1 or j == c-1) and (self.board[i][j][1] == "d")):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+			# if square is empty and in front of pawn and it is the pawn's first move
+			if (r == 6) and (self.board[r-2][c] == "  "):
+				moves.append(Move((r, c), (r-2, c), self.board)) # create a move object and append to list
+			
+			# if square is empty and in front of pawn
+			if (r-1 >= 0) and (self.board[r-1][c] == "  "):
+				moves.append(Move((r, c), (r-1, c), self.board)) # create a move object and append to list
+			
+			# if square on pawn's left diagonal has an opponent piece
+			if ((r-1 >= 0) and (c-1 >= 0)) and (self.board[r-1][c-1][1] == "d"):
+				moves.append(Move((r, c), (r-1, c-1), self.board)) # create a move object and append to list
+			
+			# if square on pawn's right diagonal has an opponent piece
+			if ((r-1 >= 0) and (c+1 < board_size)) and (self.board[r-1][c+1][1] == "d"):
+				moves.append(Move((r, c), (r-1, c+1), self.board)) # create a move object and append to list
 
-		
 
 		##FIX
 		else: # if it's dark's turn to move
 
-			for i in range(len(self.board)):
-				for j in range(len(self.board[i])):
-					# if square is empty and in front of pawn and it is the pawn's first move
-					if ((i == r+2) and (j == c) ) and (r == 1) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
-					
-					# if square is empty and in front of pawn
-					if ((i == r+1) and (j == c) ) and (self.board[i][j] == "  "):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
-					
-					# if square is diagonal to pawn and has an opponent piece
-					if ((i == r+1) and (j == c+1 or j == c-1) and (self.board[i][j][1] == "l")):
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+			# if square is empty and in front of pawn and it is the pawn's first move
+			if (r == 1) and (self.board[r+2][c] == "  "):
+				moves.append(Move((r, c), (r+2, c), self.board)) # create a move object and append to list
+			
+			# if square is empty and in front of pawn
+			if (r+1 < board_size) and (self.board[r+1][c] == "  "):
+				moves.append(Move((r, c), (r+1, c), self.board)) # create a move object and append to list
+			
+			# if square on pawn's left diagonal has an opponent piece
+			if ((r+1 < board_size) and (c-1 >= 0)) and (self.board[r+1][c-1][1] == "l"):
+				moves.append(Move((r, c), (r+1, c-1), self.board)) # create a move object and append to list
+			
+			# if square on pawn's right diagonal has an opponent piece
+			if ((r+1 < board_size) and (c+1 < board_size)) and (self.board[r+1][c+1][1] == "l"):
+				moves.append(Move((r, c), (r+1, c+1), self.board)) # create a move object and append to list
+
 
 
 	def get_bishop_moves(self, r, c, moves):
