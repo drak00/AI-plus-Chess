@@ -24,7 +24,7 @@ class Game_state():
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+			["  ", "  ", "bd", "  ", "bl", "  ", "  ", "  "],
 			["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
 			["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"]]
 
@@ -134,26 +134,42 @@ class Game_state():
 			return parameter(s):
 			None"""
 		##TODO
-		direction = ((-1,-1),(-1,1),(1,-1),(1,1)) #4 directions
+		
 		if self.light_to_move:
-			player = "l"
+			direction = ((-1,-1),(-1,1),(1,-1),(1,1)) #4 directions
+			for d in direction:
+				for i in range(1, len(self.board)): #move bishop within the board
+					row = r + d[0] * i
+					col = c + d[1] * i
+					if 0 <= row < len(self.board) and 0 <= col < len(self.board): #check if it still on the board
+						endPiece = self.board[row][col]
+						if endPiece == "  ":#check to see if empty
+							moves.append(Move((r,c), (row, col), self.board))
+						elif endPiece[1] == "d":
+							moves.append(Move((r,c), (row, col), self.board))
+							break
+						else:
+							break
+					else:#outside board
+						break
 		else:
-			player = "d"
-		for d in direction:
-			for i in range(1, len(self.board)): #move bishop within the board
-				row = r + d[0] * i
-				col = c + d[1] * i
-				if 0 <= row < len(self.board) and 0 <= col < len(self.board): #check if it still on the board
-					endPiece = self.board[row][col]
-					if endPiece == "  ":#check to see if empty
-						moves.append(Move((r,c), (row, col), self.board))
-					elif endPiece[0] == player:
-						moves.append(Move((r,c), (row, col), self.board))
+			direction = ((1,-1),(1,1),(-1,-1),(-1,1)) #4 directions
+			for d in direction:
+				for i in range(1, len(self.board)): #move bishop within the board
+					row = r + d[0] * i
+					col = c + d[1] * i
+					if 0 <= row < len(self.board) and 0 <= col < len(self.board): #check if it still on the board
+						endPiece = self.board[row][col]
+						if endPiece == "  ":#check to see if empty
+							moves.append(Move((r,c), (row, col), self.board))
+						elif endPiece[1] == "l":
+							moves.append(Move((r,c), (row, col), self.board))
+							break
+						else:
+							break
+					else:#outside board
 						break
-					else:
-						break
-				else:#outside board
-					break
+
  		
 
 
