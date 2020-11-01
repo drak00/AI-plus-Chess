@@ -23,14 +23,14 @@ class Game_state():
 
 		self.board = [
 
-			["bd", "nd", "rd", "qd", "kd", "rd", "nd", "bd"],
+			["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
 			["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
-			["bl", "nl", "rl", "ql", "kl", "rl", "nl", "bl"]]
+			["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"]]
 
 		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
 		self.move_log = []        # keeps a log of all moves made withing a game
@@ -107,8 +107,54 @@ class Game_state():
 
 
 	def get_queen_moves(self, r, c, moves):
-		##TODO
-		pass
+		"""
+			calculates all possible moves the queen for a given colour (light or dark)
+			and appends them to a list
+			input parameters:
+			r     --> starting row (int)
+			c     --> starting column (int)
+			moves --> possible moves container (list)
+			return parameter(s):
+			None
+ 		"""
+		# possible directions Queen can move
+		queen_moves = ((-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1))
+		# when light to move is True
+		if self.light_to_move: 
+			for mv in queen_moves:
+				for i in range(1,8):
+					new_row = (mv[0]*i) + r
+					new_col = (mv[1]*i) + c
+					# making sure new row and column positions are on the board
+					if (0 <= new_row < 8) and (0 <= new_col < 8): 
+						# If square is empty or has an opponent piece
+						if self.board[new_row][new_col] == "  " or self.board[new_row][new_col][1] == "d":
+							moves.append(Move((r,c), (new_row,new_col), (self.board)))
+						# if the square has your piece 
+						else:
+							break  
+					# When the new position is off the board
+					else:
+						break
+
+		# When it is dark to move
+		else:
+			# for each move in the range of possible moves
+			for mv in queen_moves:
+				for i in range(1,8):
+					new_row = (mv[0]*i) + r
+					new_col = (mv[1]*i) + c
+					# making sure new row and column positions are on the board
+					if (0 <= new_row < 8) and (0 <= new_col < 8):
+						# If square is empty or has an opponent piece
+						if self.board[new_row][new_col] == "  " or self.board[new_row][new_col][1] == "l":
+							moves.append(Move((r,c), (new_row,new_col), (self.board)))
+						# if the square has your piece 
+						else:
+							break  
+					# When the new position is off the board
+					else:
+						break
 
 
 	def make_move(self, move):
