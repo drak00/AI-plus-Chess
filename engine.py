@@ -93,19 +93,19 @@ class Game_state():
 
 	def get_bishop_moves(self, r, c, moves):
 
-			"""
-				calculates all possible bishop moves for a given colour (light or dark)
-				and appends them to a list
-				input parameters:
-				r     --> starting row (int)
-				c     --> starting column (int)
-				moves --> posiible moves container (list)
-				return parameter(s):
-				None
-			"""
+		"""
+			calculates all possible bishop moves for a given colour (light or dark)
+			and appends them to a list
+			input parameters:
+			r     --> starting row (int)
+			c     --> starting column (int)
+			moves --> posiible moves container (list)
+			return parameter(s):
+			None
+		"""
 
-			##TODO
-			pass
+		##TODO
+		pass
 
 
 	def get_knight_moves(self, r, c, moves):
@@ -148,7 +148,6 @@ class Game_state():
 					and (self.board[i][j][1] in available_squares) ):
 
 					moves.append(Move((r, c), square, self.board)) # create a move object and append to list
-
 
 
 	def get_king_moves(self, r, c, moves):
@@ -231,7 +230,6 @@ class Game_state():
 							break # when ally piece encountered
 					else:
 						break # when off the board
-
 
 
 	def get_queen_moves(self, r, c, moves):
@@ -376,4 +374,3 @@ class Move():
             operator overloading for printing Move objects
         """
         return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
-
