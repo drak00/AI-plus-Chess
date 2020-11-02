@@ -33,6 +33,7 @@ def main():
 	clock = pg.time.Clock()
 	#screen.fill(pg.Color("ghostwhite"))
 	screen.fill(pg.Color("brown4"))
+	#screen.fill(pg.Color("sienna"))
 
 
 	gs = Game_state()
@@ -204,7 +205,7 @@ def animate(move, screen, board, clock):
 		r, c = ((move.start_row + dr*frame/frame_count, move.start_col + dc*frame/frame_count))
 
 		# play sound 
-		if not sound_played and ((abs(move.end_row - r) + abs(move.end_col - c))/max((move.end_row+move.end_col + 0.01), (r+c + 0.01))) < 0.4:
+		if not sound_played and ((abs(move.end_row - r) + abs(move.end_col - c))/max((move.end_row+move.end_col+0.01), (r+c+0.01))) < 0.4:
 			play_sound(move)
 			sound_played = True
 

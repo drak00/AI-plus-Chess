@@ -72,10 +72,8 @@ class Game_state():
 			if ((r-1 >= 0) and (c+1 < len(self.board))) and (self.board[r-1][c+1][1] == "d"):
 				moves.append(Move((r, c), (r-1, c+1), self.board)) # create a move object and append to list
 
-
-		##FIX
 		else: # if it's dark's turn to move
-
+            
 			# if square is empty and in front of pawn and it is the pawn's first move
 			if (r == 1) and (self.board[r+2][c] == "  "):
 				moves.append(Move((r, c), (r+2, c), self.board)) # create a move object and append to list
@@ -93,24 +91,21 @@ class Game_state():
 				moves.append(Move((r, c), (r+1, c+1), self.board)) # create a move object and append to list
 
 
-
 	def get_bishop_moves(self, r, c, moves):
 
- 		"""
-			calculates all possible bishop moves for a given colour (light or dark)
-			and appends them to a list
+			"""
+				calculates all possible bishop moves for a given colour (light or dark)
+				and appends them to a list
+				input parameters:
+				r     --> starting row (int)
+				c     --> starting column (int)
+				moves --> posiible moves container (list)
+				return parameter(s):
+				None
+			"""
 
-			input parameters:
-			r     --> starting row (int)
-			c     --> starting column (int)
-			moves --> posiible moves container (list)
-
-			return parameter(s):
-			None
- 		"""
-
- 		##TODO
- 		pass
+			##TODO
+			pass
 
 
 	def get_knight_moves(self, r, c, moves):
@@ -162,8 +157,81 @@ class Game_state():
 
 
 	def get_rook_moves(self, r, c, moves):
- 		##TODO
- 		pass
+		
+		"""
+		calculates all possible rook moves for a given colour (light or dark)
+		and appends them to a list
+
+		input parameters:
+		r     --> starting row (int)
+		c     --> starting column (int)
+		moves --> posiible moves container (list)
+
+		return parameter(s):
+		None
+		"""
+		direction = (-1, 1) # possible direction
+		
+		if self.light_to_move: # if it's light's turn to move
+		
+			for d in direction:
+				#rows
+				for i in range(1,len(self.board)):
+					rownum = r + d*i
+					if (0 <= rownum < len(self.board)): # making sure row is on board
+						if self.board[rownum][c] == "  ": # if square is empty
+							moves.append(Move((r,c), (rownum,c), (self.board)))
+						elif self.board[rownum][c][1] == "d": # if square has opponent piece
+							moves.append(Move((r,c), (rownum,c), (self.board)))
+							break
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
+				#columns
+				for i in range(1,len(self.board)):
+					colnum = c + d*i
+					if (0 <= colnum < len(self.board)): # making sure column is on board
+						if self.board[r][colnum] == "  ": # if square is empty
+							moves.append(Move((r,c), (r,colnum), (self.board)))
+						elif self.board[r][colnum][1] == "d": # if square has opponent piece
+							moves.append(Move((r,c), (r,colnum), (self.board)))
+							break
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
+		
+		#if it's dark's turn to move
+		else: 
+			for d in direction:
+				#rows
+				for i in range(1,len(self.board)):
+					rownum = r + d*i
+					if (0 <= rownum < len(self.board)): # making sure row is on board
+						if self.board[rownum][c] == "  ": # if square is empty
+							moves.append(Move((r,c), (rownum,c), (self.board)))
+						elif self.board[rownum][c][1] == "l": # if square has opponent piece
+							moves.append(Move((r,c), (rownum,c), (self.board)))
+							break
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
+				#columns
+				for i in range(1,len(self.board)):
+					colnum = c + d*i
+					if (0 <= colnum < len(self.board)): # making sure column is on board
+						if self.board[r][colnum] == "  ": # if square is empty
+							moves.append(Move((r,c), (r,colnum), (self.board)))
+						elif self.board[r][colnum][1] == "l": # if square has opponent piece
+							moves.append(Move((r,c), (r,colnum), (self.board)))
+							break
+						else:
+							break # when ally piece encountered
+					else:
+						break # when off the board
+
 
 
 	def get_queen_moves(self, r, c, moves):
@@ -213,93 +281,99 @@ class Game_state():
 
 		return moves, turn
 
+		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
+		self.move_log = []        # keeps a log of all moves made withing a game
+		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
+						"q":self.get_queen_moves, "k":self.get_king_moves, \
+						"b":self.get_bishop_moves, "n":self.get_knight_moves}
+                        
 
 
 class Move():
 
-	# map ranks to rows
-	ranks_to_rows = {"1":7, "2":6, "3":5, "4":4,
-					"5":3, "6":2, "7":1, "8":0}
 
-	# map rows to ranks (revers of ranks to rows)
-	rows_to_ranks = {row:rank for rank, row in ranks_to_rows.items()}
+    # map ranks to rows
+    ranks_to_rows = {"1":7, "2":6, "3":5, "4":4,
+                    "5":3, "6":2, "7":1, "8":0}
 
-	# map files to columns 
-	files_to_cols = {"a":0, "b":1, "c":2, "d":3,
-					"e":4, "f":5, "g":6, "h":7}
+    # map rows to ranks (revers of ranks to rows)
+    rows_to_ranks = {row:rank for rank, row in ranks_to_rows.items()}
 
-	# map columns to files (revers of files to columns)
-	cols_to_files = {col:file for file, col in files_to_cols.items()} 
+    # map files to columns
+    files_to_cols = {"a":0, "b":1, "c":2, "d":3,
+                    "e":4, "f":5, "g":6, "h":7}
 
-	def __init__(self, start_sq, end_sq, board):
-		"""
-			A Move class abstracting all parameters needed
-			for moving chess pieces on the board
+    # map columns to files (revers of files to columns)
+    cols_to_files = {col:file for file, col in files_to_cols.items()}
 
-			input parameter(s):
-			start_sq --> (row, column) of piece to be moved (tuple)
-			end_square --> (row, column) of move destination on the board (tuple)
-			board --> board object referencing current state of the board (class Game_state) 
-		"""
-		self.start_row = start_sq[0] # row location of piece to be moved
-		self.start_col = start_sq[1] # column location of piece to be moved
-		self.end_row = end_sq[0] # intended row destination of piece to be moved 
-		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
-		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
-		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
+    def __init__(self, start_sq, end_sq, board):
+        """
+            A Move class abstracting all parameters needed
+            for moving chess pieces on the board
 
-	def get_chess_notation(self):
-		"""
-			creates a live commentary of pieces moved on the chess board during a game
+            input parameter(s):
+            start_sq --> (row, column) of piece to be moved (tuple)
+            end_square --> (row, column) of move destination on the board (tuple)
+            board --> board object referencing current state of the board (class Game_state)
+        """
+        self.start_row = start_sq[0] # row location of piece to be moved
+        self.start_col = start_sq[1] # column location of piece to be moved
+        self.end_row = end_sq[0] # intended row destination of piece to be moved
+        self.end_col = end_sq[1] # intended column destiantion of piece to e moved
+        self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
+        self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
 
-			input parameter(s):
-			None
+    def get_chess_notation(self):
+        """
+            creates a live commentary of pieces moved on the chess board during a game
 
-			return parameter(s)
-			commentary (string)
-		"""
-		return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
-			"(" + self.piece_captured[0].upper() + " captured!)" if self.piece_captured != "  " else self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
-			self.get_rank_file(self.end_row, self.end_col)
+            input parameter(s):
+            None
 
-
-	def get_rank_file(self, r, c):
-		"""
-			calls cols_to_file and rows_to_rank attributes
-
-			input parameter(s):
-			r --> row to be converted to rank (int)
-			c --> column to be converted to file (int)
-
-			return parameter(s):
-			"file" + "rank" (str)
-		"""
-		return self.cols_to_files[c] + self.rows_to_ranks[r]
+            return parameter(s)
+            commentary (string)
+        """
+        return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+            "(" + self.piece_captured[0].upper() + " captured!)" if self.piece_captured != "  " else self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
+            self.get_rank_file(self.end_row, self.end_col)
 
 
-	def __eq__(self, other):
-		"""
-			operator overloading for equating two move objects
-		"""
+    def get_rank_file(self, r, c):
+        """
+            calls cols_to_file and rows_to_rank attributes
 
-		if isinstance(other, Move): # if first (self) and second (other) parameters are both Move objects
-			return self.start_row == other.start_row and self.start_col == other.start_col and \
-					self.end_row == other.end_row and self.end_col == other.end_col
-		else:
-			return False
+            input parameter(s):
+            r --> row to be converted to rank (int)
+            c --> column to be converted to file (int)
 
-
-	def __ne__(self, other):
-		"""
-			"not equals to" --> conventional counterpart to __eq__
-		"""
-		return self.__eq__(other)
+            return parameter(s):
+            "file" + "rank" (str)
+        """
+        return self.cols_to_files[c] + self.rows_to_ranks[r]
 
 
-	def __str__(self):
-		"""
-			operator overloading for printing Move objects
-		"""
-		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
+    def __eq__(self, other):
+        """
+            operator overloading for equating two move objects
+        """
 
+        if isinstance(other, Move): # if first (self) and second (other) parameters are both Move objects
+            return self.start_row == other.start_row and self.start_col == other.start_col and \
+                    self.end_row == other.end_row and self.end_col == other.end_col
+        else:
+            return False
+
+
+    def __ne__(self, other):
+        """
+            "not equals to" --> conventional counterpart to __eq__
+        """
+        return self.__eq__(other)
+
+
+    def __str__(self):
+        """
+            operator overloading for printing Move objects
+        """
+        return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
 
