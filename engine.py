@@ -4,291 +4,328 @@
 
 class Game_state():
 	
-	def __init__(self):
-		"""
-			The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
-			i.e a list of lists. Each element of the Matrix is a string of two characters 
-			representing the chess pieces in the order "type" + "colour"
+    def __init__(self):
+        """
+            The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
+            i.e a list of lists. Each element of the Matrix is a string of two characters 
+            representing the chess pieces in the order "type" + "colour"
 
-			light pawn = pl
-			dark pawn  = pd
+            light pawn = pl
+            dark pawn  = pd
 
-			light knight = nl
-			dark knight  = nd
-			e.t.c
+            light knight = nl
+            dark knight  = nd
+            e.t.c
 
-			empty board square = "  " ---> double empty space
+            empty board square = "  " ---> double empty space
 
-		"""
+        """
 
-		self.board = [
+        self.board = [
 
-			["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
-			["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
-			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
-			["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
-			["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"]]
+            ["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
+            ["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
+            ["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"]]
 
-		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
-		self.move_log = []        # keeps a log of all moves made withing a game
-		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
-						"q":self.get_queen_moves, "k":self.get_king_moves, \
-						"b":self.get_bishop_moves, "n":self.get_knight_moves}
+        self.light_to_move = True # True = light's turn to play; False = dark's turn to play
+        self.move_log = []        # keeps a log of all moves made withing a game
+        self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
+                        "q":self.get_queen_moves, "k":self.get_king_moves, \
+                        "b":self.get_bishop_moves, "n":self.get_knight_moves}
 
 
-	def get_pawn_moves(self, r, c, moves):
-		"""
-			Calculates all possible pawn moves for a given color (light or dark)
-			and appends them to a list
+    def get_pawn_moves(self, r, c, moves):
+        """
+            Calculates all possible pawn moves for a given color (light or dark)
+            and appends them to a list
 
-			input parameter(s):
-			r     --> starting row (int)
-			c     --> starting colum (int)
-			moves --> possible moves container (list)
+            input parameter(s):
+            r     --> starting row (int)
+            c     --> starting colum (int)
+            moves --> possible moves container (list)
 
-			return parameter(s):
-			None
-		"""
+            return parameter(s):
+            None
+        """
 
-		## FIX
-		if self.light_to_move: # if it's light's turn to move
-			
-			# if square is empty and in front of pawn and it is the pawn's first move
-			if (r == 6) and (self.board[r-2][c] == "  "):
-				moves.append(Move((r, c), (r-2, c), self.board)) # create a move object and append to list
-			
-			# if square is empty and in front of pawn
-			if (r-1 >= 0) and (self.board[r-1][c] == "  "):
-				moves.append(Move((r, c), (r-1, c), self.board)) # create a move object and append to list
-			
-			# if square on pawn's left diagonal has an opponent piece
-			if ((r-1 >= 0) and (c-1 >= 0)) and (self.board[r-1][c-1][1] == "d"):
-				moves.append(Move((r, c), (r-1, c-1), self.board)) # create a move object and append to list
-			
-			# if square on pawn's right diagonal has an opponent piece
-			if ((r-1 >= 0) and (c+1 < len(self.board))) and (self.board[r-1][c+1][1] == "d"):
-				moves.append(Move((r, c), (r-1, c+1), self.board)) # create a move object and append to list
-
-		else: # if it's dark's turn to move
+        ## FIX
+        if self.light_to_move: # if it's light's turn to move
             
-			# if square is empty and in front of pawn and it is the pawn's first move
-			if (r == 1) and (self.board[r+2][c] == "  "):
-				moves.append(Move((r, c), (r+2, c), self.board)) # create a move object and append to list
-			
-			# if square is empty and in front of pawn
-			if (r+1 < len(self.board)) and (self.board[r+1][c] == "  "):
-				moves.append(Move((r, c), (r+1, c), self.board)) # create a move object and append to list
-			
-			# if square on pawn's left diagonal has an opponent piece
-			if ((r+1 < len(self.board)) and (c-1 >= 0)) and (self.board[r+1][c-1][1] == "l"):
-				moves.append(Move((r, c), (r+1, c-1), self.board)) # create a move object and append to list
-			
-			# if square on pawn's right diagonal has an opponent piece
-			if ((r+1 < len(self.board)) and (c+1 < len(self.board))) and (self.board[r+1][c+1][1] == "l"):
-				moves.append(Move((r, c), (r+1, c+1), self.board)) # create a move object and append to list
+            # if square is empty and in front of pawn and it is the pawn's first move
+            if (r == 6) and (self.board[r-2][c] == "  "):
+                moves.append(Move((r, c), (r-2, c), self.board)) # create a move object and append to list
+            
+            # if square is empty and in front of pawn
+            if (r-1 >= 0) and (self.board[r-1][c] == "  "):
+                moves.append(Move((r, c), (r-1, c), self.board)) # create a move object and append to list
+            
+            # if square on pawn's left diagonal has an opponent piece
+            if ((r-1 >= 0) and (c-1 >= 0)) and (self.board[r-1][c-1][1] == "d"):
+                moves.append(Move((r, c), (r-1, c-1), self.board)) # create a move object and append to list
+            
+            # if square on pawn's right diagonal has an opponent piece
+            if ((r-1 >= 0) and (c+1 < len(self.board))) and (self.board[r-1][c+1][1] == "d"):
+                moves.append(Move((r, c), (r-1, c+1), self.board)) # create a move object and append to list
+
+        else: # if it's dark's turn to move
+            
+            # if square is empty and in front of pawn and it is the pawn's first move
+            if (r == 1) and (self.board[r+2][c] == "  "):
+                moves.append(Move((r, c), (r+2, c), self.board)) # create a move object and append to list
+            
+            # if square is empty and in front of pawn
+            if (r+1 < len(self.board)) and (self.board[r+1][c] == "  "):
+                moves.append(Move((r, c), (r+1, c), self.board)) # create a move object and append to list
+            
+            # if square on pawn's left diagonal has an opponent piece
+            if ((r+1 < len(self.board)) and (c-1 >= 0)) and (self.board[r+1][c-1][1] == "l"):
+                moves.append(Move((r, c), (r+1, c-1), self.board)) # create a move object and append to list
+            
+            # if square on pawn's right diagonal has an opponent piece
+            if ((r+1 < len(self.board)) and (c+1 < len(self.board))) and (self.board[r+1][c+1][1] == "l"):
+                moves.append(Move((r, c), (r+1, c+1), self.board)) # create a move object and append to list
 
 
-	def get_bishop_moves(self, r, c, moves):
+    def get_bishop_moves(self, r, c, moves):
+        
+        """
+            calculates all possible bishop moves for a given colour (light or dark)
+            and appends them to a list
 
-		"""
-			calculates all possible bishop moves for a given colour (light or dark)
-			and appends them to a list
-			input parameters:
-			r     --> starting row (int)
-			c     --> starting column (int)
-			moves --> posiible moves container (list)
-			return parameter(s):
-			None
-		"""
+            input parameters:
+            r     --> starting row (int)
+            c     --> starting column (int)
+            moves --> posiible moves container (list)
 
-		##TODO
-		pass
-
-
-	def get_knight_moves(self, r, c, moves):
-
-		"""
-			calculates all possible knight moves for a given colour (light or dark)
-			and appends them to a list
-
-			input parameters:
-			r     --> starting row (int)
-			c     --> starting column (int)
-			moves --> posiible moves container (list)
-
-			return parameter(s):
-			None
-		"""
-		#possible squares for knight move
-		squares = (
-			(r+2,c+1), (r+2,c-1), (r-2,c+1), (r-2,c-1),
-			(r+1,c+2), (r+1,c-2), (r-1,c+2), (r-1,c-2)
-		)
-
-		if self.light_to_move: # if it's light's turn to move
-			available_squares = (" ", "d") #squares the knight can move to
-
-			for square in squares:
-				i,j = square
-				if ( (0 <= i < len(self.board)) and (0 <= j < len(self.board))
-					and (self.board[i][j][1] in available_squares) ):
-
-					moves.append(Move((r, c), square, self.board)) # create a move object and append to list
-		
-
-		else: #if it's dark's turn to move
-			available_squares = (" ", "l") #squares the knight can move to
-
-			for square in squares:
-				i,j = square
-				if ( (0 <= i < len(self.board)) and (0 <= j < len(self.board))
-					and (self.board[i][j][1] in available_squares) ):
-
-					moves.append(Move((r, c), square, self.board)) # create a move object and append to list
+            return parameter(s):
+            None
+        """
+        direction = ((-1, -1), (1, 1), (1, -1), (-1, 1))  # possible  Bishop direction
+        if self.light_to_move:  # light piece turn to move
+            for d in direction:
+                for i in range(1, len(self.board)):
+                    rownum = r + d[0] * i
+                    colnum = c + d[1] * i
+                    if (0 <= rownum < len(self.board)) and (
+                            0 <= colnum < len(self.board)):  # making sure r and c on board
+                        if self.board[rownum][colnum] == "  ":  # if square is empty
+                            moves.append(Move((r, c), (rownum, colnum), (self.board)))
+                        elif self.board[rownum][colnum][1] == "d":  # if square has opponent piece
+                            moves.append(Move((r, c), (rownum, colnum), (self.board)))
+                            break
+                        else:
+                            break  # when ally piece encountered
+                    else:
+                        break  # when off the board
+        else:  # Dark piece turn to move
+            for d in direction:
+                for i in range(1, len(self.board)):
+                    rownum = r + d[0] * i
+                    colnum = c + d[1] * i
+                    if (0 <= rownum < len(self.board)) and (
+                            0 <= colnum < len(self.board)):  # making sure r and c on board
+                        if self.board[rownum][colnum] == "  ":  # if square is empty
+                            moves.append(Move((r, c), (rownum, colnum), (self.board)))
+                        elif self.board[rownum][colnum][1] == "l":  # if square has opponent piece
+                            moves.append(Move((r, c), (rownum, colnum), (self.board)))
+                            break
+                        else:
+                            break  # when ally piece encountered
+                    else:
+                        break  # when off the board
 
 
-	def get_king_moves(self, r, c, moves):
- 		##TODO
- 		pass
+    def get_knight_moves(self, r, c, moves):
+
+        """
+            calculates all possible knight moves for a given colour (light or dark)
+            and appends them to a list
+
+            input parameters:
+            r     --> starting row (int)
+            c     --> starting column (int)
+            moves --> posiible moves container (list)
+
+            return parameter(s):
+            None
+        """
+        #possible squares for knight move
+        squares = (
+            (r+2,c+1), (r+2,c-1), (r-2,c+1), (r-2,c-1),
+            (r+1,c+2), (r+1,c-2), (r-1,c+2), (r-1,c-2)
+        )
+
+        if self.light_to_move: # if it's light's turn to move
+            available_squares = (" ", "d") #squares the knight can move to
+
+            for square in squares:
+                i,j = square
+                if ( (0 <= i < len(self.board)) and (0 <= j < len(self.board))
+                    and (self.board[i][j][1] in available_squares) ):
+
+                    moves.append(Move((r, c), square, self.board)) # create a move object and append to list
+        
+
+        else: #if it's dark's turn to move
+            available_squares = (" ", "l") #squares the knight can move to
+
+            for square in squares:
+                i,j = square
+                if ( (0 <= i < len(self.board)) and (0 <= j < len(self.board))
+                    and (self.board[i][j][1] in available_squares) ):
+
+                    moves.append(Move((r, c), square, self.board)) # create a move object and append to list
 
 
-	def get_rook_moves(self, r, c, moves):
-		
-		"""
-		calculates all possible rook moves for a given colour (light or dark)
-		and appends them to a list
+    def get_king_moves(self, r, c, moves):
+        ##TODO
+        pass
+            
 
-		input parameters:
-		r     --> starting row (int)
-		c     --> starting column (int)
-		moves --> posiible moves container (list)
+    def get_rook_moves(self, r, c, moves):
+        """
+            calculates all possible rook moves for a given colour (light or dark)
+            and appends them to a list
 
-		return parameter(s):
-		None
-		"""
-		direction = (-1, 1) # possible direction
-		
-		if self.light_to_move: # if it's light's turn to move
-		
-			for d in direction:
-				#rows
-				for i in range(1,len(self.board)):
-					rownum = r + d*i
-					if (0 <= rownum < len(self.board)): # making sure row is on board
-						if self.board[rownum][c] == "  ": # if square is empty
-							moves.append(Move((r,c), (rownum,c), (self.board)))
-						elif self.board[rownum][c][1] == "d": # if square has opponent piece
-							moves.append(Move((r,c), (rownum,c), (self.board)))
-							break
-						else:
-							break # when ally piece encountered
-					else:
-						break # when off the board
-				#columns
-				for i in range(1,len(self.board)):
-					colnum = c + d*i
-					if (0 <= colnum < len(self.board)): # making sure column is on board
-						if self.board[r][colnum] == "  ": # if square is empty
-							moves.append(Move((r,c), (r,colnum), (self.board)))
-						elif self.board[r][colnum][1] == "d": # if square has opponent piece
-							moves.append(Move((r,c), (r,colnum), (self.board)))
-							break
-						else:
-							break # when ally piece encountered
-					else:
-						break # when off the board
-		
-		#if it's dark's turn to move
-		else: 
-			for d in direction:
-				#rows
-				for i in range(1,len(self.board)):
-					rownum = r + d*i
-					if (0 <= rownum < len(self.board)): # making sure row is on board
-						if self.board[rownum][c] == "  ": # if square is empty
-							moves.append(Move((r,c), (rownum,c), (self.board)))
-						elif self.board[rownum][c][1] == "l": # if square has opponent piece
-							moves.append(Move((r,c), (rownum,c), (self.board)))
-							break
-						else:
-							break # when ally piece encountered
-					else:
-						break # when off the board
-				#columns
-				for i in range(1,len(self.board)):
-					colnum = c + d*i
-					if (0 <= colnum < len(self.board)): # making sure column is on board
-						if self.board[r][colnum] == "  ": # if square is empty
-							moves.append(Move((r,c), (r,colnum), (self.board)))
-						elif self.board[r][colnum][1] == "l": # if square has opponent piece
-							moves.append(Move((r,c), (r,colnum), (self.board)))
-							break
-						else:
-							break # when ally piece encountered
-					else:
-						break # when off the board
+            input parameters:
+            r     --> starting row (int)
+            c     --> starting column (int)
+            moves --> posiible moves container (list)
 
+            return parameter(s):
+            None
+         """
+        direction = (-1, 1) # possible direction
 
-	def get_queen_moves(self, r, c, moves):
-		##TODO
-		pass
+        if self.light_to_move: # if it's light's turn to move
 
+            for d in direction:
+                #rows
+                for i in range(1,len(self.board)):
+                    rownum = r + d*i
+                    if (0 <= rownum < len(self.board)): # making sure row is on board
+                        if self.board[rownum][c] == "  ": # if square is empty
+                            moves.append(Move((r,c), (rownum,c), (self.board)))
+                        elif self.board[rownum][c][1] == "d": # if square has opponent piece
+                            moves.append(Move((r,c), (rownum,c), (self.board)))
+                            break
+                        else:
+                            break # when ally piece encountered
+                    else:
+                        break # when off the board
+                #columns
+                for i in range(1,len(self.board)):
+                    colnum = c + d*i
+                    if (0 <= colnum < len(self.board)): # making sure column is on board
+                        if self.board[r][colnum] == "  ": # if square is empty
+                            moves.append(Move((r,c), (r,colnum), (self.board)))
+                        elif self.board[r][colnum][1] == "d": # if square has opponent piece
+                            moves.append(Move((r,c), (r,colnum), (self.board)))
+                            break
+                        else:
+                            break # when ally piece encountered
+                    else:
+                        break # when off the board
 
-	def make_move(self, move):
-		"""
-			moves pieces on the board
-		"""
-		self.board[move.start_row][move.start_col] = "  "
-		self.board[move.end_row][move.end_col] = move.piece_moved
-		self.move_log.append(move) # log move
-		self.light_to_move = not self.light_to_move # next player to move
+         #if it's dark's turn to move
+        else:
+            for d in direction:
+                #rows
+                for i in range(1,len(self.board)):
+                    rownum = r + d*i
+                    if (0 <= rownum < len(self.board)): # making sure row is on board
+                        if self.board[rownum][c] == "  ": # if square is empty
+                            moves.append(Move((r,c), (rownum,c), (self.board)))
+                        elif self.board[rownum][c][1] == "l": # if square has opponent piece
+                            moves.append(Move((r,c), (rownum,c), (self.board)))
+                            break
+                        else:
+                            break # when ally piece encountered
+                    else:
+                        break # when off the board
+                #columns
+                for i in range(1,len(self.board)):
+                    colnum = c + d*i
+                    if (0 <= colnum < len(self.board)): # making sure column is on board
+                        if self.board[r][colnum] == "  ": # if square is empty
+                            moves.append(Move((r,c), (r,colnum), (self.board)))
+                        elif self.board[r][colnum][1] == "l": # if square has opponent piece
+                            moves.append(Move((r,c), (r,colnum), (self.board)))
+                            break
+                        else:
+                            break # when ally piece encountered
+                    else:
+                        break # when off the board
 
 
-	def undo_move(self, look_ahead_mode = False):
-		"""
-			undoes last move
-		"""
-		if self.move_log:
-			last_move = self.move_log.pop()
-			self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
-			self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
-			self.light_to_move = not self.light_to_move
+    def get_queen_moves(self, r, c, moves):
+        """
+        Calculates all possible queen moves for a given color (light or dark)
+        based on bishop and rook moves.
 
-			print("undoing ->", last_move.get_chess_notation())
-		else:
-			print("All undone!")
+        input parameter(s):
+        r     --> starting row (int)
+        c     --> starting colum (int)
+        moves --> possible moves container (list)
+
+        return parameter(s):
+        None
+        """
+        ##TODO
+        self.get_bishop_moves(r, c, moves)
+        self.get_rook_moves(r, c, moves)
 
 
-	def get_valid_moves(self):
-		return self.get_possible_moves()
+    def make_move(self, move):
+        """
+            moves pieces on the board
+        """
+        self.board[move.start_row][move.start_col] = "  "
+        self.board[move.end_row][move.end_col] = move.piece_moved
+        self.move_log.append(move) # log move
+        self.light_to_move = not self.light_to_move # next player to move
 
 
-	def get_possible_moves(self):
+    def undo_move(self, look_ahead_mode = False):
+        """
+            undoes last move
+        """
+        if self.move_log:
+            last_move = self.move_log.pop()
+            self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
+            self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
+            self.light_to_move = not self.light_to_move
 
-		moves = []
+            print("undoing ->", last_move.get_chess_notation())
+        else:
+            print("All undone!")
 
-		turn = "l" if self.light_to_move else "d"
 
-		for i in range(len(self.board)):
-			for j in range(len(self.board[i])):
-				if self.board[i][j][1] == turn:
-					self.move_piece[self.board[i][j][0]](i, j, moves)
+    def get_valid_moves(self):
+        return self.get_possible_moves()
 
-		return moves, turn
 
-		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
-		self.move_log = []        # keeps a log of all moves made withing a game
-		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
-						"q":self.get_queen_moves, "k":self.get_king_moves, \
-						"b":self.get_bishop_moves, "n":self.get_knight_moves}
-                        
+    def get_possible_moves(self):
+
+        moves = []
+
+        turn = "l" if self.light_to_move else "d"
+
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j][1] == turn:
+                    self.move_piece[self.board[i][j][0]](i, j, moves)
+
+        return moves, turn
+
 
 
 class Move():
-
 
     # map ranks to rows
     ranks_to_rows = {"1":7, "2":6, "3":5, "4":4,
@@ -374,3 +411,5 @@ class Move():
             operator overloading for printing Move objects
         """
         return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
+
+
