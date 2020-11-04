@@ -53,28 +53,41 @@ class Game_state():
 			None
 		"""
 
-		## FIX
-		if self.light_to_move: # if it's light's turn to move
-			
-			for i in range(len(self.board)):
-				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "d": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), self.board)) # create a move object and append to list
+		if self.light_to_move: # light pawns
+			if r-1 >= 0 and self.board[r-1][c] == "  ": # one square advance
+				moves.append(Move((r, c), (r-1, c), self.board))
 
-		
+				if r == 6 and self.board[r-2][c] == "  ": # two square advance
+					moves.append(Move((r, c), (r-2, c), self.board))
 
-		##FIX
-		else: # if it's dark's turn to move
+			if c-1 >= 0: # left captures
+				if r-1 >=0 and self.board[r-1][c-1][1] == "d": # dark piece present
+					moves.append(Move((r, c), (r-1, c-1), self.board))
 
-			for i in range(len(self.board)):
-				for j in range(len(self.board[i])):
-					if self.board[i][j] == "  " or self.board[i][j][1] == "l": # if square is empty or square has opponent's piece
-						moves.append(Move((r, c), (i, j), (self.board))) # create a move object and append to moves
- 
+			if c+1 <= len(self.board[0]) - 1: # right captures
+				if r-1>= 0  and self.board[r-1][c+1][1] == "d":
+					moves.append(Move((r, c), (r-1, c+1), self.board))
+
+		else: # dark pawns
+
+			if r+1 <= 7 and self.board[r+1][c] == "  ": # one square advance
+				moves.append(Move((r, c), (r+1, c), self.board))
+
+				if r == 1 and self.board[r+2][c] == "  ": # two square advance
+					moves.append(Move((r, c), (r+2, c), self.board))
+
+			if c-1 >= 0: # left captures
+				if r+1 <= 7 and self.board[r+1][c-1][1] == "l": # light piece present
+					moves.append(Move((r, c), (r+1, c-1), self.board))
+
+			if c+1 <= len(self.board[0]) - 1: # right captures
+				if r+1 <= 7 and self.board[r+1][c+1][1] == "l":
+					moves.append(Move((r, c), (r+1, c+1), self.board))
+					
 
 	def get_bishop_moves(self, r, c, moves):
 
- 		"""
+		"""
 			calculates all possible bishop moves for a given colour (light or dark)
 			and appends them to a list
 
@@ -85,30 +98,83 @@ class Game_state():
 
 			return parameter(s):
 			None
- 		"""
+		"""
+		directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
+		enemy_color = "d" if self.light_to_move else "l"
 
- 		##TODO
- 		pass
+		for d in directions:
+			for i in range(1, 8):
+				end_row = r + d[0] * i
+				end_col = c + d[1] * i
+
+				if 0 <= end_row < 8 and 0 <= end_col < 8:
+					destination = self.board[end_row][end_col]
+					if destination == "  ":
+						moves.append(Move((r, c), (end_row, end_col), self.board))
+					elif destination[1] == enemy_color:
+						moves.append(Move((r, c), (end_row, end_col), self.board))
+						break
+					else: # friendly piece
+						break
+				else: # off board
+					break
+		
 
 
 	def get_knight_moves(self, r, c, moves):
- 		##TODO
- 		pass
+		directions = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
+		enemy_color = "d" if self.light_to_move else "l"
+
+		for d in directions:
+			end_row = r + d[0]
+			end_col = c + d[1]
+
+			if 0 <= end_row < 8 and 0 <= end_col < 8:
+				destination = self.board[end_row][end_col]
+				if destination[1] == enemy_color or destination == "  ":
+					moves.append(Move((r, c), (end_row, end_col), self.board))
 
 
 	def get_king_moves(self, r, c, moves):
- 		##TODO
- 		pass
+		directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+		enemy_color = "d" if self.light_to_move else "l"
+
+		for d in directions:
+			end_row = r + d[0]
+			end_col = c + d[1]
+
+			if 0 <= end_row < 8 and 0<= end_col < 8:
+				destination = self.board[end_row][end_col]
+				if destination[1] == enemy_color or destination == "  ":
+					moves.append(Move((r, c), (end_row, end_col), self.board))
 
 
 	def get_rook_moves(self, r, c, moves):
- 		##TODO
- 		pass
 
+		directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
+		enemy_color = "d" if self.light_to_move else "l"
+		
+		for d in directions:
+			for i in range(1, 8):
+				end_row = r + d[0] * i
+				end_col = c + d[1] * i
+
+				if 0 <= end_row < 8 and 0 <= end_col <8: # on board
+					destination = self.board[end_row][end_col]
+					if destination == "  ": # empty
+						moves.append(Move((r, c), (end_row, end_col), self.board))
+					elif destination[1] == enemy_color:
+						moves.append(Move((r, c), (end_row, end_col), self.board))
+						break
+					else: # freindly piece
+						break
+				else: # off board
+					break
+		
 
 	def get_queen_moves(self, r, c, moves):
-		##TODO
-		pass
+		self.get_bishop_moves(r, c, moves)
+		self.get_rook_moves(r, c, moves)
 
 
 	def make_move(self, move):
