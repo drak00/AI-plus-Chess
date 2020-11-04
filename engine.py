@@ -183,8 +183,31 @@ class Game_state():
 
 
     def get_king_moves(self, r, c, moves):
-        ##TODO
-        pass
+        """
+            calculates all possible king moves for a given colour (light or dark)
+            and appends them to a list
+
+            input parameters:
+            r     --> starting row (int)
+            c     --> starting column (int)
+            moves --> posiible moves container (list)
+
+            return parameter(s):
+            None
+        """
+
+        directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+        enemy_color = "d" if self.light_to_move else "l"
+
+        for d in directions:
+            end_row = r + d[0]
+            end_col = c + d[1]
+
+            if 0 <= end_row < 8 and 0<= end_col < 8:
+                destination = self.board[end_row][end_col]
+                if destination[1] == enemy_color or destination == "  ":
+                    moves.append(Move((r, c), (end_row, end_col), self.board))
+
             
 
     def get_rook_moves(self, r, c, moves):
