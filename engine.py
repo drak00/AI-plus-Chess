@@ -56,13 +56,13 @@ class Game_state():
         ## FIX
         if self.light_to_move: # if it's light's turn to move
             
-            # if square is empty and in front of pawn and it is the pawn's first move
-            if (r == 6) and (self.board[r-2][c] == "  "):
-                moves.append(Move((r, c), (r-2, c), self.board)) # create a move object and append to list
-            
             # if square is empty and in front of pawn
             if (r-1 >= 0) and (self.board[r-1][c] == "  "):
                 moves.append(Move((r, c), (r-1, c), self.board)) # create a move object and append to list
+                # if square two steps in front of pawn is empty and it is the pawn's first move
+                if (r == 6) and (self.board[r-2][c] == "  "):
+                    moves.append(Move((r, c), (r-2, c), self.board)) # create a move object and append to list
+            
             
             # if square on pawn's left diagonal has an opponent piece
             if ((r-1 >= 0) and (c-1 >= 0)) and (self.board[r-1][c-1][1] == "d"):
@@ -74,13 +74,12 @@ class Game_state():
 
         else: # if it's dark's turn to move
             
-            # if square is empty and in front of pawn and it is the pawn's first move
-            if (r == 1) and (self.board[r+2][c] == "  "):
-                moves.append(Move((r, c), (r+2, c), self.board)) # create a move object and append to list
-            
             # if square is empty and in front of pawn
             if (r+1 < len(self.board)) and (self.board[r+1][c] == "  "):
                 moves.append(Move((r, c), (r+1, c), self.board)) # create a move object and append to list
+                # if square two steps in front of pawn is empty and it is the pawn's first move
+                if (r == 1) and (self.board[r+2][c] == "  "):
+                    moves.append(Move((r, c), (r+2, c), self.board)) # create a move object and append to list
             
             # if square on pawn's left diagonal has an opponent piece
             if ((r+1 < len(self.board)) and (c-1 >= 0)) and (self.board[r+1][c-1][1] == "l"):
