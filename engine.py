@@ -181,15 +181,16 @@ class Game_state():
 		self.light_to_move = not self.light_to_move # next player to move
 		#pawnpromotion
 		if move.pawnpromotion:
+			#window to allow the user enter his choice
 			master = tk.Tk()
-			master.title("Pawn Promotion Chooser")
 			master.withdraw()
 			while True:
 				userDb = simpledialog.askstring("pawns promotion chooser",
 												"Enter q to promote to Queen,r to Rook ,b to Bishop or n to Knight: ")
-				n = ["q","n","r","b"]
-				if userDb.lower() not in n:
-					mbox.showerror("WRONG CHIOSE", "YOUR CHOISE IS WRONG")
+				if userDb is None:
+					mbox.showerror("CAN NOT CANCEL","THIS OPERATION CANNOT BE CANCELED")
+				elif userDb.lower() not in ["q","n","r","b"]:
+					mbox.showerror("WRONG CHOICE", "ENTER ONLY q,r,n or b")
 				else:
 					self.board[move.end_row][move.end_col] = userDb + move.piece_moved[1]
 					master.destroy()
