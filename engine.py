@@ -1,6 +1,8 @@
 ## This is the main chess game engine that implements the rules of the game
 ## and stores the state of the the chess board, including its pieces and moves
-
+import  tkinter as tk
+from tkinter import simpledialog
+from tkinter import messagebox as mbox
 
 class Game_state():
 	
@@ -177,7 +179,22 @@ class Game_state():
 		self.board[move.end_row][move.end_col] = move.piece_moved
 		self.move_log.append(move) # log move
 		self.light_to_move = not self.light_to_move # next player to move
-
+		#pawnpromotion
+		if move.pawnpromotion:
+			#window to allow the user enter his choice
+			master = tk.Tk()
+			master.withdraw()
+			while True:
+				userDb = simpledialog.askstring("pawns promotion chooser",
+												"Enter q to promote to Queen,r to Rook ,b to Bishop or n to Knight: ")
+				if userDb is None:
+					mbox.showerror("CAN NOT CANCEL","THIS OPERATION CANNOT BE CANCELED")
+				elif userDb.lower() not in ["q","n","r","b"]:
+					mbox.showerror("WRONG CHOICE", "ENTER ONLY q,r,n or b")
+				else:
+					self.board[move.end_row][move.end_col] = userDb + move.piece_moved[1]
+					master.destroy()
+					break
 
 	def undo_move(self, look_ahead_mode = False):
 		"""
@@ -244,7 +261,9 @@ class Move():
 		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
 		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
 		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
-
+		#pawn promotion
+		self.pawnpromotion = (self.piece_moved == "pl" and self.end_row == 0) or (
+					self.piece_moved == "pd" and self.end_row == 7)
 	def get_chess_notation(self):
 		"""
 			creates a live commentary of pieces moved on the chess board during a game
