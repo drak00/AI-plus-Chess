@@ -81,13 +81,24 @@ def main():
 					
 					if len(player_clicks) == 2: # 'from' and 'to' are available
 						move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
-							
+						en_passant_move = Move(player_clicks[0], player_clicks[1], gs.board, move_type="en_passant") # create move object
+
 						if move in valid_moves:
 							
 							gs.make_move(move)
 							animate(move, screen, gs.board, clock)
 
 							print(move.get_chess_notation())
+							
+							square_selected = ()
+							player_clicks = []
+						
+						elif en_passant_move in valid_moves:
+							
+							gs.make_move(en_passant_move)
+							animate(en_passant_move, screen, gs.board, clock)
+
+							print(en_passant_move.get_chess_notation())
 							
 							square_selected = ()
 							player_clicks = []
