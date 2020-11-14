@@ -363,16 +363,6 @@ class Game_state():
             self.king_pos[move.piece_moved] = (move.end_row, move.end_col) # update tuple containing postion
 
         self.move_log.append(move) # log move
-
-        # Pawn Promotion
-        if (move.piece_moved == "pl" and move.end_row == 0) or (move.piece_moved == "pd" and move.end_row == 7):
-            promote_to = input("Pawn Promotion:\nInput q(Queen), r(rook), b(bishop), or n(knight) to promote: ") #we can add this to the ui later
-            promotion_options = ("q","r","b","n")
-            if promote_to in promotion_options:
-                self.board[move.end_row][move.end_col] = promote_to + move.piece_moved[1]
-            else: #create a default queen promotion if wrong input is given
-                self.board[move.end_row][move.end_col] = "q" + move.piece_moved[1]
-        
         self.light_to_move = not self.light_to_move # next player to move
 
 
