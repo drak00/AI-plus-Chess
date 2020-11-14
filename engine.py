@@ -52,7 +52,7 @@ class Game_state():
             return parameter(s):
             None
         """
-
+        
         ## FIX
         if self.light_to_move: # if it's light's turn to move
             
@@ -72,6 +72,23 @@ class Game_state():
             if ((r-1 >= 0) and (c+1 < len(self.board))) and (self.board[r-1][c+1][1] == "d"):
                 moves.append(Move((r, c), (r-1, c+1), self.board)) # create a move object and append to list
 
+            # en-passant move
+            if len(self.move_log) != 0: # if move log is not empty
+                if self.move_log[-1].piece_moved[0] == 'p': # if last piece moved is a pawn
+                    if self.move_log[-1].start_row == 1: # if it's the pawn's first move
+                        # if the pawn made a double move on this piece's left side 
+                        if (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c-1):
+                            # create a move object and append to list
+                            moves.append(Move((r, c), (r-1, c-1), self.board, move_type="en_passant"))
+                        # if the pawn made a double move on this piece's right side 
+                        elif (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c+1):
+                            # create a move object and append to list
+                            moves.append(Move((r, c), (r-1, c+1), self.board, move_type="en_passant"))
+                        # if the pawn did not make a double move
+                        else:
+                            pass
+			
+
         else: # if it's dark's turn to move
             
             # if square is empty and in front of pawn
@@ -88,6 +105,22 @@ class Game_state():
             # if square on pawn's right diagonal has an opponent piece
             if ((r+1 < len(self.board)) and (c+1 < len(self.board))) and (self.board[r+1][c+1][1] == "l"):
                 moves.append(Move((r, c), (r+1, c+1), self.board)) # create a move object and append to list
+            
+            # en-passant move
+            if len(self.move_log) != 0: # if move log is not empty
+                if self.move_log[-1].piece_moved[0] == 'p': # if last piece moved is a pawn
+                    if self.move_log[-1].start_row == 6: # if it's the pawn's first move
+                        # if the pawn made a double move on this piece's left side 
+                        if (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c+1):
+                            # create a move object and append to list
+                            moves.append(Move((r, c), (r+1, c+1), self.board, move_type="en_passant"))
+                        # if the pawn made a double move on this piece's right side 
+                        elif (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c-1):
+                            # create a move object and append to list
+                            moves.append(Move((r, c), (r+1, c-1), self.board, move_type="en_passant"))
+                        # if the pawn did not make a double move
+                        else:
+                            pass
 
 
     def get_bishop_moves(self, r, c, moves):
@@ -307,6 +340,16 @@ class Game_state():
         """
             moves pieces on the board
         """
+        if move.move_type == "en_passant": # if move is an en-passant move
+            if self.light_to_move: # if it's light's turn to move
+                # capturing piece
+                move.piece_captured = self.board[move.end_row + 1][move.end_col]
+                self.board[move.end_row + 1][move.end_col] = "  "
+            else: # if it's dark's turn to move
+                # capturing piece
+                move.piece_captured = self.board[move.end_row - 1][move.end_col]
+                self.board[move.end_row - 1][move.end_col] = "  "
+        
         self.board[move.start_row][move.start_col] = "  "
         self.board[move.end_row][move.end_col] = move.piece_moved
         self.move_log.append(move) # log move
@@ -331,6 +374,23 @@ class Game_state():
             last_move = self.move_log.pop()
             self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
             self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
+            
+            if last_move.move_type == "en_passant": # if the last move was an en-passant move
+                
+                if not self.light_to_move: # if the last move was light's move
+                    # undo piece capture
+                    self.board[last_move.end_row + 1][last_move.end_col] = last_move.piece_captured
+                else: # if the last move was dark's move
+                    # undo piece capture
+                    self.board[last_move.end_row - 1][last_move.end_col] = last_move.piece_captured
+
+                # remove piece from occupied square
+                self.board[last_move.end_row][last_move.end_col] = "  "
+
+            else: # if the last move was not an en-passant move
+                # undo piece capture
+                self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
+            
             self.light_to_move = not self.light_to_move
 
             print("undoing ->", last_move.get_chess_notation())
@@ -373,7 +433,7 @@ class Move():
     # map columns to files (revers of files to columns)
     cols_to_files = {col:file for file, col in files_to_cols.items()}
 
-    def __init__(self, start_sq, end_sq, board):
+    def __init__(self, start_sq, end_sq, board, move_type="normal"):
         """
             A Move class abstracting all parameters needed
             for moving chess pieces on the board
@@ -389,6 +449,7 @@ class Move():
         self.end_col = end_sq[1] # intended column destiantion of piece to e moved
         self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
         self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
+        self.move_type = move_type # variable to store move type
 
     def get_chess_notation(self):
         """
@@ -426,7 +487,8 @@ class Move():
 
         if isinstance(other, Move): # if first (self) and second (other) parameters are both Move objects
             return self.start_row == other.start_row and self.start_col == other.start_col and \
-                    self.end_row == other.end_row and self.end_col == other.end_col
+                    self.end_row == other.end_row and self.end_col == other.end_col and \
+                    self.move_type == other.move_type
         else:
             return False
 
