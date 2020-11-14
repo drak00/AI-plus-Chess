@@ -75,7 +75,8 @@ class Game_state():
             # en-passant move
             if len(self.move_log) != 0: # if move log is not empty
                 if self.move_log[-1].piece_moved[0] == 'p': # if last piece moved is a pawn
-                    if self.move_log[-1].start_row == 1: # if it's the pawn's first move
+                    # if the pawn made a double move
+                    if (self.move_log[-1].start_row == 1) and (self.move_log[-1].end_row == 3):
                         # if the pawn made a double move on this piece's left side 
                         if (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c-1):
                             # create a move object and append to list
@@ -84,7 +85,7 @@ class Game_state():
                         elif (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c+1):
                             # create a move object and append to list
                             moves.append(Move((r, c), (r-1, c+1), self.board, move_type="en_passant"))
-                        # if the pawn did not make a double move
+                        # if the pawn did not make a move on this pawn's side
                         else:
                             pass
 			
@@ -109,7 +110,8 @@ class Game_state():
             # en-passant move
             if len(self.move_log) != 0: # if move log is not empty
                 if self.move_log[-1].piece_moved[0] == 'p': # if last piece moved is a pawn
-                    if self.move_log[-1].start_row == 6: # if it's the pawn's first move
+                    # if the pawn made a double move
+                    if (self.move_log[-1].start_row == 6) and (self.move_log[-1].end_row == 4):
                         # if the pawn made a double move on this piece's left side 
                         if (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c+1):
                             # create a move object and append to list
@@ -118,7 +120,7 @@ class Game_state():
                         elif (self.move_log[-1].end_row, self.move_log[-1].end_col) == (r,c-1):
                             # create a move object and append to list
                             moves.append(Move((r, c), (r+1, c-1), self.board, move_type="en_passant"))
-                        # if the pawn did not make a double move
+                        # if the pawn did not make a move on this pawn's side
                         else:
                             pass
 
