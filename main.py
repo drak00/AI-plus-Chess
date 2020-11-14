@@ -1,4 +1,4 @@
-##This is the GUI displaying all aspects of the chess game and 
+##This is the GUI displaying all aspects of the chess game and
 ##handling user inputs
 
 import pygame as pg
@@ -7,8 +7,8 @@ from engine import Game_state, Move
 pg.init()
 
 BORDER = 128 # for the ranks and files
-WIDTH = HEIGHT = 512 # of the chess board 
-DIMENSION = 8 # rows and columns 
+WIDTH = HEIGHT = 512 # of the chess board
+DIMENSION = 8 # rows and columns
 OFFSET = 5 # for image scaling
 SQ_SIZE = HEIGHT // DIMENSION # size of each board square
 MAX_FPS = 15
@@ -19,11 +19,11 @@ SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")]
 
 def load_images():
 	"""
-		loads images from directory into dictionary with parameters SQ_SIZE and OFFSET 
+		loads images from directory into dictionary with parameters SQ_SIZE and OFFSET
 	"""
 
 	pieces = ["bd", "bl", "kd", "kl", "nd", "nl", "pd", "pl", "qd", "ql", "rd", "rl"]
-	
+
 	for piece in pieces:
 		IMAGES[piece] = pg.transform.scale(pg.image.load("images/"+ piece + ".png"), (SQ_SIZE - OFFSET, SQ_SIZE - OFFSET))
 
@@ -40,12 +40,13 @@ def main():
 	load_images()
 	running = True
 
-	square_selected = () # x, y coordinate of selected square 
+	square_selected = () # x, y coordinate of selected square
 	player_clicks = [] # list of appended square_selected
-	valid_moves = [] 
+	valid_moves = []
+	game_over = False
 	while running:
 
-		valid_moves, first_click_turn = gs.get_valid_moves()		
+		valid_moves, first_click_turn = gs.get_valid_moves()
 
 		for e in pg.event.get():
 			if e.type == pg.QUIT:
@@ -54,6 +55,7 @@ def main():
 			elif e.type == pg.KEYDOWN:
 				if e.key == pg.K_u: # u key pressed (undo last move)
 					gs.undo_move()
+					print(gs.undo_text) #print an undo message
 
 				elif e.key == pg.K_r: # r key pressed (reset game)
 					gs = Game_state()
@@ -66,7 +68,7 @@ def main():
 				location = pg.mouse.get_pos() # x, y location of mouse click
 				location_col_transform = location[0] // SQ_SIZE - 1
 				location_row_transform = location[1] // SQ_SIZE - 1
-				col = (location_col_transform) if (0 <= location_col_transform < 8) else -1  
+				col = (location_col_transform) if (0 <= location_col_transform < 8) else -1
 				row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
 
 				if col >= 0 and row >= 0:
@@ -78,18 +80,18 @@ def main():
 					else: # new position clicked (destination)
 						square_selected = (row, col)
 						player_clicks.append(square_selected)
-					
+
 					if len(player_clicks) == 2: # 'from' and 'to' are available
 						move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
 						en_passant_move = Move(player_clicks[0], player_clicks[1], gs.board, move_type="en_passant") # create move object
 
 						if move in valid_moves:
-							
+
 							gs.make_move(move)
 							animate(move, screen, gs.board, clock)
 
 							print(move.get_chess_notation())
-							
+
 							square_selected = ()
 							player_clicks = []
 						
@@ -113,8 +115,31 @@ def main():
 								square_selected = ()
 
 		display_game_state(screen, gs, valid_moves, player_clicks)
+		if gs.check_mate: # calling checkmate from engine to see if check is true
+			if gs.light_to_move: # if it is light turn to play
+				#calling draw_text function to display dark team wins on screen
+				draw_text(screen, "Check Mate.. Dark Team Wins")
+			else: # if it is dark turn to play
+				#calling draw_text function to display dark team wins on screen
+				draw_text(screen, "Check Mate... light Team Wins")
+		elif gs.stale_mate:
+			draw_text(screen, "Stale Mate.... Draw")
 		clock.tick(MAX_FPS)
 		pg.display.flip()
+
+
+def draw_text(screen, text):
+	"""
+		display text on scree when there is a stalemate of checkmate
+
+		input parameter:
+		screen
+		text ------> string
+	"""
+	font = pg.font.SysFont("Times Roman", 40, True, False) # determing font, font size, bold and italic
+	text_mess = font.render(text, 0, pg.Color("darkblue"))	# colour and wrinting the text
+	text_pos = text_mess.get_rect(center = pg.display.get_surface().get_rect().center) # postion of the text on screen
+	screen.blit(text_mess, text_pos) # displaying the text on screen
 
 
 def display_game_state(screen, gs, valid_moves, player_clicks):
@@ -161,8 +186,8 @@ def display_ranks_files(screen):
 		file_surface = myfont.render(file, 0, (0, 0, 0))
 		screen.blit(file_surface, (((index+1) * SQ_SIZE)+SQ_SIZE//4, SQ_SIZE//3))
 		screen.blit(file_surface, (((index+1) * SQ_SIZE)+SQ_SIZE//4, (9*SQ_SIZE) + SQ_SIZE//8))
-		
-	
+
+
 	for index, rank in enumerate(range(8, 0, -1)):
 		rank_surface = myfont.render(str(rank), 0, (0, 0, 0))
 		screen.blit(rank_surface, (SQ_SIZE//2, ((index+1) * SQ_SIZE)+SQ_SIZE//4))
@@ -211,7 +236,7 @@ def animate(move, screen, board, clock):
 	frame_count = int((dr**2 + dc**2)**0.5 * frames_per_square)
 	sound_played = False
 	for frame in range(frame_count+1):
-		
+
 
 		r, c = ((move.start_row + dr*frame/frame_count, move.start_col + dc*frame/frame_count))
 
