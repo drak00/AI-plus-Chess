@@ -35,8 +35,9 @@ class Game_state():
 		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
 						"q":self.get_queen_moves, "k":self.get_king_moves, \
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
-
-
+		self.light_kings_location = (7, 4)
+		self.dark_kings_location = (0, 4)
+		self.undo = True
 	def get_pawn_moves(self, r, c, moves):
 		"""
 			Calculates all possible pawn moves for a given color (light or dark)
@@ -179,6 +180,10 @@ class Game_state():
 		self.board[move.end_row][move.end_col] = move.piece_moved
 		self.move_log.append(move) # log move
 		self.light_to_move = not self.light_to_move # next player to move
+		if move.piece_moved == "kl":
+			self.light_kings_location = (move.end_row, move.end_col)
+		elif move.piece_moved == "kd":
+			self.dark_kings_location = (move.end_row, move.end_col)
 		#pawnpromotion
 		if move.pawnpromotion:
 			#window to allow the user enter his choice
@@ -196,7 +201,7 @@ class Game_state():
 					master.destroy()
 					break
 
-	def undo_move(self, look_ahead_mode = False):
+	def undo_move(self, move, n, look_ahead_mode = False, undo=True):
 		"""
 			undoes last move
 		"""
@@ -205,15 +210,47 @@ class Game_state():
 			self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
 			self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
 			self.light_to_move = not self.light_to_move
-
-			print("undoing ->", last_move.get_chess_notation())
+			if self.board[move.start_row][move.start_col] == "kl" :
+				self.light_kings_location = (move.start_row, move.start_col)
+			elif self.board[move.start_row][move.start_col] == "kd" :
+				self.dark_kings_location = (move.start_row, move.start_col)
+			if n:
+				print("undoing ->", last_move.get_chess_notation())
+				
 		else:
 			print("All undone!")
 
 
-	def get_valid_moves(self):
-		return self.get_possible_moves()
-
+	def get_valid_moves(self,move):
+		moves = self.get_possible_moves()[0] #generate all moves
+  
+		for i in range(len(moves)-1, -1, -1): #for each move, make the move
+			self.make_move(moves[i])
+			self.light_to_move = not self.light_to_move #change the current player
+   
+			if self.light_to_move: #when it is lights turn to play
+				self.light_to_move = not self.light_to_move
+				opponentsmoves = self.get_possible_moves()[0] #generate all opponents moves
+				self.light_to_move = not self.light_to_move
+    
+				for move in opponentsmoves:
+					#check to see if move leaves king in check
+					if move.end_row == self.light_kings_location[0] and move.end_col == self.light_kings_location[1]:
+						moves.remove(moves[i])
+			else:
+				self.light_to_move = not self.light_to_move
+				opponentsmoves = self.get_possible_moves()[0]
+				self.light_to_move = not self.light_to_move
+    
+				for move in opponentsmoves:
+					if move.end_row == self.dark_kings_location[0] and move.end_col == self.dark_kings_location[1]:
+						moves.remove(moves[i])
+      
+			self.light_to_move = not self.light_to_move
+			n = False
+			self.undo_move(move, n)
+			
+		return moves
 
 	def get_possible_moves(self):
 
@@ -227,8 +264,6 @@ class Game_state():
 					self.move_piece[self.board[i][j][0]](i, j, moves)
 
 		return moves, turn
-
-
 
 class Move():
 

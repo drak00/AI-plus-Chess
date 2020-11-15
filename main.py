@@ -44,7 +44,8 @@ def main():
 	valid_moves = [] 
 	while running:
 
-		valid_moves, first_click_turn = gs.get_valid_moves()		
+		valid_moves = gs.get_valid_moves(Move)		
+		first_click_turn = "l" if gs.light_to_move else "d"
 
 		for e in pg.event.get():
 			if e.type == pg.QUIT:
@@ -52,7 +53,8 @@ def main():
 
 			elif e.type == pg.KEYDOWN:
 				if e.key == pg.K_u: # u key pressed (undo last move)
-					gs.undo_move()
+					n = True
+					gs.undo_move(move, n)
 
 				elif e.key == pg.K_r: # r key pressed (reset game)
 					gs = Game_state()
