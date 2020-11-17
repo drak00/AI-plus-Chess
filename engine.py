@@ -37,7 +37,8 @@ class Game_state():
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
 		self.light_kings_location = (7, 4)
 		self.dark_kings_location = (0, 4)
-		self.undo = True
+		self.is_check_mate = False
+		self.is_stalemate = False
 	def get_pawn_moves(self, r, c, moves):
 		"""
 			Calculates all possible pawn moves for a given color (light or dark)
@@ -201,7 +202,8 @@ class Game_state():
 					master.destroy()
 					break
 
-	def undo_move(self, move, n, look_ahead_mode = False, undo=True):
+
+	def undo_move(self, n, look_ahead_mode = False, undo=True):
 		"""
 			undoes last move
 		"""
@@ -210,10 +212,11 @@ class Game_state():
 			self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
 			self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
 			self.light_to_move = not self.light_to_move
-			if self.board[move.start_row][move.start_col] == "kl" :
-				self.light_kings_location = (move.start_row, move.start_col)
-			elif self.board[move.start_row][move.start_col] == "kd" :
-				self.dark_kings_location = (move.start_row, move.start_col)
+			#update light kings and dark kings location after undoing a move
+			if self.board[last_move.start_row][last_move.start_col] == "kl" :
+				self.light_kings_location = (last_move.start_row, last_move.start_col)
+			elif self.board[last_move.start_row][last_move.start_col] == "kd" :
+				self.dark_kings_location = (last_move.start_row, last_move.start_col)
 			if n:
 				print("undoing ->", last_move.get_chess_notation())
 				
@@ -223,35 +226,51 @@ class Game_state():
 
 	def get_valid_moves(self,move):
 		moves = self.get_possible_moves()[0] #generate all moves
-  
 		for i in range(len(moves)-1, -1, -1): #for each move, make the move
 			self.make_move(moves[i])
 			self.light_to_move = not self.light_to_move #change the current player
-   
-			if self.light_to_move: #when it is lights turn to play
-				self.light_to_move = not self.light_to_move
-				opponentsmoves = self.get_possible_moves()[0] #generate all opponents moves
-				self.light_to_move = not self.light_to_move
-    
-				for move in opponentsmoves:
-					#check to see if move leaves king in check
-					if move.end_row == self.light_kings_location[0] and move.end_col == self.light_kings_location[1]:
-						moves.remove(moves[i])
-			else:
-				self.light_to_move = not self.light_to_move
-				opponentsmoves = self.get_possible_moves()[0]
-				self.light_to_move = not self.light_to_move
-    
-				for move in opponentsmoves:
-					if move.end_row == self.dark_kings_location[0] and move.end_col == self.dark_kings_location[1]:
-						moves.remove(moves[i])
-      
+			if self.king_in_check(): #check to see if move leaves king in check
+				moves.remove(moves[i]) #if yes, remove move
 			self.light_to_move = not self.light_to_move
-			n = False
-			self.undo_move(move, n)
-			
-		return moves
+			n = False # undo moves should not print undoing
+			self.undo_move(n)
+		if len(moves) == 0 and self.king_in_check():  # checking if there are no possible valid moves  and king incheck
+			self.is_check_mate = True  # check mate
+		elif len(moves) == 0:  # checking if there are no possible moves but king not incheck
+			self.is_stalemate = True  # stalemate
+		else:
+			self.is_check_mate = False
+			self.is_stalemate = False
 
+		return moves
+	def king_in_check(self):
+		"""
+		A function that check to see if move leaves a king under check or not
+		input: None
+		:return: True or False
+		"""
+		if self.light_to_move:
+			if self.square_in_check(self.light_kings_location[0], self.light_kings_location[1]):
+				return True
+			else: return False
+		else:
+			if self.square_in_check(self.dark_kings_location[0], self.dark_kings_location[1]):
+				return True
+			else: return False
+	def square_in_check(self, r, c):
+		"""
+		A function that check to see if king is in check
+		:param r: a variable representing row
+		:param c: a variable representing column
+		:return: True or False
+		"""
+		self.light_to_move = not self.light_to_move #change the current player
+		opponents_moves = self.get_possible_moves()[0] #generate all opponenets moves
+		self.light_to_move = not self.light_to_move
+		for mov in opponents_moves:
+			if mov.end_row == r and mov.end_col == c:
+				return True
+		return False
 	def get_possible_moves(self):
 
 		moves = []
