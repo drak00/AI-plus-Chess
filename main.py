@@ -44,7 +44,8 @@ def main():
 	valid_moves = [] 
 	while running:
 
-		valid_moves, first_click_turn = gs.get_valid_moves()		
+		valid_moves  = gs.get_valid_moves()	
+		first_click_turn = "l" if gs.light_to_move else "d"
 
 		for e in pg.event.get():
 			if e.type == pg.QUIT:
