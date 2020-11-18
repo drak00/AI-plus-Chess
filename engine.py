@@ -1,8 +1,6 @@
 ## This is the main chess game engine that implements the rules of the game
 ## and stores the state of the the chess board, including its pieces and moves
-import  tkinter as tk
-from tkinter import simpledialog
-from tkinter import messagebox as mbox
+
 
 class Game_state():
 	
@@ -11,40 +9,73 @@ class Game_state():
 			The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
 			i.e a list of lists. Each element of the Matrix is a string of two characters 
 			representing the chess pieces in the order "type" + "colour"
+
 			light pawn = pl
 			dark pawn  = pd
+
 			light knight = nl
 			dark knight  = nd
 			e.t.c
+
 			empty board square = "  " ---> double empty space
+
 		"""
 
 		self.board = [
 
-			["rd", "nd", "bd", "qd", "kd", "bd", "nd", "rd"],
+			["rd", "  ", "  ", "  ", "kd", "  ", "  ", "rd"],
 			["pd", "pd", "pd", "pd", "pd", "pd", "pd", "pd"],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
 			["pl", "pl", "pl", "pl", "pl", "pl", "pl", "pl"],
-			["rl", "nl", "bl", "ql", "kl", "bl", "nl", "rl"]]
+			["rl", "  ", "  ", "  ", "kl", "  ", "  ", "rl"]]
 
 		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
 		self.move_log = []        # keeps a log of all moves made withing a game
+		self.track_of_castling = castling(True, True, True, True) 
+		self.castling_log = [castling(self.track_of_castling.lks,self.track_of_castling.dks,self.track_of_castling.lqs, self.track_of_castling.dqs)] #keeping track of castling right
+		self.light_king_location = (7,4)
+		self.dark_king_location = (0, 4)
+		
 		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
 						"q":self.get_queen_moves, "k":self.get_king_moves, \
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
+	
+	def  in_check(self):
+		""" 
+		determine if current player is in check
+		"""
+		if self.light_to_move:
+			return self.squareUnderAttack(self.light_king_location[0], self.light_king_location[1])
+		else:
+			return self.squareUnderAttack(self.dark_king_location[0], self.dark_king_location[1])
+	
+
+	def squareUnderAttack(self, r, c):
+		""" 
+		determine if enemy can attack the square r,c
+		"""
+		self.light_to_move = not self.light_to_move #switch to opponent's turn
+		opponent_moves, turn = self.get_possible_moves()
+		self.light_to_move = not self.light_to_move #swicth back turn
+		for move in opponent_moves:
+			if (move.end_row == r) and (move.end_col == c): #square is under attack
+				return True
+		return False
 
 
 	def get_pawn_moves(self, r, c, moves):
 		"""
 			Calculates all possible pawn moves for a given color (light or dark)
 			and appends them to a list
+
 			input parameter(s):
 			r     --> starting row (int)
 			c     --> starting colum (int)
 			moves --> possible moves container (list)
+
 			return parameter(s):
 			None
 		"""
@@ -86,10 +117,12 @@ class Game_state():
 		"""
 			calculates all possible bishop moves for a given colour (light or dark)
 			and appends them to a list
+
 			input parameters:
 			r     --> starting row (int)
 			c     --> starting column (int)
 			moves --> posiible moves container (list)
+
 			return parameter(s):
 			None
 		"""
@@ -143,6 +176,9 @@ class Game_state():
 					moves.append(Move((r, c), (end_row, end_col), self.board))
 
 
+		
+
+
 	def get_rook_moves(self, r, c, moves):
 
 		directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
@@ -170,7 +206,7 @@ class Game_state():
 		self.get_bishop_moves(r, c, moves)
 		self.get_rook_moves(r, c, moves)
 
-
+	
 	def make_move(self, move):
 		"""
 			moves pieces on the board
@@ -179,22 +215,21 @@ class Game_state():
 		self.board[move.end_row][move.end_col] = move.piece_moved
 		self.move_log.append(move) # log move
 		self.light_to_move = not self.light_to_move # next player to move
-		#pawnpromotion
-		if move.pawnpromotion:
-			#window to allow the user enter his choice
-			master = tk.Tk()
-			master.withdraw()
-			while True:
-				userDb = simpledialog.askstring("pawns promotion chooser",
-												"Enter q to promote to Queen,r to Rook ,b to Bishop or n to Knight: ")
-				if userDb is None:
-					mbox.showerror("CAN NOT CANCEL","THIS OPERATION CANNOT BE CANCELED")
-				elif userDb.lower() not in ["q","n","r","b"]:
-					mbox.showerror("WRONG CHOICE", "ENTER ONLY q,r,n or b")
-				else:
-					self.board[move.end_row][move.end_col] = userDb + move.piece_moved[1]
-					master.destroy()
-					break
+
+		#castle move
+		if move.is_castle_move:
+			if move.end_col - move.start_col == 2:#king side castle move
+				self.board[move.end_row][move.end_col-1] = self.board[move.end_row][move.end_col+1] #move the rook
+				self.board[move.end_row][move.end_col+1] = "  " #delete old rook
+			else: #queen side castle move
+				self.board[move.end_row][move.end_col+1] = self.board[move.end_row][move.end_col-2] #move the rook
+				self.board[move.end_row][move.end_col-2] = "  " #delete old rook
+			
+
+		#update castling right
+		self.castle_move_update(move)
+		self.castling_log.append(castling(self.track_of_castling.lks,self.track_of_castling.dks,self.track_of_castling.lqs, self.track_of_castling.dqs))
+
 
 	def undo_move(self, look_ahead_mode = False):
 		"""
@@ -209,14 +244,60 @@ class Game_state():
 			print("undoing ->", last_move.get_chess_notation())
 		else:
 			print("All undone!")
+		#undo castle right
+		self.castling_log.pop() #remove the new castle rights from the move we undo
+		new_castle_right - self.castling_log[-1]
+		self.track_of_castling = castling(new_castle_right.lks, new_castle_right.dks, new_castle_right.lqs, new_castle_right.dqs )
+		#undo castle move
+		if move.is_castle_move:
+			if move.end_col - move.start_col == 2: #kingside
+				self.board[move.end_row][move.end_col+1] = self.board[move.end_row][move.end_col-1]
+				self.board[move.end_row][move.end_col-1] = "  "
+			else: #queen side 
+				self.board[move.end_row][move.end_col-2] = self.board[move.end_row][move.end_col+1]
+				self.board[move.end_row][move.end_col+1] = "  "
 
+		#undo castling
+		self.castling_log.pop() #delete the new castle right
+		self.track_of_castling = self.castling_log[-1] #set the track to the last castle right on the list
+		
+
+	
+	def castle_move_update(self, move):
+		""" update the castle move rights """
+		if move.piece_moved == 'kl':
+			self.track_of_castling.lks = False
+			self.track_of_castling.lqs = False
+		elif move.piece_moved == 'kd':
+			self.track_of_castling.dks = False
+			self.track_of_castling.dqs = False
+		elif move.piece_moved == 'rl':
+			if move.start_row == 7:
+				if move.start_col == 0: #left rrook
+					self.track_of_castling.lqs = False
+				elif move.start_col == 7: #right rook
+					self.track_of_castling.lks = False
+		elif move.piece_moved == 'rd':
+			if move.start_row == 0:
+				if move.start_col == 0: #left rrook
+					self.track_of_castling.dqs = False
+				elif move.start_col == 7: #right rook
+					self.track_of_castling.dks = False
 
 	def get_valid_moves(self):
-		return self.get_possible_moves()
+		moves = self.get_possible_moves()
+		castling_tempo = castling(self.track_of_castling.lks, self.track_of_castling.dks, self.track_of_castling.lqs, self.track_of_castling.dqs)
+		if self.light_to_move:
+			self.get_castle_moves(self.light_king_location[0], self.light_king_location[1], moves)
+		else:
+			self.get_castle_moves(self.dark_king_location[0], self.dark_king_location[1], moves)
+		
+		self.track_of_castling = castling_tempo
+		return moves
+
 
 
 	def get_possible_moves(self):
-
 		moves = []
 
 		turn = "l" if self.light_to_move else "d"
@@ -228,7 +309,30 @@ class Game_state():
 
 		return moves, turn
 
+	def get_castle_moves(self, r, c, moves):
+		""" get all valid castle moves for the king at r,c and add them to the list """
+		if self.squareUnderAttack(r,c):
+			return #cant castle while in check
+		if (self.light_to_move and self.track_of_castling.lks) or (not self.light_to_move and self.track_of_castling.dks):
+			self.get_king_side_catle_moves(r,c,moves) 
+		if (self.light_to_move and track_of_castling.lqs) or (not self.light_to_move and self.track_of_castling.dqs):
+			self.get_queen_side_catle_moves(r,c,moves)
 
+	def get_king_side_catle_moves(self, r,c, moves):
+		if self.board[r][c+1] == "  " and self.board[r][c+2] == "  ":
+			if (not self.squareUnderAttack(r, c+1)) and (not self.squareUnderAttack(r, c+2)):
+				moves.append(Move((r,c), (r, c+2), self.board, is_castle_move=True))
+
+	def get_queen_side_catle_moves(self, r,c, moves):
+		if self.board[r][c-1] == "  " and self.board[r][c-2] == "  " and self.board[r][c-3]:
+			if (not self.squareUnderAttack(r, c-1)) and (not self.squareUnderAttack(r, c-2)):
+				moves.append(Move((r,c), (r, c-2), self.board, is_castle_move=True))
+class castling():
+	def __init__(self,lks,dks,lqs,dqs):
+		self.lks = lks #lks - light king side 
+		self.dks = dks #dks - dark king side
+		self.lqs = lqs #lqs - light queen side
+		self.dqs = dqs #dqs - dark queen side
 
 class Move():
 
@@ -246,10 +350,11 @@ class Move():
 	# map columns to files (revers of files to columns)
 	cols_to_files = {col:file for file, col in files_to_cols.items()} 
 
-	def __init__(self, start_sq, end_sq, board):
+	def __init__(self, start_sq, end_sq, board, is_castle_move=False):
 		"""
 			A Move class abstracting all parameters needed
 			for moving chess pieces on the board
+
 			input parameter(s):
 			start_sq --> (row, column) of piece to be moved (tuple)
 			end_square --> (row, column) of move destination on the board (tuple)
@@ -261,14 +366,14 @@ class Move():
 		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
 		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
 		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
-		#pawn promotion
-		self.pawnpromotion = (self.piece_moved == "pl" and self.end_row == 0) or (
-					self.piece_moved == "pd" and self.end_row == 7)
+		self.is_castle_move = is_castle_move #castle move
 	def get_chess_notation(self):
 		"""
 			creates a live commentary of pieces moved on the chess board during a game
+
 			input parameter(s):
 			None
+
 			return parameter(s)
 			commentary (string)
 		"""
@@ -280,9 +385,11 @@ class Move():
 	def get_rank_file(self, r, c):
 		"""
 			calls cols_to_file and rows_to_rank attributes
+
 			input parameter(s):
 			r --> row to be converted to rank (int)
 			c --> column to be converted to file (int)
+
 			return parameter(s):
 			"file" + "rank" (str)
 		"""
@@ -313,3 +420,5 @@ class Move():
 			operator overloading for printing Move objects
 		"""
 		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
+
+
