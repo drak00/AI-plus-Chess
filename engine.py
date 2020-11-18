@@ -43,25 +43,16 @@ class Game_state():
 						"q":self.get_queen_moves, "k":self.get_king_moves, \
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
 	
-	def  in_check(self):
-		""" 
-		determine if current player is in check
-		"""
-		if self.light_to_move:
-			return self.squareUnderAttack(self.light_king_location[0], self.light_king_location[1])
-		else:
-			return self.squareUnderAttack(self.dark_king_location[0], self.dark_king_location[1])
 	
-
 	def squareUnderAttack(self, r, c):
 		""" 
 		determine if enemy can attack the square r,c
 		"""
 		self.light_to_move = not self.light_to_move #switch to opponent's turn
-		opponent_moves, turn = self.get_possible_moves()
+		opponent_moves = self.get_possible_moves()[0]
 		self.light_to_move = not self.light_to_move #swicth back turn
 		for move in opponent_moves:
-			if (move.end_row == r) and (move.end_col == c): #square is under attack
+			if move.end_row == r and move.end_col == c: #square is under attack
 				return True
 		return False
 
@@ -285,7 +276,7 @@ class Game_state():
 					self.track_of_castling.dks = False
 
 	def get_valid_moves(self):
-		moves = self.get_possible_moves()
+		moves = self.get_possible_moves()[0]
 		castling_tempo = castling(self.track_of_castling.lks, self.track_of_castling.dks, self.track_of_castling.lqs, self.track_of_castling.dqs)
 		if self.light_to_move:
 			self.get_castle_moves(self.light_king_location[0], self.light_king_location[1], moves)
@@ -298,6 +289,7 @@ class Game_state():
 
 
 	def get_possible_moves(self):
+
 		moves = []
 
 		turn = "l" if self.light_to_move else "d"
@@ -315,18 +307,19 @@ class Game_state():
 			return #cant castle while in check
 		if (self.light_to_move and self.track_of_castling.lks) or (not self.light_to_move and self.track_of_castling.dks):
 			self.get_king_side_catle_moves(r,c,moves) 
-		if (self.light_to_move and track_of_castling.lqs) or (not self.light_to_move and self.track_of_castling.dqs):
+		if (self.light_to_move and self.track_of_castling.lqs) or (not self.light_to_move and self.track_of_castling.dqs):
 			self.get_queen_side_catle_moves(r,c,moves)
 
 	def get_king_side_catle_moves(self, r,c, moves):
 		if self.board[r][c+1] == "  " and self.board[r][c+2] == "  ":
-			if (not self.squareUnderAttack(r, c+1)) and (not self.squareUnderAttack(r, c+2)):
+			if not self.squareUnderAttack(r, c+1) and not self.squareUnderAttack(r, c+2):
 				moves.append(Move((r,c), (r, c+2), self.board, is_castle_move=True))
+
 
 	def get_queen_side_catle_moves(self, r,c, moves):
 		if self.board[r][c-1] == "  " and self.board[r][c-2] == "  " and self.board[r][c-3]:
-			if (not self.squareUnderAttack(r, c-1)) and (not self.squareUnderAttack(r, c-2)):
-				moves.append(Move((r,c), (r, c-2), self.board, is_castle_move=True))
+			if not self.squareUnderAttack(r, c-1) and not self.squareUnderAttack(r, c-2):
+				moves.append(Move((r,c),(r, c-2), self.board, is_castle_move=True))
 class castling():
 	def __init__(self,lks,dks,lqs,dqs):
 		self.lks = lks #lks - light king side 
