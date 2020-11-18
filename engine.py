@@ -235,18 +235,15 @@ class Game_state():
 			print("undoing ->", last_move.get_chess_notation())
 		else:
 			print("All undone!")
-		#undo castle right
-		self.castling_log.pop() #remove the new castle rights from the move we undo
-		new_castle_right - self.castling_log[-1]
-		self.track_of_castling = castling(new_castle_right.lks, new_castle_right.dks, new_castle_right.lqs, new_castle_right.dqs )
+		
 		#undo castle move
-		if move.is_castle_move:
-			if move.end_col - move.start_col == 2: #kingside
-				self.board[move.end_row][move.end_col+1] = self.board[move.end_row][move.end_col-1]
-				self.board[move.end_row][move.end_col-1] = "  "
+		if last_move.is_castle_move:
+			if last_move.end_col - last_move.start_col == 2: #kingside
+				self.board[last_move.end_row][last_move.end_col+1] = self.board[last_move.end_row][last_move.end_col-1]
+				self.board[last_move.end_row][last_move.end_col-1] = "  "
 			else: #queen side 
-				self.board[move.end_row][move.end_col-2] = self.board[move.end_row][move.end_col+1]
-				self.board[move.end_row][move.end_col+1] = "  "
+				self.board[last_move.end_row][last_move.end_col-2] = self.board[last_move.end_row][last_move.end_col+1]
+				self.board[last_move.end_row][last_move.end_col+1] = "  "
 
 		#undo castling
 		self.castling_log.pop() #delete the new castle right
