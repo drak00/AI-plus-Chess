@@ -42,6 +42,7 @@ def main():
 	square_selected = () # x, y coordinate of selected square 
 	player_clicks = [] # list of appended square_selected
 	valid_moves = [] 
+	game_over = False
 	while running:
 
 		valid_moves, first_click_turn = gs.get_valid_moves()		
@@ -62,45 +63,62 @@ def main():
 					print("Board reset!")
 
 			elif e.type == pg.MOUSEBUTTONDOWN:
-				location = pg.mouse.get_pos() # x, y location of mouse click
-				location_col_transform = location[0] // SQ_SIZE - 1
-				location_row_transform = location[1] // SQ_SIZE - 1
-				col = (location_col_transform) if (0 <= location_col_transform < 8) else -1  
-				row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
 
-				if col >= 0 and row >= 0:
+				if not game_over:
 
-					if square_selected == (row, col): # clicked same position twice
-						square_selected = ()
-						player_clicks = []
+					location = pg.mouse.get_pos() # x, y location of mouse click
+					location_col_transform = location[0] // SQ_SIZE - 1
+					location_row_transform = location[1] // SQ_SIZE - 1
+					col = (location_col_transform) if (0 <= location_col_transform < 8) else -1  
+					row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
 
-					else: # new position clicked (destination)
-						square_selected = (row, col)
-						player_clicks.append(square_selected)
-					
-					if len(player_clicks) == 2: # 'from' and 'to' are available
-						move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
-							
-						if move in valid_moves:
-							
-							gs.make_move(move)
-							animate(move, screen, gs.board, clock)
+					if col >= 0 and row >= 0:
 
-							print(move.get_chess_notation())
-							
+						if square_selected == (row, col): # clicked same position twice
 							square_selected = ()
 							player_clicks = []
 
-						else:
-							current_turn = "l" if gs.light_to_move else "d"
-							if current_turn == first_click_turn:
-								player_clicks = [square_selected]
+						else: # new position clicked (destination)
+							square_selected = (row, col)
+							player_clicks.append(square_selected)
+						
+						if len(player_clicks) == 2: # 'from' and 'to' are available
+							move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
+								
+							if move in valid_moves:
+								
+								gs.make_move(move)
+								animate(move, screen, gs.board, clock)
+
+								print(move.get_chess_notation())
+								
 								square_selected = ()
-							else:
 								player_clicks = []
-								square_selected = ()
+
+							else:
+								current_turn = "l" if gs.light_to_move else "d"
+								if current_turn == first_click_turn:
+									player_clicks = [square_selected]
+									square_selected = ()
+								else:
+									player_clicks = []
+									square_selected = ()
 
 		display_game_state(screen, gs, valid_moves, player_clicks)
+
+		if gs.check_mate:
+			game_over = True
+
+			if gs.light_to_move:
+				display_text(screen, "Dark wins by checkmate")
+			else:
+				display_text(screen, "Light wins by checkmate")
+
+		elif gs.stale_mate:
+			game_over = True
+			display_text(screen, "Stalemate")
+
+
 		clock.tick(MAX_FPS)
 		pg.display.flip()
 
@@ -186,6 +204,18 @@ def play_sound(move):
 		pg.mixer.Sound.play(SOUND[0])
 	else:
 		pg.mixer.Sound.play(SOUND[1])
+
+
+def display_text(screen, text):
+
+	font = pg.font.SysFont("Helvetica", 32, True, False)
+	text_object = font.render(text, 0, pg.Color("Gray"))
+
+	text_location = pg.Rect(0, 0, WIDTH+BORDER, HEIGHT+BORDER).move((WIDTH+BORDER)//2 - text_object.get_width()/2, (HEIGHT+BORDER)//2 - text_object.get_height()/2)
+	screen.blit(text_object, text_location)
+
+	text_object = font.render(text, 0, pg.Color("Black"))
+	screen.blit(text_object, text_location.move(2, 2))
 
 
 def animate(move, screen, board, clock):

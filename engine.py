@@ -38,6 +38,12 @@ class Game_state():
 		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
 						"q":self.get_queen_moves, "k":self.get_king_moves, \
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
+
+		self.light_king_location =  (7, 4)
+		self.dark_king_location  =  (0, 4)
+		self.check_mate = False # king is being attacked (initiated by opposing piece)
+		self.stale_mate = False # no valid moves (king cornered; initiated by king)
+
 		
 
 
@@ -223,6 +229,11 @@ class Game_state():
 			if (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pl"):
 				self.en_passant.append(Move((move.end_row, move.end_col+1), (move.end_row-1, move.end_col), self.board))
 
+		# update king's position
+		if move.piece_moved == "kl":
+			self.light_king_location = (move.end_row, move.end_col)
+		elif move.piece_moved == "kd":
+			self.dark_king_location = (move.end_row, move.end_col)
 
 
 	def undo_move(self, look_ahead_mode = False):
@@ -244,14 +255,46 @@ class Game_state():
 				else:
 					self.board[last_move.end_row-1][last_move.end_col] = last_move.en_passant_captured
 
+			# handles checkmate and stalemate
+			self.check_mate = False if self.check_mate else False
+			self.stale_mate = False if self.stale_mate else False
 
-			print("undoing ->", last_move.get_chess_notation())
+			# update king's position
+			if last_move.piece_moved == "kl":
+				self.light_king_location = (last_move.start_row, last_move.start_col)
+			elif last_move.piece_moved == "kd":
+				self.dark_king_location = (last_move.start_row, last_move.start_col)
+
+			# interactive
+			if not look_ahead_mode:
+				print("undoing ->", last_move.get_chess_notation())
 		else:
 			print("All undone!")
 
 
 	def get_valid_moves(self):
-		return self.get_possible_moves()
+
+		moves, turn = self.get_possible_moves()
+		for move in moves[::-1]: # reverse iteration
+			self.make_move(move)
+			self.light_to_move = not self.light_to_move
+			in_check = self.is_in_check()
+			if in_check:
+				moves.remove(move)
+			self.undo_move(True)
+			self.light_to_move = not self.light_to_move
+
+		if in_check and len(moves) == 0:
+			self.check_mate = True
+		elif not in_check and len(moves) == 0:
+			self.stale_mate = True
+			
+			# handles undoing
+		else:
+			self.check_mate = False
+			self.stale_mate = False
+
+		return moves, turn
 
 
 	def get_possible_moves(self):
@@ -269,6 +312,84 @@ class Game_state():
 					self.move_piece[self.board[i][j][0]](i, j, moves)
 
 		return moves, turn
+
+
+	# if current player is in check
+	def is_in_check(self):
+		if self.light_to_move:
+			return self.is_square_attacked(self.light_king_location[0], self.light_king_location[1])
+		else:
+			return self.is_square_attacked(self.dark_king_location[0], self.dark_king_location[1])
+
+
+	# if enemy can attack square (r, c)
+	def is_square_attacked(self, r, c):
+
+		turn = 'l' if self.light_to_move else "d" # allies turn 
+		opp_turn = "d" if self.light_to_move else "l" # opponents turn
+
+		# check for all possible knigh attacks
+		checks = ((1, 2), (-1, 2), (1, -2), (-1, -2), (2, 1), (2, -1), (-2, -1), (-2, 1))
+		for loc in checks:
+			end_row = r + loc[0]
+			end_col = c + loc[1]
+
+			if 0<= end_row < 8 and 0<= end_col< 8:
+				if self.board[end_row][end_col][1] == opp_turn and self.board[end_row][end_col][0] == "n":
+					return True
+
+
+		# check for all possible pawn attacks
+		checks = ((-1, -1), (-1, 1)) if self.light_to_move else ((1, -1), (1, 1))
+		for loc in checks:
+			end_row = r + loc[0]
+			end_col = c + loc[1]
+
+			if 0<= end_row < 8 and 0<= end_col < 8:
+				if self.board[end_row][end_col][1] == opp_turn and self.board[end_row][end_col][0] == "p":
+					return True
+
+		# check for all possible rook or queen or king attacks
+		checks = ((1, -1), (1, 1), (-1, -1), (-1, 1))
+		for loc in checks:
+			for i in range(1, 8):
+				end_row = loc[0]*i + r
+				end_col = loc[1]*i + c
+
+				if 0<= end_row < 8 and 0<= end_col < 8:
+					if self.board[end_row][end_col][1] == turn:
+						break
+
+					elif (i == 1) and (self.board[end_row][end_col][1] == opp_turn) and (self.board[end_row][end_col][0] == "k"):
+						break
+
+					elif self.board[end_row][end_col][1] == opp_turn:
+						if self.board[end_row][end_col][0] == "r" or self.board[end_row][end_col][0] == "q":
+							return True
+						else:
+							break
+
+		# check for all possible bishop or queen or king attacks
+		checks = ((1, 0), (-1, 0), (0, 1), (0, -1))
+		for loc in checks:
+			for i in range(1, 8):
+				end_row = loc[0]*i + r
+				end_col = loc[1]*i + c
+
+				if 0<= end_row < 8 and 0<= end_col < 8:
+					if self.board[end_row][end_col][1] == turn:
+						break
+
+					elif (i == 1) and (self.board[end_row][end_col][1] == opp_turn) and (self.board[end_row][end_col][0] == "k"):
+						break
+
+					elif (self.board[end_row][end_col][1] == opp_turn):
+						if self.board[end_row][end_col][0] == "b" or self.board[end_row][end_col][0] == "q":
+							return True
+						else:
+							break
+
+		return False
 
 
 
