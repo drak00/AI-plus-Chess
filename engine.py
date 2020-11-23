@@ -34,9 +34,11 @@ class Game_state():
 
 		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
 		self.move_log = []        # keeps a log of all moves made withing a game
+		self.en_passant = [] 	  # flags possible en-passant moves
 		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
 						"q":self.get_queen_moves, "k":self.get_king_moves, \
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
+		
 
 
 	def get_pawn_moves(self, r, c, moves):
@@ -166,7 +168,7 @@ class Game_state():
 					elif destination[1] == enemy_color:
 						moves.append(Move((r, c), (end_row, end_col), self.board))
 						break
-					else: # freindly piece
+					else: # friendly piece
 						break
 				else: # off board
 					break
@@ -181,10 +183,46 @@ class Game_state():
 		"""
 			moves pieces on the board
 		"""
+
 		self.board[move.start_row][move.start_col] = "  "
 		self.board[move.end_row][move.end_col] = move.piece_moved
 		self.move_log.append(move) # log move
+
+		# handles en-passant moves
+		if move in self.en_passant:
+			if self.light_to_move:
+				move.en_passant_captured = self.board[move.end_row+1][move.end_col]
+				self.board[move.end_row+1][move.end_col] = "  "
+			else:
+				move.en_passant_captured = self.board[move.end_row-1][move.end_col]
+				self.board[move.end_row-1][move.end_col] = "  "
+
 		self.light_to_move = not self.light_to_move # next player to move
+
+		self.en_passant = [] # reset en-passant tuple
+
+		# dark en-passant
+		if (move.start_row == 6 and move.piece_moved == "pl" and move.start_row - move.end_row == 2):
+
+			# from left of light pawn
+			if (move.end_col -1 >= 0 and self.board[move.end_row][move.end_col-1] == "pd"):
+				self.en_passant.append(Move((move.end_row, move.end_col-1), (move.end_row+1, move.end_col), self.board))
+
+			# from right of light pawn
+			if (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pd"):
+				self.en_passant.append(Move((move.end_row, move.start_col+1), (move.end_row+1, move.end_col), self.board))
+
+		# light en-passant
+		if (move.start_row == 1 and move.piece_moved == "pd" and move.end_row - move.start_row == 2):
+
+			# from left of dark pawn
+			if (move.end_col -1 >= 0 and self.board[move.end_row][move.end_col-1] == "pl"):
+				self.en_passant.append(Move((move.end_row, move.start_col-1), (move.end_row-1, move.end_col), self.board))
+
+			# from right of dark pawn
+			if (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pl"):
+				self.en_passant.append(Move((move.end_row, move.end_col+1), (move.end_row-1, move.end_col), self.board))
+
 
 
 	def undo_move(self, look_ahead_mode = False):
@@ -195,7 +233,17 @@ class Game_state():
 			last_move = self.move_log.pop()
 			self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
 			self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
+
+			# handles enpassant
 			self.light_to_move = not self.light_to_move
+			if last_move.en_passant_captured:
+				self.en_passant.append(Move((last_move.start_row, last_move.start_col), (last_move.end_row, last_move.end_col), self.board)) # recall en-passant valid move(s)
+				
+				if self.light_to_move:
+					self.board[last_move.end_row+1][last_move.end_col] = last_move.en_passant_captured
+				else:
+					self.board[last_move.end_row-1][last_move.end_col] = last_move.en_passant_captured
+
 
 			print("undoing ->", last_move.get_chess_notation())
 		else:
@@ -209,7 +257,10 @@ class Game_state():
 	def get_possible_moves(self):
 
 		moves = []
-
+		if self.en_passant:
+			for obj in self.en_passant:
+				moves.append(obj)
+			
 		turn = "l" if self.light_to_move else "d"
 
 		for i in range(len(self.board)):
@@ -253,6 +304,7 @@ class Move():
 		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
 		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
 		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
+		self.en_passant_captured = None
 
 	def get_chess_notation(self):
 		"""
@@ -264,9 +316,21 @@ class Move():
 			return parameter(s)
 			commentary (string)
 		"""
-		return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
-			"(" + self.piece_captured[0].upper() + " captured!)" if self.piece_captured != "  " else self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
-			self.get_rank_file(self.end_row, self.end_col)
+		
+		if self.en_passant_captured:
+			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+				"(" + self.en_passant_captured[0].upper() + " captured!)"
+		elif not self.en_passant_captured and self.piece_captured != "  ":
+			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+				"(" + self.piece_captured[0].upper() + " captured!)"
+		else:
+			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
+				self.get_rank_file(self.end_row, self.end_col)
+
+
+		# return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+		# 	"(" + self.piece_captured[0].upper() + " captured!)" if self.piece_captured != "  " else self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
+		# 	self.get_rank_file(self.end_row, self.end_col)
 
 
 	def get_rank_file(self, r, c):
