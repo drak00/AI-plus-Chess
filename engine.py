@@ -1,7 +1,6 @@
 ## This is the main chess game engine that implements the rules of the game
 ## and stores the state of the the chess board, including its pieces and moves
 
-
 class Game_state():
 	
 	def __init__(self):
@@ -203,6 +202,7 @@ class Game_state():
 				move.en_passant_captured = self.board[move.end_row-1][move.end_col]
 				self.board[move.end_row-1][move.end_col] = "  "
 
+
 		self.light_to_move = not self.light_to_move # next player to move
 
 		self.en_passant = [] # reset en-passant tuple
@@ -234,6 +234,7 @@ class Game_state():
 			self.light_king_location = (move.end_row, move.end_col)
 		elif move.piece_moved == "kd":
 			self.dark_king_location = (move.end_row, move.end_col)
+
 
 
 	def undo_move(self, look_ahead_mode = False):

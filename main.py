@@ -42,67 +42,79 @@ def main():
 	square_selected = () # x, y coordinate of selected square 
 	player_clicks = [] # list of appended square_selected
 	valid_moves = [] 
-	game_over = False
+	game_over = False # signals end of game
+	user_prompt = False # pauses gui rendering for user input
 	while running:
 
-		valid_moves, first_click_turn = gs.get_valid_moves()		
+		if not user_prompt:
+			valid_moves, first_click_turn = gs.get_valid_moves()		
 
-		for e in pg.event.get():
-			if e.type == pg.QUIT:
-				running = False
+			for e in pg.event.get():
+				if e.type == pg.QUIT:
+					running = False
 
-			elif e.type == pg.KEYDOWN:
-				if e.key == pg.K_u: # u key pressed (undo last move)
-					gs.undo_move()
+				elif e.type == pg.KEYDOWN:
+					if e.key == pg.K_u: # u key pressed (undo last move)
+						gs.undo_move()
 
-				elif e.key == pg.K_r: # r key pressed (reset game)
-					gs = Game_state()
-					valid_moves, turn = [], None
-					square_selected = ()
-					player_clicks = []
-					print("Board reset!")
+					elif e.key == pg.K_r: # r key pressed (reset game)
+						gs = Game_state()
+						valid_moves, turn = [], None
+						square_selected = ()
+						player_clicks = []
+						print("Board reset!")
 
-			elif e.type == pg.MOUSEBUTTONDOWN:
+				elif e.type == pg.MOUSEBUTTONDOWN:
 
-				if not game_over:
+					if not game_over:
 
-					location = pg.mouse.get_pos() # x, y location of mouse click
-					location_col_transform = location[0] // SQ_SIZE - 1
-					location_row_transform = location[1] // SQ_SIZE - 1
-					col = (location_col_transform) if (0 <= location_col_transform < 8) else -1  
-					row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
+						location = pg.mouse.get_pos() # x, y location of mouse click
+						location_col_transform = location[0] // SQ_SIZE - 1
+						location_row_transform = location[1] // SQ_SIZE - 1
+						col = (location_col_transform) if (0 <= location_col_transform < 8) else -1  
+						row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
 
-					if col >= 0 and row >= 0:
+						if col >= 0 and row >= 0:
 
-						if square_selected == (row, col): # clicked same position twice
-							square_selected = ()
-							player_clicks = []
-
-						else: # new position clicked (destination)
-							square_selected = (row, col)
-							player_clicks.append(square_selected)
-						
-						if len(player_clicks) == 2: # 'from' and 'to' are available
-							move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
-								
-							if move in valid_moves:
-								
-								gs.make_move(move)
-								animate(move, screen, gs.board, clock)
-
-								print(move.get_chess_notation())
-								
+							if square_selected == (row, col): # clicked same position twice
 								square_selected = ()
 								player_clicks = []
 
-							else:
-								current_turn = "l" if gs.light_to_move else "d"
-								if current_turn == first_click_turn:
-									player_clicks = [square_selected]
+							else: # new position clicked (destination)
+								square_selected = (row, col)
+								player_clicks.append(square_selected)
+							
+							if len(player_clicks) == 2: # 'from' and 'to' are available
+								move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
+									
+								if move in valid_moves:
+									
+									gs.make_move(move)
+									
+									if (move.end_row == 0 or move.end_row == 7) and (move.piece_moved[0] == "p"):
+										user_prompt = True
+										choice = ("q", "r", "b", "n")
+										promotion = ""
+										while promotion not in choice:
+											promotion = input("Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
+										gs.board[move.end_row][move.end_col] = promotion + move.piece_moved[1]
+										user_prompt = False
+
+									animate(move, screen, gs.board, clock)
+
+									print(move.get_chess_notation())
+									
 									square_selected = ()
-								else:
 									player_clicks = []
-									square_selected = ()
+
+								else:
+									current_turn = "l" if gs.light_to_move else "d"
+									if current_turn == first_click_turn:
+										player_clicks = [square_selected]
+										square_selected = ()
+									else:
+										player_clicks = []
+										square_selected = ()
 
 		display_game_state(screen, gs, valid_moves, player_clicks)
 
