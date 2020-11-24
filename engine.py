@@ -34,6 +34,7 @@ class Game_state():
 		self.light_to_move = True # True = light's turn to play; False = dark's turn to play
 		self.move_log = []        # keeps a log of all moves made withing a game
 		self.en_passant = [] 	  # flags possible en-passant moves
+		self.castling = [] 		  # flags possible casling moves
 		self.move_piece = {"p":self.get_pawn_moves, "r":self.get_rook_moves, \
 						"q":self.get_queen_moves, "k":self.get_king_moves, \
 						"b":self.get_bishop_moves, "n":self.get_knight_moves}
@@ -42,6 +43,10 @@ class Game_state():
 		self.dark_king_location  =  (0, 4)
 		self.check_mate = False # king is being attacked (initiated by opposing piece)
 		self.stale_mate = False # no valid moves (king cornered; initiated by king)
+		self.light_king_side_castle = True # light king side castle available (king and right rook not moved)
+		self.light_queen_side_castle = True # light queen side castle available (king and left rook not moved)
+		self.dark_king_side_castle = True # dark king side castle available (king and right rook not moved)
+		self.dark_queen_side_castle = True # dark queen side castle available (king and left rook not moved)
 
 		
 
@@ -155,6 +160,53 @@ class Game_state():
 				if destination[1] == enemy_color or destination == "  ":
 					moves.append(Move((r, c), (end_row, end_col), self.board))
 
+		# castling
+
+		# light king side
+		if self.light_to_move and self.light_king_side_castle:
+
+			# if path is clear
+			if self.board[7][5] == "  " and self.board[7][6] == "  ":
+
+				# if path not under attack
+				if (not self.is_square_attacked(7, 5)) and (not self.is_square_attacked(7, 6)):
+					moves.append(Move((7, 4), (7, 6), self.board))
+					self.castling.append(Move((7, 4), (7, 6), self.board))
+
+		# light queen side	
+		if self.light_to_move and self.light_queen_side_castle:
+
+			# if path is clear	
+			if self.board[7][1] == "  " and self.board[7][2] == "  " and self.board[7][3] == "  ":
+
+				# if path not under attack
+				if (not self.is_square_attacked(7, 1)) and (not self.is_square_attacked(7, 2)) and (not self.is_square_attacked(7, 3)):
+					moves.append(Move((7, 4), (7, 2), self.board))
+					self.castling.append(Move((7, 4), (7, 2), self.board))
+
+		# dark king side
+		if not self.light_to_move and self.dark_king_side_castle:
+
+			# if path is clear
+			if self.board[0][5] == "  " and self.board[0][6] == "  ":
+
+				# if path not under attack
+				if (not self.is_square_attacked(0, 5)) and (not self.is_square_attacked(0, 6)):
+					moves.append(Move((0, 4), (0, 6), self.board))
+					self.castling.append(Move((0, 4), (0, 6), self.board))
+
+		# dark queen side
+		if not self.light_to_move and self.dark_queen_side_castle:
+
+			# if path is clear
+			if self.board[0][1] == "  " and self.board[0][2] == "  " and self.board[0][3] == "  ":
+
+				# if path not under attach
+				if (not self.is_square_attacked(0, 1)) and (not self.is_square_attacked(0, 2)) and (not self.is_square_attacked(0, 3)):
+					moves.append(Move((0, 4), (0, 2), self.board))
+					self.castling.append(Move((0, 4), (0, 2), self.board))
+
+
 
 	def get_rook_moves(self, r, c, moves):
 
@@ -184,9 +236,16 @@ class Game_state():
 		self.get_rook_moves(r, c, moves)
 
 
-	def make_move(self, move):
+	def make_move(self, move, ignore = False):
 		"""
 			moves pieces on the board
+
+			input parameters:
+			move     --> move to be made (Move object)
+			ignore   --> flag to ignore castling or not (during thinking mode)
+
+			return parameter(s):
+			None
 		"""
 
 		self.board[move.start_row][move.start_col] = "  "
@@ -202,10 +261,25 @@ class Game_state():
 				move.en_passant_captured = self.board[move.end_row-1][move.end_col]
 				self.board[move.end_row-1][move.end_col] = "  "
 
+		# handles castling moves
+		if not ignore and move in self.castling:
+
+			# determine rook to be castled
+			if move.end_col == 2:
+				move.castling_rook = self.board[move.start_row][0]
+				self.board[move.start_row][0] = "  "
+				self.board[move.end_row][3] = "r" + self.board[move.end_row][move.end_col][1] # castle rook
+			elif move.end_col == 6:
+				move.castling_rook = self.board[move.start_row][7]
+				self.board[move.start_row][7] = "  "
+				self.board[move.end_row][5] = "r" + self.board[move.end_row][move.end_col][1] # castle rook
+
 
 		self.light_to_move = not self.light_to_move # next player to move
 
 		self.en_passant = [] # reset en-passant tuple
+		if not ignore:
+			self.castling = [] # reset castling tuple
 
 		# dark en-passant
 		if (move.start_row == 6 and move.piece_moved == "pl" and move.start_row - move.end_row == 2):
@@ -229,17 +303,72 @@ class Game_state():
 			if (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pl"):
 				self.en_passant.append(Move((move.end_row, move.end_col+1), (move.end_row-1, move.end_col), self.board))
 
+
 		# update king's position
 		if move.piece_moved == "kl":
 			self.light_king_location = (move.end_row, move.end_col)
+
+			if not ignore:	
+
+				# non castling king move
+				if not move.castling_rook:
+					self.light_king_side_castle = False
+					self.light_queen_side_castle = False
+
+				# castling king moves
+				# queen side castled
+				elif move.castling_rook and move.end_col == 2:
+					self.light_queen_side_castle = False
+
+				# king side castled	
+				elif move.castling_rook and move.end_col == 6:
+					self.light_king_side_castle = False
+
 		elif move.piece_moved == "kd":
 			self.dark_king_location = (move.end_row, move.end_col)
 
+			if not ignore:	
+
+				# non castling king move
+				if not move.castling_rook:
+					self.dark_king_side_castle = False
+					self.dark_queen_side_castle = False
+
+				# castling king moves
+				# queen side castled
+				elif move.castling_rook and move.end_col == 2:
+					self.dark_queen_side_castle = False
+
+				# king side castled	
+				elif move.castling_rook and move.end_col == 6:
+					self.dark_king_side_castle = False
+
+
+		# check rook moves for castling
+
+		if not ignore:
+			# light rooks
+			if move.start_row == 7 and move.start_col == 0:
+				self.light_queen_side_castle = False
+			elif move.start_row == 7 and move.start_col == 7:
+				self.light_king_side_castle = False
+			
+			# dark rooks
+			elif move.start_row == 0 and move.start_col == 0:
+				self.dark_queen_side_castle = False
+			elif move.start_row == 0 and move.start_col == 7:
+				self.dark_king_side_castle = False
 
 
 	def undo_move(self, look_ahead_mode = False):
 		"""
 			undoes last move
+
+			input parameter(s):
+			look_ahead_mode   -->  flag for thinking mode vs playing mode (false = playing mode)
+
+			return parameter(s):
+			None
 		"""
 		if self.move_log:
 			last_move = self.move_log.pop()
@@ -263,8 +392,115 @@ class Game_state():
 			# update king's position
 			if last_move.piece_moved == "kl":
 				self.light_king_location = (last_move.start_row, last_move.start_col)
+
+				# undoing first-time non-castling light king move (for castling)
+				if last_move.start_row == 7 and last_move.start_col == 4 and not last_move.castling_rook:
+
+					# ensure no king moves in past moves (first time king move!)
+					count = 0
+					for past_move in self.move_log:
+						if (past_move.piece_moved == last_move.piece_moved) and (past_move.start_row == last_move.start_row) and \
+						(past_move.start_col == last_move.start_col):
+							count += 1
+							break
+					if count == 0:
+						self.light_queen_side_castle = True
+						self.light_king_side_castle = True
+
 			elif last_move.piece_moved == "kd":
 				self.dark_king_location = (last_move.start_row, last_move.start_col)
+
+				# undoing first-time non-castling dark king move (for castling)
+				if last_move.start_row == 0 and last_move.start_col == 4 and not last_move.castling_rook:
+
+					# ensure no king moves in past moves (first time king move!)
+					count = 0
+					for past_move in self.move_log:
+						if (past_move.piece_moved == last_move.piece_moved) and (past_move.start_row == last_move.start_row) and \
+						(past_move.start_col == last_move.start_col):
+							count += 1
+							break
+					if count == 0:
+						self.dark_queen_side_castle = True
+						self.dark_king_side_castle = True
+
+			# handles castling
+			if last_move.castling_rook:
+				if last_move.piece_moved == "kl" and last_move.end_col == 2:
+					self.light_queen_side_castle = True
+					self.board[7][3] = "  "
+					self.board[7][0] = "rl"
+				elif last_move.piece_moved == "kl" and last_move.end_col == 6:
+					self.light_king_side_castle = True
+					self.board[7][5] = "  "
+					self.board[7][7] = "rl"
+				elif last_move.piece_moved == "kd" and last_move.end_col == 2:
+					self.dark_queen_side_castle = True
+					self.board[0][3] = "  "
+					self.board[0][0] = "rd"
+				elif last_move.piece_moved == "kd" and last_move.end_col == 6:
+					self.dark_king_side_castle = True
+					self.board[0][5] = "  "
+					self.board[0][7] = "rd"
+
+			# undoing first-time rook moves (for castling)
+			# light king side rook 
+			if last_move.piece_moved == "rl":
+				if last_move.start_row == 7 and last_move.start_col == 7:
+
+					# ensure no rook moves in past moves (first time rook move!)
+					count = 0
+					for past_move in self.move_log:
+						if (past_move.piece_moved == last_move.piece_moved) and (past_move.start_row == last_move.start_row)\
+						and (past_move.start_col == last_move.start_col):
+							count += 1
+							break
+
+					if count == 0:
+						self.light_king_side_castle = True
+
+				# light queen side rook
+				elif last_move.start_row == 7 and last_move.start_col == 0:
+
+					# ensure no rook moves in past moves (first time rook move!)
+					count = 0
+					for past_move in self.move_log:
+						if (past_move.piece_moved == last_move.piece_moved) and (past_move.start_row == last_move.start_row)\
+						and (past_move.start_col == last_move.start_col):
+							count += 1
+							break
+
+					if count == 0:
+						self.light_queen_side_castle = True
+
+			#dark king side rook
+			elif last_move.piece_moved == "rd":
+				if last_move.start_row == 0 and last_move.start_col == 7:
+
+					# ensure no rook moves in past moves (first time rook move!)
+					count = 0
+					for past_move in self.move_log:
+						if (past_move.piece_moved == last_move.piece_moved) and (past_move.start_row == last_move.start_row)\
+						and (past_move.start_col == last_move.start_col):
+							count += 1
+							break
+
+					if count == 0:
+						self.dark_king_side_castle = True
+
+				# dark queen side rook
+				elif last_move.start_row == 0 and last_move.start_col == 0:
+
+					# ensure no rook moves in past moves (first time rook move!)
+					count = 0
+					for past_move in self.move_log:
+						if (past_move.piece_moved == last_move.piece_moved) and (past_move.start_row == last_move.start_row)\
+						and (past_move.start_col == last_move.start_col):
+							count += 1
+							break
+
+					if count == 0:
+						self.dark_queen_side_castle = True
 
 			# interactive
 			if not look_ahead_mode:
@@ -274,10 +510,20 @@ class Game_state():
 
 
 	def get_valid_moves(self):
+		"""
+			gives the valid piece moves on the board while considering potential checks
+
+			input parameter(s):
+			None
+
+			return parameter(s):
+			moves --> list of vlid move objects
+			turn  --> char of current player turn ('l' for light, 'd' for dark)
+		"""
 
 		moves, turn = self.get_possible_moves()
 		for move in moves[::-1]: # reverse iteration
-			self.make_move(move)
+			self.make_move(move, ignore = True)
 			self.light_to_move = not self.light_to_move
 			in_check = self.is_in_check()
 			if in_check:
@@ -299,6 +545,17 @@ class Game_state():
 
 
 	def get_possible_moves(self):
+		"""
+			gives naive possible moves of pieces on the board without taking checks into 
+			account
+			
+			input parameters:
+			None
+
+			return parameter(s):
+			moves --> list of possible move objects
+			turn  --> char of current player turn ('l' for light, 'd' for dark)
+		"""
 
 		moves = []
 		if self.en_passant:
@@ -315,21 +572,38 @@ class Game_state():
 		return moves, turn
 
 
-	# if current player is in check
 	def is_in_check(self):
+		"""
+			determines if current player isnin check (king under attack)
+
+			input parameter(s):
+			None
+
+			return parameter(s):
+			bool of True or False
+		"""
 		if self.light_to_move:
 			return self.is_square_attacked(self.light_king_location[0], self.light_king_location[1])
 		else:
 			return self.is_square_attacked(self.dark_king_location[0], self.dark_king_location[1])
 
 
-	# if enemy can attack square (r, c)
 	def is_square_attacked(self, r, c):
+		"""
+			determines if enemy can attack given board position
+
+			input parameter(s):
+			r     --> board row (int)
+			c     --> board column (int)
+
+			return parameter(s):
+			bool of True or False
+		"""
 
 		turn = 'l' if self.light_to_move else "d" # allies turn 
 		opp_turn = "d" if self.light_to_move else "l" # opponents turn
 
-		# check for all possible knigh attacks
+		# check for all possible knight attacks
 		checks = ((1, 2), (-1, 2), (1, -2), (-1, -2), (2, 1), (2, -1), (-2, -1), (-2, 1))
 		for loc in checks:
 			end_row = r + loc[0]
@@ -350,7 +624,7 @@ class Game_state():
 				if self.board[end_row][end_col][1] == opp_turn and self.board[end_row][end_col][0] == "p":
 					return True
 
-		# check for all possible rook or queen or king attacks
+		# check for all possible bishop or queen or king attacks
 		checks = ((1, -1), (1, 1), (-1, -1), (-1, 1))
 		for loc in checks:
 			for i in range(1, 8):
@@ -365,12 +639,12 @@ class Game_state():
 						break
 
 					elif self.board[end_row][end_col][1] == opp_turn:
-						if self.board[end_row][end_col][0] == "r" or self.board[end_row][end_col][0] == "q":
+						if self.board[end_row][end_col][0] == "b" or self.board[end_row][end_col][0] == "q":
 							return True
 						else:
 							break
 
-		# check for all possible bishop or queen or king attacks
+		# check for all possible rook or queen or king attacks
 		checks = ((1, 0), (-1, 0), (0, 1), (0, -1))
 		for loc in checks:
 			for i in range(1, 8):
@@ -385,7 +659,7 @@ class Game_state():
 						break
 
 					elif (self.board[end_row][end_col][1] == opp_turn):
-						if self.board[end_row][end_col][0] == "b" or self.board[end_row][end_col][0] == "q":
+						if self.board[end_row][end_col][0] == "r" or self.board[end_row][end_col][0] == "q":
 							return True
 						else:
 							break
@@ -426,7 +700,8 @@ class Move():
 		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
 		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
 		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
-		self.en_passant_captured = None
+		self.en_passant_captured = None # piece captured during en-passant
+		self.castling_rook = None # rook castled during castling
 
 	def get_chess_notation(self):
 		"""
@@ -442,9 +717,15 @@ class Move():
 		if self.en_passant_captured:
 			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
 				"(" + self.en_passant_captured[0].upper() + " captured!)"
+		
 		elif not self.en_passant_captured and self.piece_captured != "  ":
 			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
 				"(" + self.piece_captured[0].upper() + " captured!)"
+		
+		elif self.castling_rook:
+			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+				"(" + "Queen side castling!)" if self.end_col == 2 else "King side castling!)"
+
 		else:
 			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
 				self.get_rank_file(self.end_row, self.end_col)
