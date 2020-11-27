@@ -47,109 +47,79 @@ def main():
 	square_selected = () # x, y coordinate of selected square 
 	player_clicks = [] # list of appended square_selected
 	valid_moves = [] 
+	game_over = False # signals end of game
+	user_prompt = False # pauses gui rendering for user input
 	while running:
 
-		valid_moves = gs.get_valid_moves(Move)		
-		first_click_turn = "l" if gs.light_to_move else "d"
-		if first_click_turn == "d":
-			if gs.is_check_mate:
-				master = tk.Tk()
-				master.withdraw()
-				mbox.showinfo("WINNER", "LIGHT TEAM WINS")
-				master.destroy()
-			elif gs.is_stalemate:
-				master = tk.Tk()
-				master.withdraw()
-				mbox.showinfo("NO WINNER", "GAME IS DRAWN")
-				master.destroy()
-			else:
-				# i = randrange(len(valid_moves))
-				# move = valid_moves[i]
-				# gs.make_move(move)
-				# animate(move, screen, gs.board, clock)
-				# if move.pawnpromotion:
-				# 	s = ["q","n","r","b"]
-				# 	x = s[randrange(len(s))]
-				# 	gs.board[move.end_row][move.end_col] = x + move.piece_moved[1]
+		if not user_prompt:
+			valid_moves, first_click_turn = gs.get_valid_moves()		
 
-				# best_move = valid_moves[0]
-				# for move in valid_moves:
-				# 	gs.make_move(move)
-				# 	score = evaluation_function(gs.board)
-				# 	if score > best_score:
-				# 		best_score = score
-				# 		best_move = move
-				# 	gs.undo_move(look_ahead_mode=True)
-				alpha = -2000000
-				beta = -2000000
-				best_move = None
-				depth = 3
-				score, best_move = alphabeta(gs.board, best_move, depth, alpha, beta)
-				gs.make_move(best_move)
-				animate(move, screen, gs.board, clock)
-				if move.pawnpromotion:
-					gs.board[move.end_row][move.end_col] = "q" + move.piece_moved[1]
-				#first_click_turn = "l"
-		for e in pg.event.get():
-			if e.type == pg.QUIT:
-				running = False
+			for e in pg.event.get():
+				if e.type == pg.QUIT:
+					running = False
 
-			elif e.type == pg.KEYDOWN:
-				if e.key == pg.K_u: # u key pressed (undo last move)
-					n = True
-					gs.undo_move(n)
+				elif e.type == pg.KEYDOWN:
+					if e.key == pg.K_u: # u key pressed (undo last move)
+						gs.undo_move()
 
-				elif e.key == pg.K_r: # r key pressed (reset game)
-					gs = Game_state()
-					valid_moves, turn = [], None
-					square_selected = ()
-					player_clicks = []
-					print("Board reset!")
+					elif e.key == pg.K_r: # r key pressed (reset game)
+						gs = Game_state()
+						valid_moves, turn = [], None
+						square_selected = ()
+						player_clicks = []
+						print("Board reset!")
 
-			elif e.type == pg.MOUSEBUTTONDOWN:
-				if first_click_turn == "l":
-					location = pg.mouse.get_pos() # x, y location of mouse click
-					location_col_transform = location[0] // SQ_SIZE - 1
-					location_row_transform = location[1] // SQ_SIZE - 1
-					col = (location_col_transform) if (0 <= location_col_transform < 8) else -1
-					row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
+				elif e.type == pg.MOUSEBUTTONDOWN:
 
-					if col >= 0 and row >= 0:
+					if not game_over:
 
-						if square_selected == (row, col): # clicked same position twice
-							square_selected = ()
-							player_clicks = []
+						location = pg.mouse.get_pos() # x, y location of mouse click
+						location_col_transform = location[0] // SQ_SIZE - 1
+						location_row_transform = location[1] // SQ_SIZE - 1
+						col = (location_col_transform) if (0 <= location_col_transform < 8) else -1  
+						row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
 
-						else: # new position clicked (destination)
-							square_selected = (row, col)
-							player_clicks.append(square_selected)
+						if col >= 0 and row >= 0:
 
-						if len(player_clicks) == 2: # 'from' and 'to' are available
-							move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
-
-							if move in valid_moves:
-
-								gs.make_move(move)
-								animate(move, screen, gs.board, clock)
-								if move.pawnpromotion:
-									#window to allow the user enter his choice
-									master = tk.Tk()
-									master.withdraw()
-									while True:
-										userDb = simpledialog.askstring("pawns promotion chooser",
-																		"Enter q to promote to Queen,r to Rook ,b to Bishop or n to Knight: ")
-										if userDb is None:
-											mbox.showerror("CAN NOT CANCEL","THIS OPERATION CANNOT BE CANCELED")
-										elif userDb.lower() not in ["q","n","r","b"]:
-											mbox.showerror("WRONG CHOICE", "ENTER ONLY q,r,n or b")
-										else:
-											gs.board[move.end_row][move.end_col] = userDb + move.piece_moved[1]
-											master.destroy()
-											break
-								print(move.get_chess_notation())
-
+							if square_selected == (row, col): # clicked same position twice
 								square_selected = ()
 								player_clicks = []
+
+							else: # new position clicked (destination)
+								square_selected = (row, col)
+								player_clicks.append(square_selected)
+							
+							if len(player_clicks) == 2: # 'from' and 'to' are available
+								move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
+									
+								if move in valid_moves:
+									
+									gs.make_move(move)
+									
+									if (move.end_row == 0 or move.end_row == 7) and (move.piece_moved[0] == "p"):
+										user_prompt = True
+										choice = ("q", "r", "b", "n")
+										promotion = ""
+										while promotion not in choice:
+											promotion = input("Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
+										gs.board[move.end_row][move.end_col] = promotion + move.piece_moved[1]
+										user_prompt = False
+
+									animate(move, screen, gs.board, clock)
+
+									print(move.get_chess_notation())
+									
+									square_selected = ()
+									player_clicks = []
+
+								else:
+									current_turn = "l" if gs.light_to_move else "d"
+									if current_turn == first_click_turn:
+										player_clicks = [square_selected]
+										square_selected = ()
+									else:
+										player_clicks = []
+										square_selected = ()
 
 							else:
 								current_turn = "l" if gs.light_to_move else "d"
@@ -164,211 +134,25 @@ def main():
 					if gs.is_stalemate: #if drawn
 						mbox.showinfo("STALEMATE", "IT IS A STALEMATE")
 		display_game_state(screen, gs, valid_moves, player_clicks)
+
+		if gs.check_mate:
+			game_over = True
+
+			if gs.light_to_move:
+				display_text(screen, "Dark wins by checkmate")
+			else:
+				display_text(screen, "Light wins by checkmate")
+
+		elif gs.stale_mate:
+			game_over = True
+			display_text(screen, "Stalemate")
+
+
 		clock.tick(MAX_FPS)
 		pg.display.flip()
 
 
-def evaluation_function(board):
-	end_game = True
-	for i in range(len(board)):
-		for k in range(len(board)):
-			if board[i][k] == "ql" or "qd":
-				end_game = False
-				break
-	piece_values = {"p": 100, "n": 320, "b": 330, "r": 500, "q": 900, "k": 20000}
-	light_pawn_pst = [
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[50, 50, 50, 50, 50, 50, 50, 50],
-		[10, 10, 20, 30, 30, 20, 10, 10],
-		[5, 5, 10, 25, 25, 10, 5, 5],
-		[0, 0, 0, 20, 20, 0, 0, 0],
-		[5, -5, -10, 0, 0, -10, -5, 5],
-		[5, 10, 10, -20, -20, 10, 10, 5],
-		[0, 0, 0, 0, 0, 0, 0, 0]]
-	dark_pawn_pst = light_pawn_pst[::-1]
 
-	light_knight_pst = [
-		[-50, -40, -30, -30, -30, -30, -40, -50],
-		[-40, -20, 0, 0, 0, 0, -20, -40],
-		[-30, 0, 10, 15, 15, 10, 0, -30],
-		[-30, 5, 15, 20, 20, 15, 5, -30],
-		[-30, 0, 15, 20, 20, 15, 0, -30],
-		[-30, 5, 10, 15, 15, 10, 5, -30],
-		[-40, -20, 0, 5, 5, 0, -20, -40],
-		[-50, -40, -30, -30, -30, -30, -40, -50]]
-	dark_knight_pst = light_knight_pst[::-1]
-
-	light_bishop_pst = [
-		[-20, -10, -10, -10, -10, -10, -10, -20],
-		[-10, 0, 0, 0, 0, 0, 0, -10],
-		[-10, 0, 5, 10, 10, 5, 0, -10],
-		[-10, 5, 5, 10, 10, 5, 5, -10],
-		[-10, 0, 10, 10, 10, 10, 0, -10],
-		[-10, 10, 10, 10, 10, 10, 10, -10],
-		[-10, 5, 0, 0, 0, 0, 5, -10],
-		[-20, -10, -10, -10, -10, -10, -10, -20]]
-	dark_bishop_pst = light_bishop_pst[::-1]
-
-	light_rook_pst = [
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[5, 10, 10, 10, 10, 10, 10, 5],
-		[-5, 0, 0, 0, 0, 0, 0, -5],
-		[-5, 0, 0, 0, 0, 0, 0, -5],
-		[-5, 0, 0, 0, 0, 0, 0, -5],
-		[-5, 0, 0, 0, 0, 0, 0, -5],
-		[-5, 0, 0, 0, 0, 0, 0, -5],
-		[0, 0, 0, 5, 5, 0, 0, 0]]
-	dark_rook_pst = light_rook_pst[::-1]
-
-	light_queen_pst = [
-		[-20, -10, -10, -5, -5, -10, -10, -20],
-		[-10, 0, 0, 0, 0, 0, 0, -10],
-		[-10, 0, 5, 5, 5, 5, 0, -10],
-		[-5, 0, 5, 5, 5, 5, 0, -5],
-		[0, 0, 5, 5, 5, 5, 0, -5],
-		[-10, 5, 5, 5, 5, 5, 0, -10],
-		[-10, 0, 5, 0, 0, 0, 0, -10],
-		[-20, -10, -10, -5, -5, -10, -10, -20]]
-	dark_queen_pst = light_queen_pst[::-1]
-
-	if end_game:
-		light_king_pst = [
-			[-50, -40, -30, -20, -20, -30, -40, -50],
-			[-30, -20, -10, 0, 0, -10, -20, -30],
-			[-30, -10, 20, 30, 30, 20, -10, -30],
-			[-30, -10, 30, 40, 40, 30, -10, -30],
-			[-30, -10, 30, 40, 40, 30, -10, -30],
-			[-30, -10, 20, 30, 30, 20, -10, -30],
-			[-30, -30, 0, 0, 0, 0, -30, -30],
-			[-50, -30, -30, -30, -30, -30, -30, -50]]
-	else:
-		light_king_pst = [
-			[-30, -40, -40, -50, -50, -40, -40, -30],
-			[-30, -40, -40, -50, -50, -40, -40, -30],
-			[-30, -40, -40, -50, -50, -40, -40, -30],
-			[-30, -40, -40, -50, -50, -40, -40, -30],
-			[-20, -30, -30, -40, -40, -30, -30, -20],
-			[-10, -20, -20, -20, -20, -20, -20, -10],
-			[20, 20, 0, 0, 0, 0, 20, 20],
-			[20, 30, 10, 0, 0, 10, 30, 20]]
-	dark_king_pst = light_king_pst[::-1]
-	light_pawn_num, light_pawn_ind = 0, []
-	dark_pawn_num, dark_pawn_ind = 0, []
-	light_knight_num, light_knight_ind = 0, []
-	dark_knight_num, dark_knight_ind = 0, []
-	light_bishop_num, light_bishop_ind = 0, []
-	dark_bishop_num, dark_bishop_ind = 0, []
-	light_rook_num, light_rook_ind = 0, []
-	dark_rook_num, dark_rook_ind = 0, []
-	light_queen_num, light_queen_ind = 0, []
-	dark_queen_num, dark_queen_ind = 0, []
-	light_king_ind = []
-	dark_king_ind = []
-	# color = "l" if gs.light_to_move else "d"
-	for i in range(len(board)):
-		for j in range(len(board)):
-			if board[i][j] == "  ":
-				continue
-			elif board[i][j] == "pl":
-				light_pawn_num += 1
-				light_pawn_ind.append((i, j))
-			elif board[i][j] == "pd":
-				dark_pawn_num += 1
-				dark_pawn_ind.append((i, j))
-			elif board[i][j] == "nl":
-				light_knight_num += 1
-				light_knight_ind.append((i, j))
-			elif board[i][j] == "nd":
-				dark_knight_num += 1
-				dark_knight_ind.append((i, j))
-			elif board[i][j] == "bl":
-				light_bishop_num += 1
-				light_bishop_ind.append((i, j))
-			elif board[i][j] == "bd":
-				dark_bishop_num += 1
-				dark_bishop_ind.append((i, j))
-			elif board[i][j] == "rl":
-				light_rook_num += 1
-				light_rook_ind.append((i, j))
-			elif board[i][j] == "rd":
-				dark_rook_num += 1
-				dark_rook_ind.append((i, j))
-			elif board[i][j] == "ql":
-				light_queen_num += 1
-				light_queen_ind.append((i, j))
-			elif board[i][j] == "qd":
-				dark_queen_num += 1
-				dark_queen_ind.append((i, j))
-			elif board[i][j] == "kl":
-				light_king_ind.append((i, j))
-			elif board[i][j] == "kd":
-				dark_king_ind.append((i, j))
-	light_material = (piece_values["p"] * light_pawn_num + piece_values["n"] * light_knight_num + piece_values["r"] * light_rook_num +
-					  piece_values["b"] * light_bishop_num + piece_values["q"] * light_queen_num + piece_values["k"])
-	dark_material = (piece_values["p"] * dark_pawn_num + piece_values["n"] * dark_knight_num + piece_values["r"] * dark_rook_num +
-					 piece_values["b"] * dark_bishop_num + piece_values["q"] * dark_queen_num + piece_values["k"])
-	light_pawnpst_material = sum(light_pawn_pst[i[0]][i[1]] for i in light_pawn_ind)
-	dark_pawnpst_material = sum(dark_pawn_pst[i[0]][i[1]] for i in dark_pawn_ind)
-	light_knightpst_material = sum(light_knight_pst[i[0]][i[1]] for i in light_knight_ind)
-	dark_knightpst_material = sum(dark_knight_pst[i[0]][i[1]] for i in dark_knight_ind)
-	light_bishoppst_material = sum(light_bishop_pst[i[0]][i[1]] for i in light_bishop_ind)
-	dark_bishoppst_material = sum(dark_bishop_pst[i[0]][i[1]] for i in dark_bishop_ind)
-	light_rookpst_material = sum(light_rook_pst[i[0]][i[1]] for i in light_rook_ind)
-	dark_rookpst_material = sum(dark_rook_pst[i[0]][i[1]] for i in dark_rook_ind)
-	light_queenpst_material = sum(light_queen_pst[i[0]][i[1]] for i in light_queen_ind)
-	dark_queenpst_material = sum(dark_queen_pst[i[0]][i[1]] for i in dark_queen_ind)
-	light_kingpst_material = sum(light_king_pst[i[0]][i[1]] for i in light_king_ind)
-	dark_kingpst_material = sum(dark_king_pst[i[0]][i[1]] for i in dark_king_ind)
-	total_light_pst_material = (
-				light_pawnpst_material + light_knightpst_material + light_bishoppst_material + light_rookpst_material +
-				light_queenpst_material + light_kingpst_material)
-	total_dark_pst_material = (
-				dark_pawnpst_material + dark_knightpst_material + dark_bishoppst_material + dark_rookpst_material +
-				dark_queenpst_material + dark_kingpst_material)
-	total_light_material = light_material + total_light_pst_material
-	total_dark_material = dark_material + total_dark_pst_material
-	return total_light_material - total_dark_material
-
-def alphabeta(board, best_move, depth, alpha, beta):
-	gs = Game_state()
-	if depth == 0:# or gs.is_check_mate() or gs.is_stalemate():
-		return evaluation_function(board), best_move
-	else:
-		if gs.light_to_move:
-			best_move = None
-			for move in gs.get_valid_moves(Move):
-				gs.make_move(move)
-				alpha = evaluation_function(board)
-				print(alpha)
-				gs.light_to_move = False
-				beta = evaluation_function(board)
-				print(beta)
-				gs.light_to_move = True
-				score, move = alphabeta(board, best_move, depth - 1, alpha, beta)
-				#print(score)
-				if score > alpha:
-					alpha = score
-					best_move = move
-					if alpha >= beta:
-						break
-				gs.undo_move(look_ahead_mode=True)
-			return alpha, best_move
-		else:
-			best_move = None
-			for move in gs.get_valid_moves(Move):
-				gs.make_move(move)
-				alpha = evaluation_function(board)
-				gs.light_to_move = True
-				beta = evaluation_function(board)
-				gs.light_to_move = False
-				score, move = alphabeta(board, perspective, depth - 1, alpha, beta)
-				if score > beta:
-					beta = score
-					best_move = move
-					if alpha >= beta:
-						break
-				gs.undo_move(look_ahead_mode=True)
-			return beta, best_move
 
 def display_game_state(screen, gs, valid_moves, player_clicks):
 	"""
@@ -451,6 +235,18 @@ def play_sound(move):
 		pg.mixer.Sound.play(SOUND[0])
 	else:
 		pg.mixer.Sound.play(SOUND[1])
+
+
+def display_text(screen, text):
+
+	font = pg.font.SysFont("Helvetica", 32, True, False)
+	text_object = font.render(text, 0, pg.Color("Gray"))
+
+	text_location = pg.Rect(0, 0, WIDTH+BORDER, HEIGHT+BORDER).move((WIDTH+BORDER)//2 - text_object.get_width()/2, (HEIGHT+BORDER)//2 - text_object.get_height()/2)
+	screen.blit(text_object, text_location)
+
+	text_object = font.render(text, 0, pg.Color("Black"))
+	screen.blit(text_object, text_location.move(2, 2))
 
 
 def animate(move, screen, board, clock):
