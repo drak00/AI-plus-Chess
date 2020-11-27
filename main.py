@@ -36,33 +36,32 @@ def load_images():
 def main():
 	screen = pg.display.set_mode((WIDTH + BORDER, HEIGHT + BORDER))
 	clock = pg.time.Clock()
-	#screen.fill(pg.Color("ghostwhite"))
+	# screen.fill(pg.Color("ghostwhite"))
 	screen.fill(pg.Color("brown4"))
-
 
 	gs = Game_state()
 	load_images()
 	running = True
 
-	square_selected = () # x, y coordinate of selected square 
-	player_clicks = [] # list of appended square_selected
-	valid_moves = [] 
-	game_over = False # signals end of game
-	user_prompt = False # pauses gui rendering for user input
+	square_selected = ()  # x, y coordinate of selected square
+	player_clicks = []  # list of appended square_selected
+	valid_moves = []
+	game_over = False  # signals end of game
+	user_prompt = False  # pauses gui rendering for user input
 	while running:
 
 		if not user_prompt:
-			valid_moves, first_click_turn = gs.get_valid_moves()		
+			valid_moves, first_click_turn = gs.get_valid_moves()
 
 			for e in pg.event.get():
 				if e.type == pg.QUIT:
 					running = False
 
 				elif e.type == pg.KEYDOWN:
-					if e.key == pg.K_u: # u key pressed (undo last move)
+					if e.key == pg.K_u:  # u key pressed (undo last move)
 						gs.undo_move()
 
-					elif e.key == pg.K_r: # r key pressed (reset game)
+					elif e.key == pg.K_r:  # r key pressed (reset game)
 						gs = Game_state()
 						valid_moves, turn = [], None
 						square_selected = ()
@@ -73,42 +72,43 @@ def main():
 
 					if not game_over:
 
-						location = pg.mouse.get_pos() # x, y location of mouse click
+						location = pg.mouse.get_pos()  # x, y location of mouse click
 						location_col_transform = location[0] // SQ_SIZE - 1
 						location_row_transform = location[1] // SQ_SIZE - 1
-						col = (location_col_transform) if (0 <= location_col_transform < 8) else -1  
+						col = (location_col_transform) if (0 <= location_col_transform < 8) else -1
 						row = (location_row_transform) if (0 <= location_row_transform < 8) else -1
 
 						if col >= 0 and row >= 0:
 
-							if square_selected == (row, col): # clicked same position twice
+							if square_selected == (row, col):  # clicked same position twice
 								square_selected = ()
 								player_clicks = []
 
-							else: # new position clicked (destination)
+							else:  # new position clicked (destination)
 								square_selected = (row, col)
 								player_clicks.append(square_selected)
-							
-							if len(player_clicks) == 2: # 'from' and 'to' are available
-								move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
-									
+
+							if len(player_clicks) == 2:  # 'from' and 'to' are available
+								move = Move(player_clicks[0], player_clicks[1], gs.board)  # create move object
+
 								if move in valid_moves:
-									
+
 									gs.make_move(move)
-									
+
 									if (move.end_row == 0 or move.end_row == 7) and (move.piece_moved[0] == "p"):
 										user_prompt = True
 										choice = ("q", "r", "b", "n")
 										promotion = ""
 										while promotion not in choice:
-											promotion = input("Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
+											promotion = input(
+												"Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
 										gs.board[move.end_row][move.end_col] = promotion + move.piece_moved[1]
 										user_prompt = False
 
 									animate(move, screen, gs.board, clock)
 
 									print(move.get_chess_notation())
-									
+
 									square_selected = ()
 									player_clicks = []
 
@@ -121,18 +121,6 @@ def main():
 										player_clicks = []
 										square_selected = ()
 
-							else:
-								current_turn = "l" if gs.light_to_move else "d"
-								if current_turn == first_click_turn:
-									player_clicks = [square_selected]
-									square_selected = ()
-								else:
-									player_clicks = []
-									square_selected = ()
-					if gs.is_check_mate: # if one player win
-						mbox.showinfo("CHECKMATE", "DARK TEAM WINS")
-					if gs.is_stalemate: #if drawn
-						mbox.showinfo("STALEMATE", "IT IS A STALEMATE")
 		display_game_state(screen, gs, valid_moves, player_clicks)
 
 		if gs.check_mate:
@@ -147,11 +135,8 @@ def main():
 			game_over = True
 			display_text(screen, "Stalemate")
 
-
 		clock.tick(MAX_FPS)
 		pg.display.flip()
-
-
 
 
 def display_game_state(screen, gs, valid_moves, player_clicks):
@@ -225,6 +210,15 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 			for move in valid_moves:
 				if move.start_row == r and move.start_col == c:
 					screen.blit(s, (move.end_col*SQ_SIZE + BORDER//2, move.end_row*SQ_SIZE + BORDER//2))
+	if gs.move_log:
+		last_move = gs.move_log[-1]
+		s = pg.Surface((SQ_SIZE, SQ_SIZE))
+		s.set_alpha(140)
+		s.fill(pg.Color("blue"))
+		if  gs.board[last_move.end_row][last_move.end_col][1] == ("d" if gs.light_to_move else "l"):
+			screen.blit(s, (last_move.end_col * SQ_SIZE + BORDER // 2, last_move.end_row * SQ_SIZE + BORDER // 2))
+			screen.blit(s, (last_move.start_col * SQ_SIZE + BORDER // 2, last_move.start_row * SQ_SIZE + BORDER // 2))
+
 
 
 def play_sound(move):
