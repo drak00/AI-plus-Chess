@@ -3,7 +3,7 @@
 import  tkinter as tk
 from tkinter import simpledialog
 from tkinter import messagebox as mbox
-
+from random import randrange as rand
 class Game_state():
 	
 	def __init__(self):
@@ -186,24 +186,28 @@ class Game_state():
 		elif move.piece_moved == "kd":
 			self.dark_kings_location = (move.end_row, move.end_col)
 		#pawnpromotion
-		if move.pawnpromotion:
-			#window to allow the user enter his choice
-			master = tk.Tk()
-			master.withdraw()
-			while True:
-				userDb = simpledialog.askstring("pawns promotion chooser",
-												"Enter q to promote to Queen,r to Rook ,b to Bishop or n to Knight: ")
-				if userDb is None:
-					mbox.showerror("CAN NOT CANCEL","THIS OPERATION CANNOT BE CANCELED")
-				elif userDb.lower() not in ["q","n","r","b"]:
-					mbox.showerror("WRONG CHOICE", "ENTER ONLY q,r,n or b")
-				else:
-					self.board[move.end_row][move.end_col] = userDb + move.piece_moved[1]
-					master.destroy()
-					break
+		# if move.pawnpromotion and move.piece_moved[1] == "d":
+		# 	promotion_choise = ["q","n","r","b"]
+		# 	i = rand(len(promotion_choise))
+		# 	self.board[move.end_row][move.end_col] = promotion_choise[i] + move.piece_moved[1]
+		# elif move.pawnpromotion:
+		# 	#window to allow the user enter his choice
+		# 	master = tk.Tk()
+		# 	master.withdraw()
+		# 	while True:
+		# 		userDb = simpledialog.askstring("pawns promotion chooser",
+		# 										"Enter q to promote to Queen,r to Rook ,b to Bishop or n to Knight: ")
+		# 		if userDb is None:
+		# 			mbox.showerror("CAN NOT CANCEL","THIS OPERATION CANNOT BE CANCELED")
+		# 		elif userDb.lower() not in ["q","n","r","b"]:
+		# 			mbox.showerror("WRONG CHOICE", "ENTER ONLY q,r,n or b")
+		# 		else:
+		# 			self.board[move.end_row][move.end_col] = userDb + move.piece_moved[1]
+		# 			master.destroy()
+		# 			break
 
 
-	def undo_move(self, n, look_ahead_mode = False, undo=True):
+	def undo_move(self, look_ahead_mode = False):
 		"""
 			undoes last move
 		"""
@@ -217,9 +221,9 @@ class Game_state():
 				self.light_kings_location = (last_move.start_row, last_move.start_col)
 			elif self.board[last_move.start_row][last_move.start_col] == "kd" :
 				self.dark_kings_location = (last_move.start_row, last_move.start_col)
-			if n:
-				print("undoing ->", last_move.get_chess_notation())
-				
+			# if look_ahead_mode == False:
+			# 	print("undoing ->", last_move.get_chess_notation())
+			#
 		else:
 			print("All undone!")
 
