@@ -191,7 +191,7 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 	"""
 		colorize selected pieces and valid moves
 	"""
-	if player_clicks != []:
+	if player_clicks:
 		r, c = player_clicks[0]
 		if gs.board[r][c][1] == ("l" if gs.light_to_move else "d"):
 
@@ -206,6 +206,14 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 			for move in valid_moves:
 				if move.start_row == r and move.start_col == c:
 					screen.blit(s, (move.end_col*SQ_SIZE + BORDER//2, move.end_row*SQ_SIZE + BORDER//2))
+	if gs.move_log:
+		last_move = gs.move_log[-1]
+		s = pg.Surface((SQ_SIZE, SQ_SIZE))
+		s.set_alpha(140)
+		s.fill(pg.Color("blue"))
+		if  gs.board[last_move.end_row][last_move.end_col][1] == ("d" if gs.light_to_move else "l"):
+			screen.blit(s, (last_move.end_col * SQ_SIZE + BORDER // 2, last_move.end_row * SQ_SIZE + BORDER // 2))
+			screen.blit(s, (last_move.start_col * SQ_SIZE + BORDER // 2, last_move.start_row * SQ_SIZE + BORDER // 2))
 
 
 def play_sound(move):
