@@ -41,13 +41,13 @@ def main():
 
 	square_selected = () # x, y coordinate of selected square 
 	player_clicks = [] # list of appended square_selected
-	valid_moves = [] 
+	valid_moves, first_click_turn = gs.get_valid_moves() # compute valid moves outside loop (for efficiency)
 	game_over = False # signals end of game
 	user_prompt = False # pauses gui rendering for user input
 	while running:
 
 		if not user_prompt:
-			valid_moves, first_click_turn = gs.get_valid_moves()		
+			found = False
 
 			for e in pg.event.get():
 				if e.type == pg.QUIT:
@@ -56,6 +56,7 @@ def main():
 				elif e.type == pg.KEYDOWN:
 					if e.key == pg.K_u: # u key pressed (undo last move)
 						gs.undo_move()
+						valid_moves, first_click_turn = gs.get_valid_moves()
 
 					elif e.key == pg.K_r: # r key pressed (reset game)
 						gs = Game_state()
@@ -63,6 +64,8 @@ def main():
 						square_selected = ()
 						player_clicks = []
 						print("Board reset!")
+						valid_moves, first_click_turn = gs.get_valid_moves()
+						
 
 				elif e.type == pg.MOUSEBUTTONDOWN:
 
@@ -87,33 +90,42 @@ def main():
 							if len(player_clicks) == 2: # 'from' and 'to' are available
 								move = Move(player_clicks[0], player_clicks[1], gs.board) # create move object
 									
-								if move in valid_moves:
+								for obj in range(len(valid_moves)):
 									
-									gs.make_move(move)
+									if move == valid_moves[obj]:
+										move = valid_moves[obj]
+										found = True
 									
-									if (move.end_row == 0 or move.end_row == 7) and (move.piece_moved[0] == "p"):
-										user_prompt = True
-										choice = ("q", "r", "b", "n")
-										promotion = ""
-										while promotion not in choice:
-											promotion = input("Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
-										gs.board[move.end_row][move.end_col] = promotion + move.piece_moved[1]
-										user_prompt = False
+										gs.make_move(move)
+										
+										
+										if (move.end_row == 0 or move.end_row == 7) and (move.piece_moved[0] == "p"):
+											user_prompt = True
+											choice = ("q", "r", "b", "n")
+											promotion = ""
+											while promotion not in choice:
+												promotion = input("Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
+											gs.board[move.end_row][move.end_col] = promotion + move.piece_moved[1]
+											user_prompt = False
 
-									animate(move, screen, gs.board, clock)
+										animate(move, screen, gs.board, clock)
 
-									print(move.get_chess_notation())
-									
-									square_selected = ()
-									player_clicks = []
+										print(move.get_chess_notation())
+										
+										square_selected = ()
+										player_clicks = []
+										valid_moves, first_click_turn = gs.get_valid_moves()
+										break
 
-								else:
+								if not found: # move selected not a valid move
+
 									current_turn = "l" if gs.light_to_move else "d"
 									if current_turn == first_click_turn:
 										player_clicks = [square_selected]
 										square_selected = ()
 									else:
 										player_clicks = []
+				
 										square_selected = ()
 
 		display_game_state(screen, gs, valid_moves, player_clicks)
@@ -191,7 +203,7 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 	"""
 		colorize selected pieces and valid moves
 	"""
-	if player_clicks != []:
+	if player_clicks:
 		r, c = player_clicks[0]
 		if gs.board[r][c][1] == ("l" if gs.light_to_move else "d"):
 
@@ -207,13 +219,26 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 				if move.start_row == r and move.start_col == c:
 					screen.blit(s, (move.end_col*SQ_SIZE + BORDER//2, move.end_row*SQ_SIZE + BORDER//2))
 
+	if gs.move_log:
+		last_move = gs.move_log[-1]
+		s = pg.Surface((SQ_SIZE, SQ_SIZE))
+		s.set_alpha(90)
+		s.fill(pg.Color("blue"))
+		if  gs.board[last_move.end_row][last_move.end_col][1] == ("d" if gs.light_to_move else "l"):
+			screen.blit(s, (last_move.end_col * SQ_SIZE + BORDER // 2, last_move.end_row * SQ_SIZE + BORDER // 2))
+			screen.blit(s, (last_move.start_col * SQ_SIZE + BORDER // 2, last_move.start_row * SQ_SIZE + BORDER // 2))
+
 
 def play_sound(move):
 	"""
 		plays move and captured sounds
 	"""
-	if move.piece_captured == "  ":
+	#print("sound"+str(move.en_passant_captured))
+	if move.en_passant_captured:
+		pg.mixer.Sound.play(SOUND[1])
+	elif move.piece_captured == "  ":
 		pg.mixer.Sound.play(SOUND[0])
+	
 	else:
 		pg.mixer.Sound.play(SOUND[1])
 

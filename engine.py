@@ -236,24 +236,26 @@ class Game_state():
 		self.get_rook_moves(r, c, moves)
 
 
-	def make_move(self, move, ignore = False):
+	def make_move(self, move, look_ahead_mode = False):
 		"""
 			moves pieces on the board
 
 			input parameters:
 			move     --> move to be made (Move object)
-			ignore   --> flag to ignore castling or not (during thinking mode)
+			look_ahead_mode   --> flag to ignore castling or not (during thinking mode)
 
 			return parameter(s):
 			None
 		"""
+		#if self.move_log:
+			#print(self.move_log[-1])
 
 		self.board[move.start_row][move.start_col] = "  "
 		self.board[move.end_row][move.end_col] = move.piece_moved
-		self.move_log.append(move) # log move
-
+		# if self.en_passant and not look_ahead_mode:
+		# 	print(self.en_passant)
 		# handles en-passant moves
-		if move in self.en_passant:
+		if not look_ahead_mode and move in self.en_passant:
 			if self.light_to_move:
 				move.en_passant_captured = self.board[move.end_row+1][move.end_col]
 				self.board[move.end_row+1][move.end_col] = "  "
@@ -261,8 +263,10 @@ class Game_state():
 				move.en_passant_captured = self.board[move.end_row-1][move.end_col]
 				self.board[move.end_row-1][move.end_col] = "  "
 
+		self.move_log.append(move) # log move
+
 		# handles castling moves
-		if not ignore and move in self.castling:
+		if not look_ahead_mode and move in self.castling:
 
 			# determine rook to be castled
 			if move.end_col == 2:
@@ -277,38 +281,38 @@ class Game_state():
 
 		self.light_to_move = not self.light_to_move # next player to move
 
-		self.en_passant = [] # reset en-passant tuple
-		if not ignore:
-			self.castling = [] # reset castling tuple
+		if not look_ahead_mode:
+			self.castling = [] # reset castling
+			self.en_passant = [] # reset en-passant
 
-		# dark en-passant
-		if (move.start_row == 6 and move.piece_moved == "pl" and move.start_row - move.end_row == 2):
+			# dark en-passant
+			if (move.start_row == 6 and move.piece_moved == "pl" and move.start_row - move.end_row == 2):
 
-			# from left of light pawn
-			if (move.end_col -1 >= 0 and self.board[move.end_row][move.end_col-1] == "pd"):
-				self.en_passant.append(Move((move.end_row, move.end_col-1), (move.end_row+1, move.end_col), self.board))
+				# from left of light pawn
+				if (move.end_col -1 >= 0 and self.board[move.end_row][move.end_col-1] == "pd"):
+					self.en_passant.append(Move((move.end_row, move.end_col-1), (move.end_row+1, move.end_col), self.board))
 
-			# from right of light pawn
-			if (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pd"):
-				self.en_passant.append(Move((move.end_row, move.start_col+1), (move.end_row+1, move.end_col), self.board))
+				# from right of light pawn
+				elif (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pd"):
+					self.en_passant.append(Move((move.end_row, move.start_col+1), (move.end_row+1, move.end_col), self.board))
 
-		# light en-passant
-		if (move.start_row == 1 and move.piece_moved == "pd" and move.end_row - move.start_row == 2):
+			# light en-passant
+			if (move.start_row == 1 and move.piece_moved == "pd" and move.end_row - move.start_row == 2):
 
-			# from left of dark pawn
-			if (move.end_col -1 >= 0 and self.board[move.end_row][move.end_col-1] == "pl"):
-				self.en_passant.append(Move((move.end_row, move.start_col-1), (move.end_row-1, move.end_col), self.board))
+				# from left of dark pawn
+				if (move.end_col -1 >= 0 and self.board[move.end_row][move.end_col-1] == "pl"):
+					self.en_passant.append(Move((move.end_row, move.start_col-1), (move.end_row-1, move.end_col), self.board))
 
-			# from right of dark pawn
-			if (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pl"):
-				self.en_passant.append(Move((move.end_row, move.end_col+1), (move.end_row-1, move.end_col), self.board))
+				# from right of dark pawn
+				elif (move.end_col +1 <= len(self.board[0])-1 and self.board[move.end_row][move.end_col+1] == "pl"):
+					self.en_passant.append(Move((move.end_row, move.end_col+1), (move.end_row-1, move.end_col), self.board))
 
 
 		# update king's position
 		if move.piece_moved == "kl":
 			self.light_king_location = (move.end_row, move.end_col)
 
-			if not ignore:	
+			if not look_ahead_mode:	
 
 				# non castling king move
 				if not move.castling_rook:
@@ -327,7 +331,7 @@ class Game_state():
 		elif move.piece_moved == "kd":
 			self.dark_king_location = (move.end_row, move.end_col)
 
-			if not ignore:	
+			if not look_ahead_mode:	
 
 				# non castling king move
 				if not move.castling_rook:
@@ -346,7 +350,7 @@ class Game_state():
 
 		# check rook moves for castling
 
-		if not ignore:
+		if not look_ahead_mode:
 			# light rooks
 			if move.start_row == 7 and move.start_col == 0:
 				self.light_queen_side_castle = False
@@ -374,11 +378,12 @@ class Game_state():
 			last_move = self.move_log.pop()
 			self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
 			self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
+			#print("piece captured ==> {}".format(last_move.piece_captured))
 
 			# handles enpassant
 			self.light_to_move = not self.light_to_move
 			if last_move.en_passant_captured:
-				self.en_passant.append(Move((last_move.start_row, last_move.start_col), (last_move.end_row, last_move.end_col), self.board)) # recall en-passant valid move(s)
+				self.en_passant.append(Move((last_move.start_row, last_move.start_col), (last_move.end_row, last_move.end_col), self.board)) # recall en-passant valid move
 				
 				if self.light_to_move:
 					self.board[last_move.end_row+1][last_move.end_col] = last_move.en_passant_captured
@@ -523,7 +528,7 @@ class Game_state():
 
 		moves, turn = self.get_possible_moves()
 		for move in moves[::-1]: # reverse iteration
-			self.make_move(move, ignore = True)
+			self.make_move(move, True)
 			self.light_to_move = not self.light_to_move
 			in_check = self.is_in_check()
 			if in_check:
@@ -558,10 +563,10 @@ class Game_state():
 		"""
 
 		moves = []
-		if self.en_passant:
-			for obj in self.en_passant:
-				moves.append(obj)
-			
+		#if self.en_passant:
+		for obj in self.en_passant:
+			moves.append(obj)
+		
 		turn = "l" if self.light_to_move else "d"
 
 		for i in range(len(self.board)):
