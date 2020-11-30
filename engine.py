@@ -378,10 +378,12 @@ class Game_state():
 			last_move = self.move_log.pop()
 			self.board[last_move.start_row][last_move.start_col] = last_move.piece_moved
 			self.board[last_move.end_row][last_move.end_col] = last_move.piece_captured
-			#print("piece captured ==> {}".format(last_move.piece_captured))
 
 			# handles enpassant
 			self.light_to_move = not self.light_to_move
+
+			if not look_ahead_mode:
+				self.en_passant = []
 			if last_move.en_passant_captured:
 				self.en_passant.append(Move((last_move.start_row, last_move.start_col), (last_move.end_row, last_move.end_col), self.board)) # recall en-passant valid move
 				
