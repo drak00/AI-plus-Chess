@@ -383,7 +383,7 @@ class Game_state():
 			# handles enpassant
 			self.light_to_move = not self.light_to_move
 			if last_move.en_passant_captured:
-				self.en_passant.append(Move((last_move.start_row, last_move.start_col), (last_move.end_row, last_move.end_col), self.board)) # recall en-passant valid move
+				#self.en_passant.append(Move((last_move.start_row, last_move.start_col), (last_move.end_row, last_move.end_col), self.board)) # recall en-passant valid move
 				
 				if self.light_to_move:
 					self.board[last_move.end_row+1][last_move.end_col] = last_move.en_passant_captured
