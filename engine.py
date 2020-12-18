@@ -2,11 +2,11 @@
 ## and stores the state of the the chess board, including its pieces and moves
 
 class Game_state():
-	
+
 	def __init__(self):
 		"""
 			The chess board is an 8 X 8 dimensional array (Matrix of 8 rows and 8 columns )
-			i.e a list of lists. Each element of the Matrix is a string of two characters 
+			i.e a list of lists. Each element of the Matrix is a string of two characters
 			representing the chess pieces in the order "type" + "colour"
 
 			light pawn = pl
@@ -48,7 +48,7 @@ class Game_state():
 		self.dark_king_side_castle = True # dark king side castle available (king and right rook not moved)
 		self.dark_queen_side_castle = True # dark queen side castle available (king and left rook not moved)
 
-		
+
 
 
 	def get_pawn_moves(self, r, c, moves):
@@ -95,7 +95,7 @@ class Game_state():
 			if c+1 <= len(self.board[0]) - 1: # right captures
 				if r+1 <= 7 and self.board[r+1][c+1][1] == "l":
 					moves.append(Move((r, c), (r+1, c+1), self.board))
-					
+
 
 	def get_bishop_moves(self, r, c, moves):
 
@@ -130,7 +130,7 @@ class Game_state():
 						break
 				else: # off board
 					break
-		
+
 
 
 	def get_knight_moves(self, r, c, moves):
@@ -173,10 +173,10 @@ class Game_state():
 					moves.append(Move((7, 4), (7, 6), self.board))
 					self.castling.append(Move((7, 4), (7, 6), self.board))
 
-		# light queen side	
+		# light queen side
 		if self.light_to_move and self.light_queen_side_castle:
 
-			# if path is clear	
+			# if path is clear
 			if self.board[7][1] == "  " and self.board[7][2] == "  " and self.board[7][3] == "  ":
 
 				# if path not under attack
@@ -212,7 +212,7 @@ class Game_state():
 
 		directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
 		enemy_color = "d" if self.light_to_move else "l"
-		
+
 		for d in directions:
 			for i in range(1, 8):
 				end_row = r + d[0] * i
@@ -229,7 +229,7 @@ class Game_state():
 						break
 				else: # off board
 					break
-		
+
 
 	def get_queen_moves(self, r, c, moves):
 		self.get_bishop_moves(r, c, moves)
@@ -312,7 +312,7 @@ class Game_state():
 		if move.piece_moved == "kl":
 			self.light_king_location = (move.end_row, move.end_col)
 
-			if not look_ahead_mode:	
+			if not look_ahead_mode:
 
 				# non castling king move
 				if not move.castling_rook:
@@ -324,14 +324,14 @@ class Game_state():
 				elif move.castling_rook and move.end_col == 2:
 					self.light_queen_side_castle = False
 
-				# king side castled	
+				# king side castled
 				elif move.castling_rook and move.end_col == 6:
 					self.light_king_side_castle = False
 
 		elif move.piece_moved == "kd":
 			self.dark_king_location = (move.end_row, move.end_col)
 
-			if not look_ahead_mode:	
+			if not look_ahead_mode:
 
 				# non castling king move
 				if not move.castling_rook:
@@ -343,7 +343,7 @@ class Game_state():
 				elif move.castling_rook and move.end_col == 2:
 					self.dark_queen_side_castle = False
 
-				# king side castled	
+				# king side castled
 				elif move.castling_rook and move.end_col == 6:
 					self.dark_king_side_castle = False
 
@@ -356,7 +356,7 @@ class Game_state():
 				self.light_queen_side_castle = False
 			elif move.start_row == 7 and move.start_col == 7:
 				self.light_king_side_castle = False
-			
+
 			# dark rooks
 			elif move.start_row == 0 and move.start_col == 0:
 				self.dark_queen_side_castle = False
@@ -386,7 +386,7 @@ class Game_state():
 				self.en_passant = []
 			if last_move.en_passant_captured:
 				self.en_passant.append(Move((last_move.start_row, last_move.start_col), (last_move.end_row, last_move.end_col), self.board)) # recall en-passant valid move
-				
+
 				if self.light_to_move:
 					self.board[last_move.end_row+1][last_move.end_col] = last_move.en_passant_captured
 				else:
@@ -451,7 +451,7 @@ class Game_state():
 					self.board[0][7] = "rd"
 
 			# undoing first-time rook moves (for castling)
-			# light king side rook 
+			# light king side rook
 			if last_move.piece_moved == "rl":
 				if last_move.start_row == 7 and last_move.start_col == 7:
 
@@ -542,7 +542,7 @@ class Game_state():
 			self.check_mate = True
 		elif not in_check and len(moves) == 0:
 			self.stale_mate = True
-			
+
 			# handles undoing
 		else:
 			self.check_mate = False
@@ -553,9 +553,9 @@ class Game_state():
 
 	def get_possible_moves(self):
 		"""
-			gives naive possible moves of pieces on the board without taking checks into 
+			gives naive possible moves of pieces on the board without taking checks into
 			account
-			
+
 			input parameters:
 			None
 
@@ -568,7 +568,7 @@ class Game_state():
 		#if self.en_passant:
 		for obj in self.en_passant:
 			moves.append(obj)
-		
+
 		turn = "l" if self.light_to_move else "d"
 
 		for i in range(len(self.board)):
@@ -607,7 +607,7 @@ class Game_state():
 			bool of True or False
 		"""
 
-		turn = 'l' if self.light_to_move else "d" # allies turn 
+		turn = 'l' if self.light_to_move else "d" # allies turn
 		opp_turn = "d" if self.light_to_move else "l" # opponents turn
 
 		# check for all possible knight attacks
@@ -684,12 +684,12 @@ class Move():
 	# map rows to ranks (revers of ranks to rows)
 	rows_to_ranks = {row:rank for rank, row in ranks_to_rows.items()}
 
-	# map files to columns 
+	# map files to columns
 	files_to_cols = {"a":0, "b":1, "c":2, "d":3,
 					"e":4, "f":5, "g":6, "h":7}
 
 	# map columns to files (revers of files to columns)
-	cols_to_files = {col:file for file, col in files_to_cols.items()} 
+	cols_to_files = {col:file for file, col in files_to_cols.items()}
 
 	def __init__(self, start_sq, end_sq, board):
 		"""
@@ -699,11 +699,11 @@ class Move():
 			input parameter(s):
 			start_sq --> (row, column) of piece to be moved (tuple)
 			end_square --> (row, column) of move destination on the board (tuple)
-			board --> board object referencing current state of the board (class Game_state) 
+			board --> board object referencing current state of the board (class Game_state)
 		"""
 		self.start_row = start_sq[0] # row location of piece to be moved
 		self.start_col = start_sq[1] # column location of piece to be moved
-		self.end_row = end_sq[0] # intended row destination of piece to be moved 
+		self.end_row = end_sq[0] # intended row destination of piece to be moved
 		self.end_col = end_sq[1] # intended column destiantion of piece to e moved
 		self.piece_moved = board[self.start_row][self.start_col] # actual piece moved
 		self.piece_captured = board[self.end_row][self.end_col] # opponent piece if any on the destination square
@@ -720,15 +720,15 @@ class Move():
 			return parameter(s)
 			commentary (string)
 		"""
-		
+
 		if self.en_passant_captured:
 			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
 				"(" + self.en_passant_captured[0].upper() + " captured!)"
-		
+
 		elif not self.en_passant_captured and self.piece_captured != "  ":
 			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
 				"(" + self.piece_captured[0].upper() + " captured!)"
-		
+
 		elif self.castling_rook:
 			return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
 				"(" + "Queen side castling!)" if self.end_col == 2 else "King side castling!)"
@@ -781,5 +781,3 @@ class Move():
 			operator overloading for printing Move objects
 		"""
 		return "({}, {}) ({}, {})".format(self.start_row, self.start_col, self.end_row, self.end_col)
-
-
