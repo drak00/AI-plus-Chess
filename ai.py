@@ -74,7 +74,7 @@ def minimax(board, depth, maximizing_player):
     """
     if depth == 0:
         return None, eval_board(board, maximizing_player) #return evaluation when depth is 0
-    moves = get_moves()   #geting moves
+    moves = get_moves(board)   #geting moves
     best_move = random.choice(moves)  #setting best_move to a random move
     if maximizing_player:
         max_eval = -inf # setting to negative infinity
@@ -108,7 +108,7 @@ def minimax(board, depth, maximizing_player):
                 break
         return best_move, min_eval
 
-def get_moves():
+def get_moves(board):
     """
         get all moves for all pieces
 
@@ -118,20 +118,20 @@ def get_moves():
         moves
     """
     moves =[]
-    for r in range(len(gs.board)):
-        for c in range(len(gs.board[r])):
-            piece = gs.board[r][c][0]
+    for r in range(len(board)):
+        for c in range(len(board[r])):
+            piece = board[r][c][0]
             if piece == "p":
                 gs.get_pawn_moves(r, c, moves)
-            elif piece == gs.board[r][c][0]=="r":
+            elif piece == board[r][c][0]=="r":
                 gs.get_rook_moves(r, c, moves)
-            elif piece == gs.board[r][c][0]=="b":
+            elif piece == board[r][c][0]=="b":
                 gs.get_bishop_moves(r, c, moves)
-            elif piece == gs.board[r][c][0]=="q":
+            elif piece == board[r][c][0]=="q":
                 gs.get_queen_moves(r, c, moves)
-            elif piece == gs.board[r][c][0]=="k":
+            elif piece == board[r][c][0]=="k":
                 gs.get_king_moves(r, c, moves)
-            elif piece == gs.board[r][c][0]=="n":
+            elif piece == board[r][c][0]=="n":
                 gs.get_knight_moves(r, c, moves)
     return moves
 
