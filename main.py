@@ -4,6 +4,7 @@
 import pygame as pg
 from engine import Game_state, Move
 import ai
+from math import inf
 pg.init()
 
 BORDER = 128 # for the ranks and files
@@ -47,9 +48,8 @@ def main():
 	while running:
 
 		if gs.light_to_move:
-			move, evaluattion, = ai.minimax(gs.board, 1, gs.light_to_move)
-			print(gs.board)
-			for obj in range(len(valid_moves)):
+			move, evaluattion, = ai.minimax(gs.board, 1, -inf, inf, gs.light_to_move) #call minimax function to suggest move
+			for obj in range(len(valid_moves)): #checking if a valid move
 				if move == valid_moves[obj]:
 					move = valid_moves[obj]
 					found = True

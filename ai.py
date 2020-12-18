@@ -61,13 +61,15 @@ def eval_board(board, maximizing_player):
         eval = get_dark_score(board) - get_light_score(board)
     return eval
 
-def minimax(board, depth, maximizing_player):
+def minimax(board, depth,alpha, beta, maximizing_player):
     """
         minimax algorithm to get best move for each turn
 
         input parameter(s):
         board -----> game board
         depth ----> how deep should it go (int)
+        alpha ------> -inf # setting to negative infinity...... to be used for pruning
+        beta ------> inf # setting to positive negative infinity...... to be used for pruning
         return parameter(s):
         best moved
         evaluation
@@ -78,32 +80,26 @@ def minimax(board, depth, maximizing_player):
     best_move = random.choice(moves)  #setting best_move to a random move
     if maximizing_player:
         max_eval = -inf # setting to negative infinity
-        alpha = -inf # setting to negative infinity...... to be used for pruning
-        beta = inf # setting to positive negative infinity...... to be used for pruning
         for move in moves:
             print(move)
             gs.make_move(move, True) # making move to evaluate board
-            current_eval = minimax(board, depth-1, False)[1] # evaluation by decrease depth it it reaches node
+            current_eval = minimax(board, depth-1, -inf, inf, False)[1] # evaluation by decrease depth it it reaches node
             print(current_eval)
-            gs.undo_move(True)  #undo move simulation
             if current_eval < max_eval:
                 best_move = move
-            alpha = min(alpha, current_eval)
+            alpha = max(alpha, current_eval)
             if beta >= alpha:
                 break
         return best_move, max_eval
     else:
         min_eval = inf
-        beta = inf # setting to positive negative infinity...... to be used for pruning
-        alpha = -inf # setting to negative infinity...... to be used for pruning
         for move in moves:
             print(move)
             gs.make_move(move, True)
-            current_eval = minimax(board, depth-1, True)[1] # evaluation by decrease depth it it reaches node
-            gs.undo_move(True) #undo move simulation
+            current_eval = minimax(board, depth-1,-inf, inf, True)[1] # evaluation by decrease depth it it reaches node
             if current_eval > min_eval:
                 best_move = move
-            beta = max(beta, current_eval)
+            beta = min(beta, current_eval)
             if beta >= alpha:
                 break
         return best_move, min_eval
@@ -138,6 +134,6 @@ def get_moves(board):
 #y = eval_board(gs.board, gs.light_to_move)
 #a = get_light_score(gs.board)
 #b = get_moves(gs.board)
-x = minimax(gs.board, 2, gs.light_to_move)
+x = minimax(gs.board, 2, -inf, inf, gs.light_to_move)
 #print(a, b, y
 print(x)
