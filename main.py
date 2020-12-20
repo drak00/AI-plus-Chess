@@ -44,6 +44,9 @@ def main():
 	valid_moves, first_click_turn = gs.get_valid_moves() # compute valid moves outside loop (for efficiency)
 	game_over = False # signals end of game
 	user_prompt = False # pauses gui rendering for user input
+	AI_MODE = False # flag for activating AI mode
+	toggle = False # AI_MODE helper variable
+	display_time = 0 # display time for AI_MODE text
 	while running:
 
 		if not user_prompt:
@@ -65,11 +68,18 @@ def main():
 						player_clicks = []
 						print("Board reset!")
 						valid_moves, first_click_turn = gs.get_valid_moves()
+
+					elif e.key == pg.K_a: # a key pressed
+						toggle = True
+						display_time = 10
+						AI_MODE = not AI_MODE
+						print("AI MODE ENABLED") if AI_MODE else print("AI MODE DISABLED")
+
 						
 
 				elif e.type == pg.MOUSEBUTTONDOWN:
 
-					if not game_over:
+					if not game_over and not AI_MODE:
 
 						location = pg.mouse.get_pos() # x, y location of mouse click
 						location_col_transform = location[0] // SQ_SIZE - 1
@@ -129,6 +139,14 @@ def main():
 										square_selected = ()
 
 		display_game_state(screen, gs, valid_moves, player_clicks)
+
+		# display text for switching AI mode
+		if display_time > 0:
+			display_text(screen, "AI MODE ENABLED") if AI_MODE else display_text(screen, "AI MODE DISABLED")
+			display_time -= 1 # countdown for text to disappear
+		else:
+			toggle = False
+
 
 		if gs.check_mate:
 			game_over = True
