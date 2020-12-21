@@ -2,6 +2,7 @@
 ##handling user inputs
 
 import pygame as pg
+from ai import ai_move, ai_reset
 from engine import Game_state, Move
 
 pg.init()
@@ -45,23 +46,37 @@ def main():
 	game_over = False # signals end of game
 	user_prompt = False # pauses gui rendering for user input
 	AI_MODE = False # flag for activating AI mode
-	toggle = False # AI_MODE helper variable
-	display_time = 0 # display time for AI_MODE text
+	delay = 0 # delay the speed of AI plays
+	display_time = 0 # AI_MODE text display persistence timer
+	
 	while running:
 
 		if not user_prompt:
 			found = False
+
+			if AI_MODE and display_time == 0 and not game_over:
+				
+				# pause a bit between AI plays if delay > 0
+				if delay == 0:
+					move, gs = ai_move(gs)
+
+					if move: # if AI made a move
+						animate(move, screen, gs.board, clock)
+						print(move.get_chess_notation())
+					delay = 4 # pause magnitude
+				else:
+					delay -= 1
 
 			for e in pg.event.get():
 				if e.type == pg.QUIT:
 					running = False
 
 				elif e.type == pg.KEYDOWN:
-					if e.key == pg.K_u: # u key pressed (undo last move)
+					if e.key == pg.K_u and not AI_MODE: # u key pressed (undo last move)
 						gs.undo_move()
 						valid_moves, first_click_turn = gs.get_valid_moves()
 
-					elif e.key == pg.K_r: # r key pressed (reset game)
+					elif e.key == pg.K_r and not AI_MODE: # r key pressed (reset game)
 						gs = Game_state()
 						valid_moves, turn = [], None
 						square_selected = ()
@@ -69,13 +84,14 @@ def main():
 						print("Board reset!")
 						valid_moves, first_click_turn = gs.get_valid_moves()
 
-					elif e.key == pg.K_a: # a key pressed
-						toggle = True
+					elif e.key == pg.K_a: # a key pressed (toggle AI mode)
+						#toggle = True
 						display_time = 10
 						AI_MODE = not AI_MODE
+						ai_reset()
 						print("AI MODE ENABLED") if AI_MODE else print("AI MODE DISABLED")
 
-						
+
 
 				elif e.type == pg.MOUSEBUTTONDOWN:
 
@@ -142,11 +158,8 @@ def main():
 
 		# display text for switching AI mode
 		if display_time > 0:
-			display_text(screen, "AI MODE ENABLED") if AI_MODE else display_text(screen, "AI MODE DISABLED")
+			display_text(screen, "AI MODE ENABLED", "Green") if AI_MODE else display_text(screen, "AI MODE DISABLED", "Red")
 			display_time -= 1 # countdown for text to disappear
-		else:
-			toggle = False
-
 
 		if gs.check_mate:
 			game_over = True
@@ -261,7 +274,7 @@ def play_sound(move):
 		pg.mixer.Sound.play(SOUND[1])
 
 
-def display_text(screen, text):
+def display_text(screen, text, color = None):
 
 	font = pg.font.SysFont("Helvetica", 32, True, False)
 	text_object = font.render(text, 0, pg.Color("Gray"))
@@ -269,8 +282,13 @@ def display_text(screen, text):
 	text_location = pg.Rect(0, 0, WIDTH+BORDER, HEIGHT+BORDER).move((WIDTH+BORDER)//2 - text_object.get_width()/2, (HEIGHT+BORDER)//2 - text_object.get_height()/2)
 	screen.blit(text_object, text_location)
 
-	text_object = font.render(text, 0, pg.Color("Black"))
-	screen.blit(text_object, text_location.move(2, 2))
+	if not color:
+		text_object = font.render(text, 0, pg.Color("Black"))
+		screen.blit(text_object, text_location.move(2, 2))
+	else:
+		text_object = font.render(text, 0, pg.Color(color))
+		screen.blit(text_object, text_location.move(2, 2))
+
 
 
 def animate(move, screen, board, clock):

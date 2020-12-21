@@ -512,6 +512,9 @@ class Game_state():
 			# interactive
 			if not look_ahead_mode:
 				print("undoing ->", last_move.get_chess_notation())
+			
+			#last_move.piece_captured = "  "
+
 		else:
 			print("All undone!")
 
@@ -529,6 +532,7 @@ class Game_state():
 		"""
 
 		moves, turn = self.get_possible_moves()
+		in_check = False
 		for move in moves[::-1]: # reverse iteration
 			self.make_move(move, True)
 			self.light_to_move = not self.light_to_move
@@ -643,7 +647,7 @@ class Game_state():
 						break
 
 					elif (i == 1) and (self.board[end_row][end_col][1] == opp_turn) and (self.board[end_row][end_col][0] == "k"):
-						break
+						return True
 
 					elif self.board[end_row][end_col][1] == opp_turn:
 						if self.board[end_row][end_col][0] == "b" or self.board[end_row][end_col][0] == "q":
@@ -663,7 +667,7 @@ class Game_state():
 						break
 
 					elif (i == 1) and (self.board[end_row][end_col][1] == opp_turn) and (self.board[end_row][end_col][0] == "k"):
-						break
+						return True
 
 					elif (self.board[end_row][end_col][1] == opp_turn):
 						if self.board[end_row][end_col][0] == "r" or self.board[end_row][end_col][0] == "q":
