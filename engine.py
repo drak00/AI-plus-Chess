@@ -676,6 +676,35 @@ class Game_state():
 							break
 
 		return False
+	
+
+	def copy(self):
+		"""
+			create a copy of the Game_state object
+
+			input parameter(s):
+			None
+			
+			return parameter(s):
+			gs --> Game_state Object
+		"""
+		gs = Game_state()
+		gs.board = self.board
+		gs.light_to_move = self.light_to_move
+		gs.move_log = self.move_log
+		gs.en_passant = self.en_passant
+		gs.castling = self.castling
+		gs.move_piece = self.move_piece
+		gs.light_king_location =  self.light_king_location
+		gs.dark_king_location  =  self.dark_king_location
+		gs.check_mate = self.check_mate
+		gs.stale_mate = self.stale_mate
+		gs.light_king_side_castle = self.light_king_side_castle
+		gs.light_queen_side_castle = self.light_queen_side_castle
+		gs.dark_king_side_castle = self.dark_king_side_castle
+		gs.dark_queen_side_castle = self.dark_queen_side_castle
+
+		return gs
 
 
 
