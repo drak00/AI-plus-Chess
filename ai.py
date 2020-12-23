@@ -3,10 +3,65 @@
 	Press 'A' on the keyboard to activate/deactivate AI mode (Light VS Dark)
 """
 import random
+from math import inf
 from engine import Move
-light_pieces = {} # dictionary of light pieces on the board (keys = "row,col"; values = chess piece eg "kl")
-dark_pieces  = {} # dictionary of dark pieces on the board (keys = "row,col"; values = chess piece eg "kl")
+# light_pieces = {} # dictionary of light pieces on the board (keys = "row,col"; values = chess piece eg "kl")
+# dark_pieces  = {} # dictionary of dark pieces on the board (keys = "row,col"; values = chess piece eg "kl")
 
+
+def evaluate(board):
+    piece_values = {"kl":2000, "ql":90, "rl":50, "bl":33, "nl":32, "pl":10, "  ":0,\
+                    "kd":-2000, "qd":-90, "rd":-50, "bd":-33, "nd":-32, "pd":-10}
+    score = 0
+
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            piece_value = piece_values[board[i][j]]
+            score += piece_value
+    
+    return score
+
+
+def minimax(game_state, depth, alpha=-inf, beta=inf):
+    if (depth == 0) or (game_state.check_mate) or (game_state.stale_mate):
+        return None, evaluate(game_state.board)
+    
+    moves = game_state.get_valid_moves()[0]
+    best_move = random.choice(moves)
+
+    if game_state.light_to_move:
+        max_eval = -inf
+        for move in moves:
+            game_state.make_move(move)
+            current_eval = minimax(game_state, depth-1, alpha, beta)[1]
+            game_state.undo_move()
+
+            if current_eval > max_eval:
+                max_eval = current_eval
+                best_move = move
+            
+            alpha = max(alpha, current_eval)
+            if beta <= alpha:
+                break
+
+        return best_move, max_eval
+    
+    else:
+        min_eval = inf
+        for move in moves:
+            game_state.make_move(move)
+            current_eval = minimax(game_state, depth-1, alpha, beta)[1]
+            game_state.undo_move()
+
+            if current_eval < min_eval:
+                min_eval = current_eval
+                best_move = move
+            
+            beta = min(beta, current_eval)
+            if beta <= alpha:
+                break
+
+        return best_move, min_eval
 
 
 def ai_light_move(gs):
