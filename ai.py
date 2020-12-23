@@ -179,7 +179,7 @@ def evaluate(board):
 
     for i in range(len(board)):
         for j in range(len(board[i])):
-            piece_value = piece_values[board[i][j]]
+            piece_value = piece_values[board[i][j]] + square_values[board[i][j]][i][j]
             score += piece_value
     
     return score
