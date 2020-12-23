@@ -27,7 +27,11 @@ def minimax(game_state, depth, alpha=-inf, beta=inf):
         return None, evaluate(game_state.board)
     
     moves = game_state.get_valid_moves()[0]
-    best_move = random.choice(moves)
+
+    if moves:
+        best_move = random.choice(moves)
+    else:
+        return None, evaluate(game_state.board)
 
     if game_state.light_to_move:
         max_eval = -inf
