@@ -1,6 +1,6 @@
-![Chess Board](/misc/Chess.png?raw=true)
-# chess
-A chess platform for collaborative teaching with python 3.7.7 and pygame 1.9.6
+![Chess Board AI Mode](/misc/Chess.gif)
+# Python Chess (with AI Bot)
+A chess platform built collaboratively with participants during the Steamledge Pythoneers Challenge (using python 3.7.7 and pygame 1.9.6)
 
 # Setup
 ## Create and Activate an Environment
@@ -9,7 +9,7 @@ A chess platform for collaborative teaching with python 3.7.7 and pygame 1.9.6
 	```
 	conda create -n chess python=3
 	source activate chess
-	```[image_0]: ./misc/Chess.png
+	```
 2
 
 	- __Windows__: 
