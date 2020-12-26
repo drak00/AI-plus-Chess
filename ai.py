@@ -199,7 +199,7 @@ def minimax(game_state, depth, alpha=-inf, beta=inf):
     if game_state.light_to_move:
         max_eval = -inf
         for move in moves:
-            game_state.make_move(move)
+            game_state.make_move(move, True)
             current_eval = minimax(game_state, depth-1, alpha, beta)[1]
             game_state.undo_move()
 
@@ -216,7 +216,7 @@ def minimax(game_state, depth, alpha=-inf, beta=inf):
     else:
         min_eval = inf
         for move in moves:
-            game_state.make_move(move)
+            game_state.make_move(move, True)
             current_eval = minimax(game_state, depth-1, alpha, beta)[1]
             game_state.undo_move()
 
