@@ -175,55 +175,87 @@ square_values = {
 }
 
 def evaluate(board):
+    """
+        Evaluates chess board
+
+        input parameter(s):
+        board --> The chess board to be evaluated
+
+        return parameter(s):
+        score --> The board evaluation
+    """
     score = 0
 
     for i in range(len(board)):
         for j in range(len(board[i])):
+            # Add piece value and it's current square value (A Queen on d4 will be worth 900 + 5)
             piece_value = piece_values[board[i][j]] + square_values[board[i][j]][i][j]
+            # Add piece value to overall board score
             score += piece_value
     
     return score
 
 
 def minimax(game_state, depth, alpha=-inf, beta=inf):
+    """
+        Determine best move to play
+
+        input parameter(s):
+        game_state --> Game_state object
+        depth --> The number of moves ahead to check before deciding best move
+        alpha --> alpha value to use for alpha beta pruning. Default is -inf
+        beta --> beta value to use for alpha beta pruning. Default is inf
+
+        return parameter(s):
+        best_move --> The best move to play
+        max_eval --> Evaluation of best_move
+    """
+    # Breaking condition
     if (depth == 0) or (game_state.check_mate) or (game_state.stale_mate):
         return None, evaluate(game_state.board)
     
+    # Get valid moves
     moves = game_state.get_valid_moves()[0]
 
-    if moves:
-        best_move = random.choice(moves)
-    else:
+    if moves: # If there are valid moves
+        best_move = random.choice(moves) # Select a random move as best_move
+    else: # If there are no valid moves
         return None, evaluate(game_state.board)
 
-    if game_state.light_to_move:
+    if game_state.light_to_move: # If it is light's turn to play
         max_eval = -inf
         for move in moves:
-            game_state.make_move(move, True)
+            game_state.make_move(move, True) # make move in look_ahead mode
+            # Call minimax on all possible moves after above move
             current_eval = minimax(game_state, depth-1, alpha, beta)[1]
             game_state.undo_move()
 
+            # Update best_move and current_eval
             if current_eval > max_eval:
                 max_eval = current_eval
                 best_move = move
             
+            # alpha beta pruning
             alpha = max(alpha, current_eval)
             if beta <= alpha:
                 break
 
         return best_move, max_eval
     
-    else:
+    else: # If it is light's turn to play
         min_eval = inf
         for move in moves:
-            game_state.make_move(move, True)
+            game_state.make_move(move, True) # make move in look_ahead mode
+            # Call minimax on all possible moves after above move
             current_eval = minimax(game_state, depth-1, alpha, beta)[1]
             game_state.undo_move()
 
+            # Update best_move and current_eval
             if current_eval < min_eval:
                 min_eval = current_eval
                 best_move = move
             
+            # alpha beta pruning
             beta = min(beta, current_eval)
             if beta <= alpha:
                 break
