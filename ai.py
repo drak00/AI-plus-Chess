@@ -247,7 +247,7 @@ def ai_light_move(gs):
     ###		  Static evaluation of the board can be done with 'light_pieces' and 'dark_pieces' dictionaries ###
 
 	
-    move = minimax(gs, 4)[0] # Move as decided by minimax
+    move = minimax(gs, 3)[0] # Move as decided by minimax
 
     # create move copy (only copy (start_row, start_col) & (end_row, end_col) of move object)
     light_move = Move((move.start_row, move.start_col), (move.end_row, move.end_col), gs.board)
@@ -259,14 +259,14 @@ def ai_light_move(gs):
         gs.board[light_move.end_row][light_move.end_col] = random.choice(("ql", "rl", "bl", "nl")) # randomly select promotion piece
 
     # update light pieces position dictionary 
-    light_pieces.pop("{},{}".format(light_move.start_row, light_move.start_col))
-    light_pieces["{},{}".format(light_move.end_row, light_move.end_col)] = light_move.piece_moved
+    # light_pieces.pop("{},{}".format(light_move.start_row, light_move.start_col))
+    # light_pieces["{},{}".format(light_move.end_row, light_move.end_col)] = light_move.piece_moved
 
-    # remove pieces captured from dark_piece dictionary for faster static board evaluation in your mini-max algorithm rewrite
-    if light_move.piece_captured != "  " and not light_move.en_passant_captured:
-        dark_pieces.pop("{},{}".format(light_move.end_row, light_move.end_col))
-    elif light_move.en_passant_captured:
-        dark_pieces.pop("{},{}".format(light_move.end_row+1, light_move.end_col if gs.light_to_move else light_move.end_row-1, light_move.end_col))
+    # # remove pieces captured from dark_piece dictionary for faster static board evaluation in your mini-max algorithm rewrite
+    # if light_move.piece_captured != "  " and not light_move.en_passant_captured:
+    #     dark_pieces.pop("{},{}".format(light_move.end_row, light_move.end_col))
+    # elif light_move.en_passant_captured:
+    #     dark_pieces.pop("{},{}".format(light_move.end_row+1, light_move.end_col if gs.light_to_move else light_move.end_row-1, light_move.end_col))
 
     return light_move, gs
 
@@ -300,14 +300,14 @@ def ai_dark_move(gs):
 			gs.board[dark_move.end_row][dark_move.end_col] = random.choice(("qd", "rd", "bd", "nd")) # randomly select promotion piece
 
 		# update dark pieces position dictionary
-		dark_pieces.pop("{},{}".format(dark_move.start_row, dark_move.start_col))
-		dark_pieces["{},{}".format(dark_move.end_row, dark_move.end_col)] = dark_move.piece_moved
+		# dark_pieces.pop("{},{}".format(dark_move.start_row, dark_move.start_col))
+		# dark_pieces["{},{}".format(dark_move.end_row, dark_move.end_col)] = dark_move.piece_moved
 
-		# remove pieces captured from light_piece dictionary for faster static board evaluation in your mini-max algorithm rewrite 
-		if dark_move.piece_captured != "  " and not dark_move.en_passant_captured:
-			light_pieces.pop("{},{}".format(dark_move.end_row, dark_move.end_col))
-		elif dark_move.en_passant_captured:
-			light_pieces.pop("{},{}".format(dark_move.end_row+1, dark_move.end_col if gs.light_to_move else dark_move.end_row-1, dark_move.end_col))
+		# # remove pieces captured from light_piece dictionary for faster static board evaluation in your mini-max algorithm rewrite 
+		# if dark_move.piece_captured != "  " and not dark_move.en_passant_captured:
+		# 	light_pieces.pop("{},{}".format(dark_move.end_row, dark_move.end_col))
+		# elif dark_move.en_passant_captured:
+		# 	light_pieces.pop("{},{}".format(dark_move.end_row+1, dark_move.end_col if gs.light_to_move else dark_move.end_row-1, dark_move.end_col))
 	else:
 		dark_move = None
 
