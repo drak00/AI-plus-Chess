@@ -4,6 +4,7 @@
 import pygame as pg
 from ai import ai_move, ai_reset
 from engine import Game_state, Move
+import sys
 
 pg.init()
 
@@ -16,7 +17,7 @@ MAX_FPS = 15
 IMAGES = {}
 COLORS = [pg.Color("burlywood1"), pg.Color("darkorange4")]
 SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")]
-
+FLIP = sys.argv[1] if len(sys.argv) == 2 else False # dark starts first if arg passed
 
 def load_images():
 	"""
@@ -33,11 +34,12 @@ def main():
 	screen = pg.display.set_mode((WIDTH + BORDER, HEIGHT + BORDER))
 	clock = pg.time.Clock()
 	#screen.fill(pg.Color("ghostwhite"))
-	screen.fill(pg.Color("brown4"))
+	screen.fill(pg.Color("Peru"))
 
 
 	gs = Game_state()
 	load_images()
+	gs.light_to_move = not gs.light_to_move if FLIP else True
 	running = True
 
 	square_selected = () # x, y coordinate of selected square 
