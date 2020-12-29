@@ -1,6 +1,6 @@
-#This contains the Names and Github repositories of all the contributors
+#This contains the Names and Github usernames of all the contributors
 
-#Name                                        #Github repositorie
+#Name                                        #Github Usernames
 
 Adebayo Adedimeji                            Drak00
 Moosa Abdullah Omieza                        Moosa95
