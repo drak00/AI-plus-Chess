@@ -23,8 +23,8 @@ def ai_light_move(gs):
 	
 	### TODO: edit to your unique algorithm (mini-max w/ pruning, etc) ###
 	###		  Static evaluation of the board can be done with 'light_pieces' and 'dark_pieces' dictionaries ###
-
 	valid_moves, turn = gs.get_valid_moves()
+
 	if valid_moves:
 		move = random.choice(valid_moves) # select random move to make
 
@@ -38,8 +38,23 @@ def ai_light_move(gs):
 			gs.board[light_move.end_row][light_move.end_col] = random.choice(("ql", "rl", "bl", "nl")) # randomly select promotion piece
 
 		# update light pieces position dictionary 
-		light_pieces.pop("{},{}".format(light_move.start_row, light_move.start_col))
-		light_pieces["{},{}".format(light_move.end_row, light_move.end_col)] = light_move.piece_moved
+
+		# handles castling
+		if light_move.castling_rook:
+			if light_move.end_col == 2:
+				light_pieces.pop("{},{}".format(light_move.start_row, 0))
+				light_pieces["{},{}".format(light_move.end_row, 3)] = "rl"
+				light_pieces.pop("{},{}".format(light_move.start_row, light_move.start_col))
+				light_pieces["{},{}".format(light_move.end_row, light_move.end_col)] = light_move.piece_moved
+			elif light_move.end_col == 6:
+				light_pieces.pop("{},{}".format(light_move.start_row, 7))
+				light_pieces["{},{}".format(light_move.end_row, 5)] = "rl"
+				light_pieces.pop("{},{}".format(light_move.start_row, light_move.start_col))
+				light_pieces["{},{}".format(light_move.end_row, light_move.end_col)] = light_move.piece_moved
+
+		else:
+			light_pieces.pop("{},{}".format(light_move.start_row, light_move.start_col))
+			light_pieces["{},{}".format(light_move.end_row, light_move.end_col)] = light_move.piece_moved
 
 		# remove pieces captured from dark_piece dictionary for faster static board evaluation in your mini-max algorithm rewrite
 		if light_move.piece_captured != "  " and not light_move.en_passant_captured:
@@ -80,9 +95,24 @@ def ai_dark_move(gs):
 		if (dark_move.end_row == 7) and (dark_move.piece_moved[0] == "p"):\
 			gs.board[dark_move.end_row][dark_move.end_col] = random.choice(("qd", "rd", "bd", "nd")) # randomly select promotion piece
 
-		# update dark pieces position dictionary
-		dark_pieces.pop("{},{}".format(dark_move.start_row, dark_move.start_col))
-		dark_pieces["{},{}".format(dark_move.end_row, dark_move.end_col)] = dark_move.piece_moved
+		# update dark pieces position dictionary 
+
+		# handles castling
+		if dark_move.castling_rook:
+			if dark_move.end_col == 2:
+				dark_pieces.pop("{},{}".format(dark_move.start_row, 0))
+				dark_pieces["{},{}".format(dark_move.end_row, 3)] = "rl"
+				dark_pieces.pop("{},{}".format(dark_move.start_row, dark_move.start_col))
+				dark_pieces["{},{}".format(dark_move.end_row, dark_move.end_col)] = dark_move.piece_moved
+			elif dark_move.end_col == 6:
+				dark_pieces.pop("{},{}".format(dark_move.start_row, 7))
+				dark_pieces["{},{}".format(dark_move.end_row, 5)] = "rl"
+				dark_pieces.pop("{},{}".format(dark_move.start_row, dark_move.start_col))
+				dark_pieces["{},{}".format(dark_move.end_row, dark_move.end_col)] = dark_move.piece_moved
+
+		else:			
+			dark_pieces.pop("{},{}".format(dark_move.start_row, dark_move.start_col))
+			dark_pieces["{},{}".format(dark_move.end_row, dark_move.end_col)] = dark_move.piece_moved
 
 		# remove pieces captured from light_piece dictionary for faster static board evaluation in your mini-max algorithm rewrite 
 		if dark_move.piece_captured != "  " and not dark_move.en_passant_captured:

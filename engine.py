@@ -270,11 +270,11 @@ class Game_state():
 
 			# determine rook to be castled
 			if move.end_col == 2:
-				move.castling_rook = self.board[move.start_row][0]
+				move.castling_rook = (move.start_row, 0)
 				self.board[move.start_row][0] = "  "
 				self.board[move.end_row][3] = "r" + self.board[move.end_row][move.end_col][1] # castle rook
 			elif move.end_col == 6:
-				move.castling_rook = self.board[move.start_row][7]
+				move.castling_rook = (move.start_row, 7)
 				self.board[move.start_row][7] = "  "
 				self.board[move.end_row][5] = "r" + self.board[move.end_row][move.end_col][1] # castle rook
 
@@ -532,20 +532,19 @@ class Game_state():
 		"""
 
 		moves, turn = self.get_possible_moves()
-		in_check = False
 		for move in moves[::-1]: # reverse iteration
 			self.make_move(move, True)
 			self.light_to_move = not self.light_to_move
-			in_check = self.is_in_check()
-			if in_check:
+			if self.is_in_check():
 				moves.remove(move)
 			self.undo_move(True)
 			self.light_to_move = not self.light_to_move
 
-		if in_check and len(moves) == 0:
-			self.check_mate = True
-		elif not in_check and len(moves) == 0:
-			self.stale_mate = True
+		if len(moves) == 0:
+			if self.is_in_check():
+				self.check_mate = True
+			else:
+				self.stale_mate = True
 			
 			# handles undoing
 		else:
