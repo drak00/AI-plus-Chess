@@ -6,6 +6,13 @@ from ai import ai_move, ai_reset
 from engine import Game_state, Move
 import ai
 from math import inf
+import tkinter as tk
+from tkinter import simpledialog
+
+ROOT = tk.Tk()
+
+ROOT.withdraw()
+
 pg.init()
 
 BORDER = 128 # for the ranks and files
@@ -51,33 +58,7 @@ def main():
 	display_time = 0 # AI_MODE text display persistence timer
 
 	while running:
-
-		if gs.light_to_move:
-			move, evaluattion, = ai.minimax(gs.board, 1, -inf, inf, gs.light_to_move) #call minimax function to suggest move
-			for obj in range(len(valid_moves)): #checking if a valid move
-				if move == valid_moves[obj]:
-					move = valid_moves[obj]
-					found = True
-					gs.make_move(move, True)
-					if (move.end_row == 0 or move.end_row == 7) and (move.piece_moved[0] == "p"):
-						user_prompt = True
-						choice = ("q", "r", "b", "n")
-						promotion = ""
-						while promotion not in choice:
-							promotion = input("Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
-						gs.board[move.end_row][move.end_col] = promotion + move.piece_moved[1]
-						user_prompt = False
-
-					animate(move, screen, gs.board, clock)
-
-					print(move.get_chess_notation())
-
-					square_selected = ()
-					player_clicks = []
-					valid_moves, first_click_turn = gs.get_valid_moves()
-					break
-
-		elif not  user_prompt:
+		if not  user_prompt:
 			found = False
 
 			if AI_MODE and display_time == 0 and not game_over:
@@ -155,8 +136,10 @@ def main():
 											user_prompt = True
 											choice = ("q", "r", "b", "n")
 											promotion = ""
+											user_input= simpledialog.askstring(title="Pawn Promotion",
+											                                  prompt="Promote to: q => Queen, r => Rook, b => Bishop, n => Knight") #using tkniter to promt user input
 											while promotion not in choice:
-												promotion = input("Promote to: q => Queen, r => Rook, b => Bishop, n => Knight\n")
+												promotion = user_input
 											gs.board[move.end_row][move.end_col] = promotion + move.piece_moved[1]
 											user_prompt = False
 
