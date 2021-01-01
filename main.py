@@ -8,10 +8,11 @@ import ai
 from math import inf
 import tkinter as tk
 from tkinter import simpledialog
+import math, time, random, os
 
-ROOT = tk.Tk()
+ROOT = tk.Tk() # creating a window Tkniter window
 
-ROOT.withdraw()
+ROOT.withdraw() #removes the window from the screen (without destroying it)
 
 pg.init()
 
@@ -23,7 +24,7 @@ SQ_SIZE = HEIGHT // DIMENSION # size of each board square
 MAX_FPS = 15
 IMAGES = {}
 COLORS = [pg.Color("burlywood1"), pg.Color("darkorange4")]
-SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")]
+SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav"), pg.mixer.Sound("audio/fireworks.wav")]
 
 
 def load_images():
@@ -175,8 +176,12 @@ def main():
 
 			if gs.light_to_move:
 				display_text(screen, "Dark wins by checkmate")
+				pg.mixer.Sound.play(SOUND[2]) #playing win sound for fireworks
+				play_fireworks(screen)
 			else:
 				display_text(screen, "Light wins by checkmate")
+				pg.mixer.Sound.play(SOUND[2]) #playing win sound for fireworks
+				play_fireworks(screen) #display fireworks
 
 		elif gs.stale_mate:
 			game_over = True
@@ -278,7 +283,6 @@ def play_sound(move):
 		pg.mixer.Sound.play(SOUND[1])
 	elif move.piece_captured == "  ":
 		pg.mixer.Sound.play(SOUND[0])
-
 	else:
 		pg.mixer.Sound.play(SOUND[1])
 
@@ -338,6 +342,91 @@ def animate(move, screen, board, clock):
 		screen.blit(IMAGES[move.piece_moved], pg.Rect(c*SQ_SIZE + BORDER//2, r*SQ_SIZE + BORDER//2, SQ_SIZE, SQ_SIZE))
 		pg.display.flip()
 		clock.tick(60)
+
+
+fireworks_color_list = [
+				[255, 50, 50],
+				[50, 255, 50],
+				[50, 50, 255],
+				[255, 255, 50],
+				[255, 50, 255],
+				[50, 255, 255],
+				[255, 255, 255]
+			 ]
+
+class Fireworks():
+	is_displaying = False
+	x, y = 0, 0
+	vy = 0
+	p_list = []
+	color = [0, 0, 0]
+	v = 0
+
+	def __init__(self, x, y, vy, n=300, color=[0, 255, 0], v=10):
+	    self.x = x
+	    self.y = y
+	    self.vy = vy
+	    self.color = color
+	    self.v = v
+	    for i in range(n):
+	        self.p_list.append([random.random() * 2 * math.pi, 0, v * math.pow(random.random(), 1 / 3)])
+
+	def again(self):
+	    self.is_displaying = True
+	    self.x = (WIDTH // 2)
+	    self.y = (HEIGHT //2)
+	    self.vy = -40 * (random.random() * 0.4 + 0.8) - self.vy * 0.2
+	    self.color = fireworks_color_list[random.randint(0, len(fireworks_color_list) - 1)].copy()
+	    n = len(self.p_list)
+	    self.p_list = []
+	    for i in range(n):
+	        self.p_list.append([random.random() * 2 * math.pi, 0, self.v * math.pow(random.random(), 1 / 3)])
+
+	def run(self):
+		show_n = 0
+		t1 = 0.18
+		for p in self.p_list:
+		    p[1] = p[1] + (random.random() * 0.6 + 0.7) * p[2]
+		    p[2] = p[2] * 0.97
+		    if p[2] < 1.2:
+		        self.color[0] *= 0.9999
+		        self.color[1] *= 0.9999
+		        self.color[2] *= 0.9999
+
+		    if max(self.color) < 10 or self.y>HEIGHT+p[1]:
+		        show_n -= 1
+		        self.is_displaying = False
+		        break
+		self.vy += 10 * t1
+		self.y += self.vy * t1
+
+fireworks_list = []
+fireworks_list.append(Fireworks(300, 300, -20, n=100, color=[0, 255, 0], v=10))
+fireworks_list.append(Fireworks(300, 300, -20, n=200, color=[0, 0, 255], v=11))
+fireworks_list.append(Fireworks(300, 300, -20, n=200, color=[0, 0, 255], v=12))
+fireworks_list.append(Fireworks(300, 300, -20, n=500, color=[0, 0, 255], v=12))
+fireworks_list.append(Fireworks(300, 300, -20, n=600, color=[0, 0, 255], v=13))
+fireworks_list.append(Fireworks(300, 300, -20, n=700, color=[255, 0, 0], v=15))
+fireworks_list.append(Fireworks(300, 300, -20, n=800, color=[255, 255, 0], v=18))
+
+def play_fireworks(screen):
+	show_n = 0
+	show_frequency = 0.0015
+	for i, fireworks in enumerate(fireworks_list):
+	    if not fireworks.is_displaying:
+	        fireworks.is_displaying = False
+	        if random.random() < show_frequency * (len(fireworks_list) - show_n):
+	            show_n += 1
+	            fireworks.again()
+	        continue
+	    fireworks.run()
+	    for p in fireworks.p_list:
+	        x, y = fireworks.x + p[1] * math.cos(p[0]), fireworks.y + p[1] * math.sin(p[0])
+	        if random.random() < 0.055:
+	            screen.set_at((int(x), int(y)),(255,255,255))
+	        else:
+	            screen.set_at((int(x), int(y)), (int(fireworks.color[0]), int(fireworks.color[1]), int(fireworks.color[2])))
+
 
 if __name__ == "__main__":
 	main()
