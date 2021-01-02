@@ -1,12 +1,12 @@
 ![Chess Board AI Mode](/misc/Chess.gif)\
 
-#STEAM CHESS ENGINE
+# STEAM CHESS ENGINE
 
-##DESCRIPTION
+## DESCRIPTION
 
 **STEAM CHESS ENGINE** (named after Steamledge), is a Chess engine focused on artifitial intelligence written in Python (using python 3.7.7 and pygame 1.9.6).  The engine has three main files `main.py`, `engine.py` and `ai.py`.
 
-###Features
+### Features
 
 *	GUI using pygame with a display resolution of 600 x600
 *	Sounds for both piece moves and piece captures
@@ -16,19 +16,19 @@
 *	Move ordering based off heuristics (captures, promotions, e.t.c)
 *	Efficient board evaluation function
 
-###Game Modes
+### Game Modes
 
 *	Human Vs Human
 *	AI Vs AI
 
-#CODE DESCRIPTION
+# CODE DESCRIPTION
 
 Composed of three files: 
 The `main.py` file is the GUI of the engine using pygame to display the chess board, pieces as well as the game simulation. 
 The `engine.py` creates the chess objects (board, pieces, moves e.t.c) and their functionalities.
 The `ai.py` programs our AI bot. below is a detail description of each file
 
-##main.py (GUI)
+## main.py (GUI)
 
 This is the GUI displaying all aspects of the chess game and handling user inputs. it contains the `main()` function which displays the chess game using pygame with the help of these supporting functions:
 *	`display_game_state` :display all graphics
@@ -38,11 +38,11 @@ This is the GUI displaying all aspects of the chess game and handling user input
 *	`play_sound`: plays 'move' and 'capture' sounds
 *	`animate`: creates moving animations for chess pieces:
 
-##engine.py (Heart of the Chess Engine)
+## engine.py (Heart of the Chess Engine)
 
 This implements the rules of the game and stores the state of the chess board, including its pieces and moves. It has two Classes `Game_state` and `Move`. Each Class has a specific function:
 
-###Game_state
+### Game_state
 
 * `self.board`: 8 X 8 dimensional array (Matrix of 8 rows and 8 columns ) i.e a list of lists. Each element of the Matrix  is a string of two characters representing the chess pieces in the order "type" + "colour".. light pawn = “pl” dark pawn = “pd” and empty square = "  " double empty space.
 *	`get_pawn_moves`, `get_rook_moves`, `get_knight_moves`, `get_queen_moves`, `get_king_moves` and `get_bishop_moves` : this functions Calculates all possible moves for a given color (light or dark) and appends them to a list. This includes all types of chess moves, capture, castling and enpassant
@@ -51,7 +51,7 @@ This implements the rules of the game and stores the state of the chess board, i
 *	`get_all_possible_moves`: this gives naive possible moves of pieces on the board without taking checks into account
 *	`get_valid_moves`: gives the valid piece moves on the board while considering potential checks
 
-###Move:
+### Move:
 
 A Move class abstracting all parameters needed for moving chess pieces on the board
 *	`self.start_row`: row location of piece to be moved
@@ -61,7 +61,7 @@ A Move class abstracting all parameters needed for moving chess pieces on the bo
 *	`self.piece_moved`: actual piece moved
 *	`self.piece_captured`: opponent piece if any on the destination square
 
-##ai.py (AI Bot(s))
+## ai.py (AI Bot(s))
 
 Included in the `ai.py` is the Minimax functions, which utilizes the MiniMax algorithm to evaluate board states. The MiniMax algorithm provided comes with alpha-beta pruning, move ordering. Some of the functions are:
 
@@ -74,9 +74,9 @@ Included in the `ai.py` is the Minimax functions, which utilizes the MiniMax alg
 *	`ai_move`: determines the turn for both team's AI also saves a running memory of the board state with moves and captures
 *	`ai_reset`: resets the light pieces and dark pieces dictionaries when AI mode is activated/deactivated (in case moves were made outside AI mode)
 
-##HOW TO PLAY
+## HOW TO PLAY
 
-###Installation:
+### Installation:
 
 *	Clone/Download and extract repo in a folder on your system
 *	Create and activate an environment
@@ -103,7 +103,7 @@ py main.py
 python main.py
 ````
 
-##USER INPUTS
+## USER INPUTS
 
 Game defaults to Player Vs Player mode
 *	Press “A” on keyboard to activate or deactivate AI mode
@@ -112,7 +112,7 @@ Game defaults to Player Vs Player mode
 *	Mouse left click on piece and square to select piece and make move respectively (only human vs human mode)
 *	Input “Q”, “R” , “B” or “K” during pawn promotion prompt for Queen, Rook, Bishop or Knight (only human vs human mode)
 
-##LIMITATIONS:
+## LIMITATIONS:
 
 *	The AI sometimes finds it hard to make checkmates at sufficiently complex end-game scenarios. This can be overcome by providing a separate group of piece-square tables for end-games
 *	Minimax search depth is currently set to 3 (higher search values take more than 10 seconds per move)
