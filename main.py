@@ -12,9 +12,9 @@ BORDER = 128 # for the ranks and files
 WIDTH = HEIGHT = 512 # of the chess board
 DIMENSION = 8 # rows and columns
 OFFSET = 5 # for image scaling
-height = width = 64
-dimension = 2
-square = height//2
+height = width = 64 # with for pawn promotion board
+dimension = 2 # rows and clolums for pawn promotion board
+square = height//2 # size of promotion piece sqaure
 
 SQ_SIZE = HEIGHT // DIMENSION # size of each board square
 MAX_FPS = 15
@@ -134,22 +134,18 @@ def main():
 
 										if (move.end_row == 0 or move.end_row == 7) and (move.piece_moved[0] == "p"):
 											user_prompt = True
-											rect, screen2 =display_rect(screen, move.end_row, move.end_col)
 											choice = ("q", "r", "b", "n")
 											promotion = True
 											while promotion:
-												iput=""
 												for event in pg.event.get():
 													if event.type == pg.MOUSEBUTTONDOWN:
 														location = pg.mouse.get_pos() # x, y location of mouse click
-														print(location)
-														location_col_transform = location[0] // 32- 1
-														location_row_transform = location[1] // 32 - 1
-														row_comb= [1,2,15,16]
-														if location_row_transform in row_comb:
+														location_col_transform = location[0] // square- 1 # divided by sqaure size
+														location_row_transform = location[1] // square - 1
+														row_comb= [1,2,15,16] # list for all the possible rows
+														if location_row_transform in row_comb:  #making sure the event meet requirements
 															row = location_row_transform
 															col =location_col_transform
-															print(row, col)
 															if ((row == 15) and (col%2 != 0)) or ((row == 1) and (col%2 != 0)):
 																piece = "q"
 															elif ((row == 15) and (col%2 == 0)) or ((row == 1) and (col%2 == 0)):
@@ -158,7 +154,7 @@ def main():
 																piece = "b"
 															elif ((row == 16) and (col%2 == 0)) or ((row == 2) and (col%2 == 0)):
 																piece = "n"
-															print(piece)
+															print("Promoting Piece")
 															promotion = False
 												display_board2(screen,move.end_row, move.end_col)
 												pg.display.update()
@@ -235,12 +231,13 @@ def display_board(screen):
 
 def display_board2(screen, row, col):
 	"""
-		display chess squares on board
+		display new surface to promt user choice of promotion
 	"""
-	screen2 = pg.Surface((64,64))
-	UpdateRect= pg.Rect((64, 64), (col*SQ_SIZE + BORDER//2, row*SQ_SIZE + BORDER//2))
-	piece = [["ql", "rl",], ["bl", "nl"]]
-	rect_list = []
+	screen2 = pg.Surface((64,64))  # second screen (a surface to bliet pieces for choice)
+	if row == 0:  #if light team
+		piece = [["ql", "rl",], ["bl", "nl"]]
+	else:  #if dark_team
+		piece = [["qd", "rd",], ["bd", "nd"]]
 	for rows in range(dimension):
 		for cols in range(dimension):
 			color = COLORS[(rows + cols) % 2]
@@ -249,23 +246,6 @@ def display_board2(screen, row, col):
 			screen2.blit(IMAGES2[piec],pg.Rect(cols*square, rows*square, square, square))
 			screen.blit(screen2, (col*SQ_SIZE + BORDER//2, row*SQ_SIZE + BORDER//2))
 
-def display_rect(screen, row, col):
-	"""
-		display chess squares on board
-	"""
-	screen2 = pg.Surface((64,64))
-	UpdateRect= pg.Rect((64, 64), (col*SQ_SIZE + BORDER//2, row*SQ_SIZE + BORDER//2))
-	piece = [["ql", "rl",], ["bl", "nl"]]
-	rect = []
-	for rows in range(dimension):
-		for cols in range(dimension):
-			color = COLORS[(rows + cols) % 2]
-			piec = piece[rows][cols]
-			pg.draw.rect(screen2, color, pg.Rect(cols*square, rows*square, square, square))
-			screen2.blit(IMAGES2[piec],pg.Rect(cols*square, rows*square, square, square))
-			screen.blit(screen2, (col*SQ_SIZE + BORDER//2, row*SQ_SIZE + BORDER//2))
-			rect.append((pg.Rect(cols*square, rows*square, square, square)))
-	return rect, screen2
 
 def input_promotion(screen, row, col):
 	#print(rect)
