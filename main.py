@@ -247,23 +247,6 @@ def display_board2(screen, row, col):
 			screen.blit(screen2, (col*SQ_SIZE + BORDER//2, row*SQ_SIZE + BORDER//2))
 
 
-def input_promotion(screen, row, col):
-	#print(rect)
-	iput=""
-	for event in pg.event.get():
-		if event.type == pg.MOUSEBUTTONDOWN:
-			if rect[0].collidepoint(event.pos):
-				iput = "q"
-			elif rect[1].collidepoint(event.pos):
-				iput = "r"
-			elif rect[2].collidepoint(event.pos):
-				iput = "b"
-			elif rect[3].collidepoint(event.pos):
-				iput = "n"
-		print(iput)
-	rect = display_board2(screen, row, col)
-	pg.display.update()
-	return iput
 
 def display_pieces(screen, board):
 	"""
