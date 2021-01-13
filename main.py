@@ -192,9 +192,9 @@ def main():
 
 		if AI_MODE and not game_over:
 			if gs.light_to_move:
-				display_Thinking_text(screen,gs, "Light Thinking....", )
+				display_Thinking_text(screen,gs, "Thinking....")
 			else:
-				display_Thinking_text(screen, gs, "Dark Thinking....")
+				display_Thinking_text(screen, gs, "Thinking....")
 		if gs.check_mate:
 			game_over = True
 
@@ -344,7 +344,7 @@ def display_text(screen, text, color = None):
 
 def display_Thinking_text(screen, gs, text, color = None):
 
-	font = pg.font.SysFont("Helvetica", 32, True, False)
+	font = pg.font.SysFont("Helvetica", 18, True, False)
 	text_object = font.render(text, 0, pg.Color("Black"))
 	if gs.light_to_move:
 		text_location = pg.Rect(0,490, BORDER, BORDER).move((WIDTH+BORDER)//2 - text_object.get_width()/2, (BORDER)//2 - text_object.get_height()/2)
