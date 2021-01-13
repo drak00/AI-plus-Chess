@@ -4,6 +4,7 @@
 import pygame as pg
 from ai import ai_move, ai_reset
 from engine import Game_state, Move
+import random
 import sys
 
 pg.init()
@@ -330,7 +331,8 @@ def play_sound(move):
 def display_text(screen, text, color = None):
 
 	font = pg.font.SysFont("Helvetica", 32, True, False)
-	text_object = font.render(text, 0, pg.Color("Gray"))
+	background = random.choice(("Red", "Green"))
+	text_object = font.render(text, 0, pg.Color("Black" if color else background))
 
 	text_location = pg.Rect(0, 0, WIDTH+BORDER, HEIGHT+BORDER).move((WIDTH+BORDER)//2 - text_object.get_width()/2, (HEIGHT+BORDER)//2 - text_object.get_height()/2)
 	screen.blit(text_object, text_location)
