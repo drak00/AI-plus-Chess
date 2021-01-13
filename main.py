@@ -70,7 +70,7 @@ def main():
 					if move: # if AI made a move
 						animate(move, screen, gs.board, clock)
 						print(move.get_chess_notation())
-					delay = 4 # pause magnitude
+					delay = 20 # pause magnitude
 				else:
 					delay -= 1
 
@@ -190,6 +190,11 @@ def main():
 			display_text(screen, "AI MODE ENABLED", "Green") if AI_MODE else display_text(screen, "AI MODE DISABLED", "Red")
 			display_time -= 1 # countdown for text to disappear
 
+		if AI_MODE and not game_over:
+			if gs.light_to_move:
+				display_Thinking_text(screen,gs, "Thinking....")
+			else:
+				display_Thinking_text(screen, gs, "Thinking....")
 		if gs.check_mate:
 			game_over = True
 
@@ -337,6 +342,22 @@ def display_text(screen, text, color = None):
 		text_object = font.render(text, 0, pg.Color(color))
 		screen.blit(text_object, text_location.move(2, 2))
 
+def display_Thinking_text(screen, gs, text, color = None):
+
+	font = pg.font.SysFont("Helvetica", 18, True, False)
+	text_object = font.render(text, 0, pg.Color("Black"))
+	if gs.light_to_move:
+		text_location = pg.Rect(0,490, BORDER, BORDER).move((WIDTH+BORDER)//2 - text_object.get_width()/2, (BORDER)//2 - text_object.get_height()/2)
+		screen.blit(text_object, text_location)
+	else:
+		text_location = pg.Rect(0,20, BORDER, BORDER).move((WIDTH+BORDER)//2 - text_object.get_width()/2, (BORDER)//2 - text_object.get_height()/2)
+		screen.blit(text_object, text_location)
+	if not color:
+		text_object = font.render(text, 0, pg.Color("Red"))
+		screen.blit(text_object, text_location.move(2, 2))
+	else:
+		text_object = font.render(text, 0, pg.Color(color))
+		screen.blit(text_object, text_location.move(2, 2))
 
 
 def animate(move, screen, board, clock):
