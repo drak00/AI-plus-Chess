@@ -93,12 +93,9 @@ Included in the `ai.py` is the Minimax functions, which utilizes the MiniMax alg
 	```
 *	Install pygame from within chess environment
 	`pip install pygame`
-*	Start game by run the following command:
-- __Linux__ or __Mac__:
-```
-py main.py
-```
-- __Windows__:
+*	Start game by running the following command:
+
+-  __Linux__ or __Mac__ or __Windows__:
 ````
 python main.py
 ````
