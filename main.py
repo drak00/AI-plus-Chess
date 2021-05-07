@@ -189,9 +189,7 @@ def main():
                                             user_prompt = False
 
                                         animate(move, screen, gs.board, clock)
-                                        mv = move.get_chess_notation()
-                                        print(mv)
-                                        record_move(move, gs)
+                                        print(move.get_chess_notation())
                                         square_selected = ()
                                         player_clicks = []
                                         valid_moves, first_click_turn = gs.get_valid_moves()
@@ -403,21 +401,6 @@ def display_Thinking_text(screen, gs, text, color=None):
     else:
         text_object = font.render(text, 0, pg.Color(color))
         screen.blit(text_object, text_location.move(2, 2))
-
-
-def record_move(move, gs):
-    if gs.light_to_move:
-        team = "Dark"
-    else:
-        team = "Light"
-    ltime = strftime("%H:%M:%S", localtime())
-    mv = move.get_chess_notation()
-    Move_data.append([team, mv, ltime])
-    print(Move_data)
-    with open("log.csv", 'r+') as logfile:
-        csvwriter = csv.writer(logfile)
-        csvwriter.writerow(["Team", "Move", "Time"])
-        csvwriter.writerows(Move_data)
 
 
 def animate(move, screen, board, clock):
