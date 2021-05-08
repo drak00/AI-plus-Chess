@@ -6,9 +6,6 @@ from ai import ai_move, ai_reset
 from engine import Game_state, Move
 import random
 import sys
-import csv
-import csv
-from time import time, localtime, strftime
 
 
 pg.init()
@@ -29,9 +26,7 @@ COLORS = [pg.Color("burlywood1"), pg.Color("darkorange4")]
 SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")]
 # dark starts first if arg passed
 FLIP = sys.argv[1] if len(sys.argv) == 2 else False
-
-Move_data = []
-i = 1
+playback_log = []
 
 
 def load_images():
@@ -69,7 +64,8 @@ def main():
     AI_MODE = False  # flag for activating AI mode
     delay = 0  # delay the speed of AI plays
     display_time = 0  # AI_MODE text display persistence timer
-
+    PLAYBACK_MODE = False  # flag for activating playback
+    playback_index = 0
     while running:
 
         if not user_prompt:
@@ -99,7 +95,7 @@ def main():
                         valid_moves, first_click_turn = gs.get_valid_moves()
 
                     # r key pressed (reset game)
-                    elif e.key == pg.K_r and not AI_MODE:
+                    elif e.key == pg.K_r and not AI_MODE and not PLAYBACK_MODE:
                         gs = Game_state()
                         valid_moves, turn = [], None
                         square_selected = ()
@@ -107,17 +103,88 @@ def main():
                         print("Board reset!")
                         valid_moves, first_click_turn = gs.get_valid_moves()
 
-                    elif e.key == pg.K_a:  # a key pressed (toggle AI mode)
-                        #toggle = True
+                    # a key pressed (toggle AI mode)
+                    elif e.key == pg.K_a and not PLAYBACK_MODE:
+                        # toggle = True
                         display_time = 10
                         AI_MODE = not AI_MODE
                         ai_reset()
                         print("AI MODE ENABLED") if AI_MODE else print(
                             "AI MODE DISABLED")
 
+                    elif e.key == pg.K_p and not AI_MODE:
+                        PLAYBACK_MODE = not PLAYBACK_MODE
+                        playback_log = gs.move_log
+                        gs = Game_state()
+                        valid_moves, turn = [], None
+                        square_selected = ()
+                        player_clicks = []
+                        valid_moves, first_click_turn = gs.get_valid_moves()
+                        print("PLAYBACK MODE ENABLED \nNumber of Moves Available: " +
+                              str(len(playback_log))) if PLAYBACK_MODE else print(
+                            "PLAYBACK MODE DISABLED")
+
+                    elif e.key == pg.K_n and PLAYBACK_MODE:
+                        if len(playback_log) == 0:
+                            print("No Moves to Play")
+                            break
+                        if playback_index >= len(playback_log):
+                            playback_index = len(playback_log) - 1
+                            print("Max Playback Reached!")
+                        else:
+                            str_sqr = str(playback_log[playback_index])
+                            start_row = int(str_sqr[1])
+                            start_col = int(str_sqr[4])
+                            start_sqr = (start_row, start_col)
+                            end_row = int(str_sqr[8])
+                            end_col = int(str_sqr[11])
+                            end_sqr = (end_row, end_col)
+                            clicked_sqr = [start_sqr, end_sqr]
+                            # print(start_sqr)
+                            # print(end_sqr)
+                            # print(str_sqr)
+                            print(clicked_sqr)
+                            playback_index += 1
+                            move = Move(
+                                start_sqr, end_sqr, gs.board)
+                            gs.make_move(move)
+                            animate(move, screen, gs.board, clock)
+                            print("Move: "+str((playback_index)))
+                            print(move.get_chess_notation())
+
+                    elif e.key == pg.K_b and PLAYBACK_MODE:
+
+                        if playback_index <= -1:
+                            playback_index = 0
+                            print("Min Playback Reached!")
+                        else:
+                            playback_index -= 1
+                            str_sqr = str(playback_log[playback_index])
+                            start_row = int(str_sqr[1])
+                            start_col = int(str_sqr[4])
+                            start_sqr = (start_row, start_col)
+                            end_row = int(str_sqr[8])
+                            end_col = int(str_sqr[11])
+                            end_sqr = (end_row, end_col)
+                            clicked_sqr = [start_sqr, end_sqr]
+                            # print(start_sqr)
+                            # print(end_sqr)
+                            # print(str_sqr)
+                            print(clicked_sqr)
+                            # print(playback_index)
+                            # playback_index += 1
+                            move = Move(
+                                end_sqr, start_sqr, gs.board)
+                            gs.make_move(move)
+                            animate(move, screen, gs.board, clock)
+                            print("Move: "+str((playback_index+1)))
+                            print(move.get_chess_notation())
+
+                        # break
+
                 elif e.type == pg.MOUSEBUTTONDOWN:
 
-                    if not game_over and not AI_MODE:
+                    if not game_over and not AI_MODE and not PLAYBACK_MODE:
 
                         location = pg.mouse.get_pos()  # x, y location of mouse click
                         location_col_transform = location[0] // SQ_SIZE - 1
@@ -142,7 +209,7 @@ def main():
                                 # create move object
                                 move = Move(
                                     player_clicks[0], player_clicks[1], gs.board)
-
+                                # print(player_clicks)
                                 for obj in range(len(valid_moves)):
 
                                     if move == valid_moves[obj]:
@@ -190,6 +257,7 @@ def main():
 
                                         animate(move, screen, gs.board, clock)
                                         print(move.get_chess_notation())
+                                        # print(gs.move_log)
                                         square_selected = ()
                                         player_clicks = []
                                         valid_moves, first_click_turn = gs.get_valid_moves()
@@ -416,7 +484,7 @@ def animate(move, screen, board, clock):
     for frame in range(frame_count+1):
 
         r, c = ((move.start_row + dr*frame/frame_count,
-                move.start_col + dc*frame/frame_count))
+                 move.start_col + dc*frame/frame_count))
 
         # play sound
         if not sound_played and ((abs(move.end_row - r) + abs(move.end_col - c))/max((move.end_row+move.end_col + 0.01), (r+c + 0.01))) < 0.4:
