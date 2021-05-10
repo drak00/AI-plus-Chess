@@ -116,7 +116,7 @@ def main():
                         print("AI MODE ENABLED") if AI_MODE else print(
                             "AI MODE DISABLED")
 
-                    elif e.key == pg.K_p and not AI_MODE:
+                    elif e.key == pg.K_p and not AI_MODE and game_over:
                         PLAYBACK_MODE = not PLAYBACK_MODE
                         playback_log = gs.move_log
                         gs = Game_state()
@@ -128,7 +128,7 @@ def main():
                               str(len(playback_log))) if PLAYBACK_MODE else print(
                             "PLAYBACK MODE DISABLED")
                         playback_index = 0
-                    elif e.key == pg.K_n and PLAYBACK_MODE:
+                    elif e.key == pg.K_n and PLAYBACK_MODE and game_over:
                         if len(playback_log) == 0:
                             print("No Moves to Play")
                             break
@@ -156,7 +156,7 @@ def main():
                             print("Move: "+str((playback_index)))
                             print(move.get_chess_notation())
 
-                    elif e.key == pg.K_b and PLAYBACK_MODE:
+                    elif e.key == pg.K_b and PLAYBACK_MODE and game_over:
                         if playback_index <= 0:
                             playback_index = 0
                             print("Min Playback Reached!")
@@ -291,6 +291,7 @@ def main():
                 display_Thinking_text(screen, gs, "Thinking....")
         if gs.check_mate:
             game_over = True
+            AI_MODE = False
 
             if gs.light_to_move:
                 display_text(screen, "Dark wins by checkmate")
@@ -299,6 +300,7 @@ def main():
 
         elif gs.stale_mate:
             game_over = True
+            AI_MODE = False
             display_text(screen, "Stalemate")
 
         clock.tick(MAX_FPS)

@@ -273,7 +273,7 @@ def minimax(game_state, depth, alpha=-inf, beta=inf):
             game_state.make_move(move, True)  # make move in look_ahead mode
             # Call minimax on all possible moves after above move
             current_eval = minimax(game_state, depth-1, alpha, beta)[1]
-            game_state.undo_move()
+            game_state.undo_move(True)
 
             # Update best_move and current_eval
             if current_eval > max_eval:
@@ -293,7 +293,7 @@ def minimax(game_state, depth, alpha=-inf, beta=inf):
             game_state.make_move(move, True)  # make move in look_ahead mode
             # Call minimax on all possible moves after above move
             current_eval = minimax(game_state, depth-1, alpha, beta)[1]
-            game_state.undo_move()
+            game_state.undo_move(True)
 
             # Update best_move and current_eval
             if current_eval < min_eval:
