@@ -109,6 +109,10 @@ def main():
                         display_time = 10
                         AI_MODE = not AI_MODE
                         ai_reset()
+                        valid_moves, turn = [], None
+                        #square_selected = ()
+                       # player_clicks = []
+                        valid_moves, first_click_turn = gs.get_valid_moves()
                         print("AI MODE ENABLED") if AI_MODE else print(
                             "AI MODE DISABLED")
 
@@ -123,13 +127,13 @@ def main():
                         print("PLAYBACK MODE ENABLED \nNumber of Moves Available: " +
                               str(len(playback_log))) if PLAYBACK_MODE else print(
                             "PLAYBACK MODE DISABLED")
-
+                        playback_index = 0
                     elif e.key == pg.K_n and PLAYBACK_MODE:
                         if len(playback_log) == 0:
                             print("No Moves to Play")
                             break
-                        if playback_index >= len(playback_log):
-                            playback_index = len(playback_log) - 1
+                        if playback_index == len(playback_log):
+                            #playback_index = len(playback_log) - 1
                             print("Max Playback Reached!")
                         else:
                             str_sqr = str(playback_log[playback_index])
@@ -143,7 +147,7 @@ def main():
                             # print(start_sqr)
                             # print(end_sqr)
                             # print(str_sqr)
-                            print(clicked_sqr)
+                            # print(clicked_sqr)
                             playback_index += 1
                             move = Move(
                                 start_sqr, end_sqr, gs.board)
@@ -153,10 +157,10 @@ def main():
                             print(move.get_chess_notation())
 
                     elif e.key == pg.K_b and PLAYBACK_MODE:
-
-                        if playback_index <= -1:
+                        if playback_index <= 0:
                             playback_index = 0
                             print("Min Playback Reached!")
+
                         else:
                             playback_index -= 1
                             str_sqr = str(playback_log[playback_index])
@@ -170,17 +174,15 @@ def main():
                             # print(start_sqr)
                             # print(end_sqr)
                             # print(str_sqr)
-                            print(clicked_sqr)
+                            # print(clicked_sqr)
                             # print(playback_index)
-                            # playback_index += 1
+                            # playback_index +=
                             move = Move(
                                 end_sqr, start_sqr, gs.board)
                             gs.make_move(move)
                             animate(move, screen, gs.board, clock)
                             print("Move: "+str((playback_index+1)))
                             print(move.get_chess_notation())
-
-                        # break
 
                 elif e.type == pg.MOUSEBUTTONDOWN:
 
