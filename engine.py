@@ -782,7 +782,7 @@ class Move():
         """
                 "not equals to" --> conventional counterpart to __eq__
         """
-        return self.__eq__(other)
+        return not self.__eq__(other)
 
     def __str__(self):
         """
