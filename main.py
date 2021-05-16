@@ -110,7 +110,7 @@ def main():
                         AI_MODE = not AI_MODE
                         ai_reset()
                         valid_moves, turn = [], None
-                        #square_selected = ()
+                        # square_selected = ()
                        # player_clicks = []
                         valid_moves, first_click_turn = gs.get_valid_moves()
                         print("AI MODE ENABLED") if AI_MODE else print(
@@ -133,7 +133,7 @@ def main():
                             print("No Moves to Play")
                             break
                         if playback_index == len(playback_log):
-                            #playback_index = len(playback_log) - 1
+                            # playback_index = len(playback_log) - 1
                             print("Max Playback Reached!")
                         else:
                             str_sqr = str(playback_log[playback_index])
@@ -163,24 +163,10 @@ def main():
 
                         else:
                             playback_index -= 1
-                            str_sqr = str(playback_log[playback_index])
-                            start_row = int(str_sqr[1])
-                            start_col = int(str_sqr[4])
-                            start_sqr = (start_row, start_col)
-                            end_row = int(str_sqr[8])
-                            end_col = int(str_sqr[11])
-                            end_sqr = (end_row, end_col)
-                            clicked_sqr = [start_sqr, end_sqr]
-                            # print(start_sqr)
-                            # print(end_sqr)
-                            # print(str_sqr)
-                            # print(clicked_sqr)
-                            # print(playback_index)
-                            # playback_index +=
-                            move = Move(
-                                end_sqr, start_sqr, gs.board)
-                            gs.make_move(move)
-                            animate(move, screen, gs.board, clock)
+                            gs.undo_move(True)
+                            valid_moves, first_click_turn = gs.get_valid_moves()
+                            # gs.make_move(move)
+                            #animate(gs.undo_move, screen, gs.board, clock)
                             print("Move: "+str((playback_index+1)))
                             print(move.get_chess_notation())
 
