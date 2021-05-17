@@ -100,6 +100,7 @@ def main():
                         valid_moves, turn = [], None
                         square_selected = ()
                         player_clicks = []
+                        game_over = False
                         print("Board reset!")
                         valid_moves, first_click_turn = gs.get_valid_moves()
 
@@ -163,12 +164,12 @@ def main():
 
                         else:
                             playback_index -= 1
-                            gs.undo_move(True)
+                            print("Move: "+str((playback_index+1)))
+                            gs.undo_move()
                             valid_moves, first_click_turn = gs.get_valid_moves()
                             # gs.make_move(move)
-                            #animate(gs.undo_move, screen, gs.board, clock)
-                            print("Move: "+str((playback_index+1)))
-                            print(move.get_chess_notation())
+                            # animate(gs.undo_move, screen, gs.board, clock)
+                            # print(move.get_chess_notation())
 
                 elif e.type == pg.MOUSEBUTTONDOWN:
 
@@ -275,6 +276,7 @@ def main():
                 display_Thinking_text(screen, gs, "Thinking....")
             else:
                 display_Thinking_text(screen, gs, "Thinking....")
+
         if gs.check_mate:
             game_over = True
             AI_MODE = False

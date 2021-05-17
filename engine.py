@@ -521,7 +521,7 @@ class Game_state():
 
             # interactive
             if not look_ahead_mode:
-                print("undoing ->", last_move.get_chess_notation())
+                print("Reversing", last_move.get_chess_notation())
 
             #last_move.piece_captured = "  "
 
