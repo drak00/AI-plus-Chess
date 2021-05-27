@@ -713,7 +713,7 @@ class Move():
 		self.en_passant_captured = None # piece captured during en-passant
 		self.castling_rook = None # rook castled during castling
 
-	#work
+
 	def get_chess_notation(self):
 		"""
 			creates a live commentary of pieces moved on the chess board during a game

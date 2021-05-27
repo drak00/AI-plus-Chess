@@ -21,11 +21,11 @@ SQ_SIZE = HEIGHT // DIMENSION # size of each board square
 MAX_FPS = 15
 IMAGES = {}
 IMAGES2 = {}
-COLORS = [pg.Color("burlywood1"), pg.Color("darkorange4")] #work add colo
-SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")] #work
-FLIP = sys.argv[1] if len(sys.argv) == 2 else False # dark starts first if arg passed # work on two players set true
+COLORS = [pg.Color("burlywood1"), pg.Color("darkorange4")] 
+SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")] 
+FLIP = sys.argv[1] if len(sys.argv) == 2 else False # dark starts first if arg passed 
 
-def load_images(): #work I can learn how to add image from here
+def load_images(): 
 	"""
 		loads images from directory into dictionary with parameters SQ_SIZE and OFFSET
 	"""
@@ -36,7 +36,7 @@ def load_images(): #work I can learn how to add image from here
 		IMAGES[piece] = pg.transform.scale(pg.image.load("images/"+ piece + ".png"), (SQ_SIZE - OFFSET, SQ_SIZE - OFFSET))
 		IMAGES2[piece] = pg.transform.scale(pg.image.load("images/"+ piece + ".png"), (32, 32))
 
-def main():
+def main(choice=False):
 	screen = pg.display.set_mode((WIDTH + BORDER, HEIGHT + BORDER))
 	clock = pg.time.Clock()
 	#screen.fill(pg.Color("ghostwhite"))
@@ -45,7 +45,7 @@ def main():
 
 	gs = Game_state()
 	load_images()
-	gs.light_to_move = not gs.light_to_move if FLIP else True #work set false for 2 playes
+	gs.light_to_move = not gs.light_to_move if FLIP else True 
 	running = True
 
 	square_selected = () # x, y coordinate of selected square
@@ -53,7 +53,7 @@ def main():
 	valid_moves, first_click_turn = gs.get_valid_moves() # compute valid moves outside loop (for efficiency)
 	game_over = False # signals end of game
 	user_prompt = False # pauses gui rendering for user input
-	AI_MODE = False # flag for activating AI mode
+	AI_MODE = choice # flag for activating AI mode
 	delay = 0 # delay the speed of AI plays
 	display_time = 0 # AI_MODE text display persistence timer
 
@@ -92,12 +92,12 @@ def main():
 						print("Board reset!")
 						valid_moves, first_click_turn = gs.get_valid_moves()
 
-					elif e.key == pg.K_a: # a key pressed (toggle AI mode)
-						#toggle = True
-						display_time = 10
-						AI_MODE = not AI_MODE
-						ai_reset()
-						print("AI MODE ENABLED") if AI_MODE else print("AI MODE DISABLED")
+					# elif e.key == pg.K_a: # a key pressed (toggle AI mode)
+					# 	#toggle = True
+					# 	display_time = 10
+					# 	AI_MODE = not AI_MODE
+					# 	ai_reset()
+					# 	print("AI MODE ENABLED") if AI_MODE else print("AI MODE DISABLED")
 
 
 
@@ -213,7 +213,7 @@ def main():
 		pg.display.flip()
 
 
-def display_game_state(screen, gs, valid_moves, player_clicks): #work call my start menu here
+def display_game_state(screen, gs, valid_moves, player_clicks): 
 	"""
 		display all graphics
 	"""
@@ -265,7 +265,7 @@ def display_pieces(screen, board):
 				screen.blit(IMAGES[piece], pg.Rect(cols*SQ_SIZE + BORDER//2, rows*SQ_SIZE + BORDER//2, SQ_SIZE, SQ_SIZE))
 
 
-def display_ranks_files(screen):#work read
+def display_ranks_files(screen):
 	"""
 		display ranks (numbers) and files (letters) around board
 	"""
@@ -315,7 +315,7 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 			screen.blit(s, (last_move.start_col * SQ_SIZE + BORDER // 2, last_move.start_row * SQ_SIZE + BORDER // 2))
 
 
-def play_sound(move): #work
+def play_sound(move): 
 	"""
 		plays move and captured sounds
 	"""
@@ -401,6 +401,3 @@ def animate(move, screen, board, clock):
 		screen.blit(IMAGES[move.piece_moved], pg.Rect(c*SQ_SIZE + BORDER//2, r*SQ_SIZE + BORDER//2, SQ_SIZE, SQ_SIZE))
 		pg.display.flip()
 		clock.tick(60)
-
-if __name__ == "__main__":
-	main()
