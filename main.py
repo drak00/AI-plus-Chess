@@ -21,11 +21,11 @@ SQ_SIZE = HEIGHT // DIMENSION # size of each board square
 MAX_FPS = 15
 IMAGES = {}
 IMAGES2 = {}
-COLORS = [pg.Color("burlywood1"), pg.Color("darkorange4")]
-SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")]
-FLIP = sys.argv[1] if len(sys.argv) == 2 else False # dark starts first if arg passed
+COLORS = [pg.Color("burlywood1"), pg.Color("darkorange4")] #work add colo
+SOUND = [pg.mixer.Sound("audio/move.wav"), pg.mixer.Sound("audio/capture.wav")] #work
+FLIP = sys.argv[1] if len(sys.argv) == 2 else False # dark starts first if arg passed # work on two players set true
 
-def load_images():
+def load_images(): #work I can learn how to add image from here
 	"""
 		loads images from directory into dictionary with parameters SQ_SIZE and OFFSET
 	"""
@@ -45,7 +45,7 @@ def main():
 
 	gs = Game_state()
 	load_images()
-	gs.light_to_move = not gs.light_to_move if FLIP else True
+	gs.light_to_move = not gs.light_to_move if FLIP else True #work set false for 2 playes
 	running = True
 
 	square_selected = () # x, y coordinate of selected square
@@ -213,7 +213,7 @@ def main():
 		pg.display.flip()
 
 
-def display_game_state(screen, gs, valid_moves, player_clicks):
+def display_game_state(screen, gs, valid_moves, player_clicks): #work call my start menu here
 	"""
 		display all graphics
 	"""
@@ -265,7 +265,7 @@ def display_pieces(screen, board):
 				screen.blit(IMAGES[piece], pg.Rect(cols*SQ_SIZE + BORDER//2, rows*SQ_SIZE + BORDER//2, SQ_SIZE, SQ_SIZE))
 
 
-def display_ranks_files(screen):
+def display_ranks_files(screen):#work read
 	"""
 		display ranks (numbers) and files (letters) around board
 	"""
@@ -296,13 +296,14 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 			s = pg.Surface((SQ_SIZE, SQ_SIZE))
 			s.set_alpha(140) # transparency value between 0 and 255 (transparent and opaque)
 			s.fill(pg.Color("darkblue"))
-			screen.blit(s, (c*SQ_SIZE + BORDER//2, r*SQ_SIZE + BORDER//2))
+			screen.blit(s, (c*SQ_SIZE + BORDER//2, r*SQ_SIZE + BORDER//2)) #show the color
 
 			# highlight valid moves
 			s.fill(pg.Color("chartreuse"))
 			for move in valid_moves:
 				if move.start_row == r and move.start_col == c:
 					screen.blit(s, (move.end_col*SQ_SIZE + BORDER//2, move.end_row*SQ_SIZE + BORDER//2))
+					
 
 	if gs.move_log:
 		last_move = gs.move_log[-1]
@@ -314,7 +315,7 @@ def highlight_square(screen, gs, valid_moves, player_clicks):
 			screen.blit(s, (last_move.start_col * SQ_SIZE + BORDER // 2, last_move.start_row * SQ_SIZE + BORDER // 2))
 
 
-def play_sound(move):
+def play_sound(move): #work
 	"""
 		plays move and captured sounds
 	"""
