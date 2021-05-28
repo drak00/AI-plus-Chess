@@ -1,3 +1,8 @@
+"""
+	This is the Offline menu. 
+    It has a single player, two players AI mode and back options.
+    You can select an option by double clicking on it.
+"""
 import pygame as pg
 from ai import ai_move, ai_reset
 from main import main
@@ -116,22 +121,27 @@ def main_menu():
 				display_main(True)
 				mode=""
 				player=""
+				
 		else:
 			player_ai = player_format("AI MODE", 75, white) 
 	
 		if selected=="quit":
-			player_quit=player_format("QUIT",  75, red)
+			player_quit=player_format("BACK",  75, red)
 			if mode=="quit":
-				pg.time.delay(500)
-				quit()   
+				mode=""
+				player=""
+				menu=False
+				
+	   
+	
+				 
 		else:
-			player_quit = player_format("QUIT", 75, white)
+			player_quit = player_format("BACK", 75, white)
 
 		   
  
 	   
 		# Main Menu player
-
 		screen.blit(name, (0,1))
 		screen.blit(title, ( 60 , 30))
 		screen.blit(player_start, (60, 200))
@@ -145,6 +155,6 @@ def main_menu():
 		pg.display.set_caption("STEAM CHESS ENGINE")	
 
 #Initialize the Game
-main_menu()
-pg.quit()
-quit()
+# main_menu()
+# pg.quit()
+# quit()
