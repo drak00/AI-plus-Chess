@@ -82,6 +82,7 @@ def menu():
 		# screen.fill(yellow)
 		title=option_format("STEAM CHESS ENGINE", 100, yellow)
 		name=pg.transform.scale(pg.image.load("images/menu.jfif"),(640,640)) #background image
+		pic=pg.transform.scale(pg.image.load("images/pl.png"),(60,60))
 
 		#selections and event trigger
 		if selected=="offline":
@@ -106,9 +107,12 @@ def menu():
 
 		if selected=="side":
 			if mode!="side":
-				option_side=option_format("< SIDE >",  75, green)
+				option_side=option_format("< BLACK >",  75, green)
+				pic=pg.transform.scale(pg.image.load("images/pd.png"),(60,60))
+
 			elif mode=="side":
-				option_side = option_format("< SIDE >", 75, brown)
+				option_side = option_format("< WHITE >", 75, brown)
+				pic=pg.transform.scale(pg.image.load("images/pl.png"),(60,60))
 				mode=""
 				option=""
 		else:
@@ -128,6 +132,7 @@ def menu():
 		# Main Menu option
 
 		screen.blit(name, (0,1))
+		screen.blit(pic, (230,380))  
 		screen.blit(title, ( 60 , 30))
 		screen.blit(option_start, (60, 200))
 		screen.blit(online_start, (60, 300))
