@@ -7,7 +7,6 @@ import sys
 # Game Initialization
 pg.init()
 
-
 # menu Resolution
 screen_width=600
 screen_height=600
@@ -81,7 +80,7 @@ def menu():
 		# Main Menu UI
 		# screen.fill(yellow)
 		title=option_format("STEAM CHESS ENGINE", 100, yellow)
-		name=pg.transform.scale(pg.image.load("images/menu.jfif"),(640,640)) #background image
+		name=pg.transform.scale(pg.image.load("images/menu.jfif"),(640,640)) #quitground image
 		pic=pg.transform.scale(pg.image.load("images/pl.png"),(60,60))
 
 		#selections and event trigger
@@ -107,16 +106,17 @@ def menu():
 
 		if selected=="side":
 			if mode!="side":
-				option_side=option_format("< BLACK >",  75, green)
+				option_side=option_format("< DARK >",  75, (0,0,0))
 				pic=pg.transform.scale(pg.image.load("images/pd.png"),(60,60))
 
 			elif mode=="side":
-				option_side = option_format("< WHITE >", 75, brown)
+				option_side = option_format("< LIGHT >", 75, white)
 				pic=pg.transform.scale(pg.image.load("images/pl.png"),(60,60))
+				selected=""
 				mode=""
-				option=""
+				
 		else:
-			option_side = option_format("< SIDE >", 75, white) 
+			option_side = option_format("< LIGHT >", 75, white) 
 	
 		if selected=="quit":
 			option_quit=option_format("QUIT",  75, red)
