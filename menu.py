@@ -25,16 +25,15 @@ def display_main(choice):
 	return main(choice)
 
 
-def player_format(message, playerSize, playerColor):
+def player_format(message, player_size, player_color):
 	"""
 		Add Menu Options
 	"""
-	newplayer=font.render(message, 0, playerColor)
-	return newplayer
+	new_player=font.render(message, 0, player_color)
+	return new_player
 # Colors
 white=pg.Color("ghostwhite")
 black=(0, 0, 0)
-gray=(50, 50, 50)
 brown=(66,44,22)
 green=pg.Color("chartreuse")
 blue=(0, 0, 255)

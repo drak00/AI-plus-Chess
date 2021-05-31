@@ -13,16 +13,14 @@ screen_height=600
 screen=pg.display.set_mode((screen_width, screen_height))
 font = pg.font.SysFont("Helvetica",75)
 
-def option_format(message, optionSize, optionColor):
+def option_format(message, player_size, player_color):
 	"""
 		Add Menu Options
 	"""
-	newoption=font.render(message, 0, optionColor)
-	return newoption
+	new_option=font.render(message, 0, player_color)
+	return new_option
 # Colors
 white=pg.Color("ghostwhite")
-black=(0, 0, 0)
-gray=(50, 50, 50)
 brown=(66,44,22)
 green=pg.Color("chartreuse")
 blue=(0, 0, 255)
