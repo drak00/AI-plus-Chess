@@ -78,7 +78,7 @@ def menu():
 		# Main Menu UI
 		# screen.fill(yellow)
 		title=option_format("STEAM CHESS ENGINE", 100, yellow)
-		name=pg.transform.scale(pg.image.load("images/menu.jfif"),(640,640)) #quitground image
+		name=pg.transform.scale(pg.image.load("images/menu3.png"),(640,640)) #quitground image
 		pic=pg.transform.scale(pg.image.load("images/pl.png"),(60,60))
 
 		#selections and event trigger

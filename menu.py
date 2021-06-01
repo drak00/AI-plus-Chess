@@ -91,7 +91,7 @@ def main_menu():
 		# Main Menu UI
 		# screen.fill(yellow)
 		title=player_format("STEAM CHESS ENGINE", 100, yellow)
-		name=pg.transform.scale(pg.image.load("images/menu.jfif"),(640,640)) #background image
+		name=pg.transform.scale(pg.image.load("images/menu3.png"),(640,640)) #background image
 
 		#selections and event trigger
 		if selected=="player1":
