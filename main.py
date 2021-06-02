@@ -6,7 +6,11 @@ from ai import ai_move, ai_reset
 from engine import Game_state, Move
 import random
 import sys
+import pyttsx3
 
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
 
 pg.init()
 
@@ -65,8 +69,11 @@ def main(choice=False):
 
 					if move: # if AI made a move
 						animate(move, screen, gs.board, clock)
-						print(move.get_chess_notation())
-					delay = 20 # pause magnitude
+						print(move.get_chess_notation()) 
+						if Move.mute==True:
+							engine.say(move.get_chess_notation())
+							engine.runAndWait()
+						delay = 20 # pause magnitude
 				else:
 					delay -= 1
 
@@ -78,6 +85,9 @@ def main(choice=False):
 					if e.key == pg.K_u and not AI_MODE and not PLAYBACK_MODE: # u key pressed (undo last move)
 						gs.undo_move()
 						valid_moves, first_click_turn = gs.get_valid_moves()
+      
+					elif e.key == pg.K_m: # m key pressed (mute commentary)
+						Move.mute=not Move.mute
 
 					elif e.key == pg.K_r and not AI_MODE and not PLAYBACK_MODE: # r key pressed (reset game)
 						gs = Game_state()
@@ -85,6 +95,9 @@ def main(choice=False):
 						square_selected = ()
 						player_clicks = []
 						print("Board reset!")
+						if Move.mute==True:
+							engine.say("Board reset!")
+							engine.runAndWait()
 						valid_moves, first_click_turn = gs.get_valid_moves()
 
 					# elif e.key == pg.K_a: # a key pressed (toggle AI mode)
@@ -108,10 +121,16 @@ def main(choice=False):
 					elif e.key == pg.K_n and PLAYBACK_MODE and game_over:
 						if len(playback_log) == 0:
 							print("No Moves to Play")
+							if Move.mute==True:
+								engine.say("No Moves to Play")
+								engine.runAndWait()
 							break
 						if playback_index == len(playback_log):
 							# playback_index = len(playback_log) - 1
 							print("Max Playback Reached!")
+							if Move.mute==True:
+								engine.say("Max Playback Reached!")
+								engine.runAndWait()
 						else:
 							str_sqr = str(playback_log[playback_index])
 							start_row = int(str_sqr[1])
@@ -131,16 +150,29 @@ def main(choice=False):
 							gs.make_move(move)
 							animate(move, screen, gs.board, clock)
 							print("Move: "+str((playback_index)))
+							if Move.mute==True:
+								engine.say("Move: "+str((playback_index)))
+								engine.runAndWait()
 							print(move.get_chess_notation())
+							if Move.mute==True:
+								engine.say(move.get_chess_notation())
+								engine.runAndWait()
 
 					elif e.key == pg.K_b and PLAYBACK_MODE and game_over:
 						if playback_index <= 0:
 							playback_index = 0
 							print("Min Playback Reached!")
+							if Move.mute==True:
+								engine.say("Min Playback Reached!")
+								engine.runAndWait()
+
 
 						else:
 							playback_index -= 1
 							print("Move: "+str((playback_index+1)))
+							if Move.mute==True:
+								engine.say("Move: "+str((playback_index+1)))
+								engine.runAndWait()
 							gs.undo_move()
 							valid_moves, first_click_turn = gs.get_valid_moves()
 							# gs.make_move(move)
@@ -204,6 +236,9 @@ def main(choice=False):
 															elif ((row == 16) and (col%2 == 0)) or ((row == 2) and (col%2 == 0)):
 																piece = "n"
 															print("Promoting Piece")
+															if Move.mute==True:
+																engine.say("Promoting Piece")
+																engine.runAndWait()
 															promotion = False
 												display_board2(screen,move.end_row, move.end_col)
 												pg.display.update()
@@ -215,6 +250,9 @@ def main(choice=False):
 										animate(move, screen, gs.board, clock)
 
 										print(move.get_chess_notation())
+										if Move.mute==True:
+											engine.say(move.get_chess_notation())
+											engine.runAndWait()
 
 										square_selected = ()
 										player_clicks = []
@@ -248,6 +286,9 @@ def main(choice=False):
 		if gs.check_mate:
 			game_over = True
 			AI_MODE = False
+			engine.say("Checkmate!")
+			engine.runAndWait()
+			engine.stop()
 
 			if gs.light_to_move:
 				display_text(screen, "Dark wins by checkmate")
@@ -257,6 +298,8 @@ def main(choice=False):
 		elif gs.stale_mate:
 			game_over = True
 			AI_MODE = False
+			engine.say("Stalemate!")
+			engine.runAndWait()
 			display_text(screen, "Stalemate")
 
 		clock.tick(MAX_FPS)

@@ -1,4 +1,4 @@
-![Chess Board AI Mode](/misc/Chess.gif)\
+![Chess Board AI Mode](/misc/game.gif)\
 
 # STEAM CHESS ENGINE
 
