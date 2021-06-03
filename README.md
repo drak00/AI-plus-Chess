@@ -1,4 +1,4 @@
-![Chess Board AI Mode](/misc/game.gif)\
+![Chess Board AI Mode](/misc/Chess.gif)\
 
 # STEAM CHESS ENGINE
 
@@ -111,6 +111,8 @@ Included in the `ai.py` is the Minimax functions, which utilizes the MiniMax alg
 	```
 *	Install pygame from within chess environment
 	`pip install pygame`
+*	Install pyttsx3  from within chess environment
+	`pip install pyttsx3`
 *	Start game by running the following command:
 - __Linux__ or __Mac__:
 ```
