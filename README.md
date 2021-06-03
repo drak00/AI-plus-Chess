@@ -1,17 +1,20 @@
-![Chess Board AI Mode](/misc/game.gif)\
+![Chess Board AI Mode](/misc/Chess.gif)\
 
 # STEAM CHESS ENGINE
 
 ## DESCRIPTION
 
-**STEAM CHESS ENGINE** (named after Steamledge), is a Chess engine focused on artifitial intelligence written in Python (using python 3.7.7 and pygame 1.9.6).  The engine has three main files `main.py`, `engine.py` and `ai.py`.
+**STEAM CHESS ENGINE** (named after Steamledge), is a Chess engine focused on artifitial intelligence written in Python (using python 3.7.7 and pygame 1.9.6).  The engine has three main files `main_menu.py`, `menu.py`, `main.py`, `engine.py` and `ai.py`.
 
 ### Features
 
 *	GUI using pygame with a display resolution of 600 x600
 *	Sounds for both piece moves and piece captures
-*	Square highlighting.
+*	Voice commentary for both moves, stalemate and checkmate
+*	Square highlighting
+*	Interactive menu for easy access to each mode
 *	AI mode
+*	Game playback after checkmate or stale (Human vs Human mode only)
 *	Minimax algorithm w/ Alpha-beta pruning.
 *	Move ordering based off heuristics (captures, promotions, e.t.c)
 *	Efficient board evaluation function
@@ -23,10 +26,24 @@
 
 # CODE DESCRIPTION
 
-Composed of three files: 
+Composed of five files:
+The `main_menu.py` its the main menu of the game, where you can choose offline or online(in progress) modes
+The `menu.py` serves as an interface between the `main_menu.py` and `main.py`it connects both files and it provides user with options to the various game modes available
 The `main.py` file is the GUI of the engine using pygame to display the chess board, pieces as well as the game simulation. 
 The `engine.py` creates the chess objects (board, pieces, moves e.t.c) and their functionalities.
 The `ai.py` programs our AI bot. below is a detail description of each file
+
+
+## main_menu.py (GUI)
+This is  the file to  be run to start the steam-chess... it is is the start menu of the game.. where you choose offline or online modes. it use the pygame modyke to display the menu window
+*	`option_format`: displays the option to choose from
+*	`menu`: functions that  displays the whole windows, captures events by user and links user to the menu 
+
+## menu.py (GUI)
+This is also another menu which links the `main_menu.py` with `main.py` (The chess board). it provides user with option on the various game mode they which to choose.
+*	`display_main`: This function displays the main board (`main.py`) with the mode of user sellected by the user (Human vs Human or AI vs AI)
+*	`player_format`: adds options to prompt users choice
+*	`main_menu`: displays the menu window, captures user event and links to main
 
 ## main.py (GUI)
 
@@ -37,6 +54,7 @@ This is the GUI displaying all aspects of the chess game and handling user input
 *	`display_ranks_files` :display ranks (numbers) and files (letters) around board
 *	`play_sound`: plays 'move' and 'capture' sounds
 *	`animate`: creates moving animations for chess pieces:
+*	`get_chess_notation`: makes the voice commentary of moves, checkmate and stalemate
 
 ## engine.py (Heart of the Chess Engine)
 
@@ -93,24 +111,26 @@ Included in the `ai.py` is the Minimax functions, which utilizes the MiniMax alg
 	```
 *	Install pygame from within chess environment
 	`pip install pygame`
-*	Start game by run the following command:
+*	Install pyttsx3  from within chess environment
+	`pip install pyttsx3`
+*	Start game by running the following command:
 - __Linux__ or __Mac__:
 ```
-py main.py
+py main_menu.py
 ```
 - __Windows__:
 ````
-python main.py
+python main_menu.py
 ````
 
 ## USER INPUTS
 
-Game defaults to Player Vs Player mode
-*	Press “A” on keyboard to activate or deactivate AI mode
+*	use double left mouse click to move to choose choices in the menu widow
 *	Press “R” on keyboard to reset game (only human vs human mode)
 *	Press “U” on keyboard to undo move made (only human vs human mode)
 *	Mouse left click on piece and square to select piece and make move respectively (only human vs human mode)
-*	Input “Q”, “R” , “B” or “K” during pawn promotion prompt for Queen, Rook, Bishop or Knight (only human vs human mode)
+*	Press "M" to mute sounds during play
+*	Press "P" after end of game (`stalemate` or `checkmate`) to playback the entire game by pressing "N" for next move and "B" for previous move
 
 ## LIMITATIONS:
 
