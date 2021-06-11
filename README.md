@@ -4,7 +4,7 @@
 
 ## DESCRIPTION
 
-**STEAM CHESS ENGINE** (named after Steamledge), is a Chess engine focused on artifitial intelligence written in Python (using python 3.7.7 and pygame 1.9.6).  The engine has three main files `main_menu.py`, `menu.py`, `main.py`, `engine.py` and `ai.py`.
+**STEAM CHESS ENGINE** (named after Steamledge), is a Chess engine focused on Artificial Intelligence written in Python (using python 3.7.7 and pygame 1.9.6).  The engine has five files `main_menu.py`, `menu.py`, `main.py`, `engine.py` and `ai.py`.
 
 ### Features
 
@@ -27,23 +27,25 @@
 # CODE DESCRIPTION
 
 Composed of five files:
-The `main_menu.py` its the main menu of the game, where you can choose offline or online(in progress) modes
-The `menu.py` serves as an interface between the `main_menu.py` and `main.py`it connects both files and it provides user with options to the various game modes available
-The `main.py` file is the GUI of the engine using pygame to display the chess board, pieces as well as the game simulation. 
+The `main_menu.py` is the main menu of the game, where user chooses between offline and online (in progress) modes
+The `menu.py` serves as an interface between the `main_menu.py` and `main.py`, connecting both files and providing the user with options to the various game modes available
+The `main.py` file is the GUI of the engine using pygame to display the chess board, chess pieces as well as the game simulation. 
 The `engine.py` creates the chess objects (board, pieces, moves e.t.c) and their functionalities.
 The `ai.py` programs our AI bot. below is a detail description of each file
 
 
 ## main_menu.py (GUI)
-This is  the file to  be run to start the steam-chess... it is is the start menu of the game.. where you choose offline or online modes. it use the pygame modyke to display the menu window
+
+This is the file to be run to start steam-chess. It uses the pygame module to display the menu window
 *	`option_format`: displays the option to choose from
 *	`menu`: functions that  displays the whole windows, captures events by user and links user to the menu 
 
 ## menu.py (GUI)
-This is also another menu which links the `main_menu.py` with `main.py` (The chess board). it provides user with option on the various game mode they which to choose.
-*	`display_main`: This function displays the main board (`main.py`) with the mode of user sellected by the user (Human vs Human or AI vs AI)
+
+This links the `main_menu.py` with `main.py` (The chess board). it provides options on the various game modes to choose from.
+*	`display_main`: This function displays the main board (`main.py`) with the appropriate mode selected by the user (Human vs Human or AI vs AI)
 *	`player_format`: adds options to prompt users choice
-*	`main_menu`: displays the menu window, captures user event and links to main
+*	`main_menu`: displays the menu window, captures user events and links to main
 
 ## main.py (GUI)
 
@@ -125,12 +127,12 @@ python main_menu.py
 
 ## USER INPUTS
 
-*	use double left mouse click to move to choose choices in the menu widow
+*	Double click mouse-left to select options in the menu window
 *	Press “R” on keyboard to reset game (only human vs human mode)
 *	Press “U” on keyboard to undo move made (only human vs human mode)
 *	Mouse left click on piece and square to select piece and make move respectively (only human vs human mode)
-*	Press "M" to mute sounds during play
-*	Press "P" after end of game (`stalemate` or `checkmate`) to playback the entire game by pressing "N" for next move and "B" for previous move
+*	Press "M" to mute commentary during game play
+*	Press "P" after end of game (`stalemate` or `checkmate`) to playback the entire game move by move. press "N" to toggle next move and "B" for previous move
 
 ## LIMITATIONS:
 
