@@ -92,7 +92,7 @@ def main_menu():
         
         # screen.fill(yellow)
         title=player_format("CHESS AI PLATFORM", 100, yellow)
-        name=pg.transform.scale(pg.image.load("images/menu3.png"),(640,640)) #background image
+        name=pg.transform.scale(pg.image.load("images/ChessMenu.png"),(640,640)) #background image
 
         #selections and event trigger
         if selected=="player1":
@@ -152,7 +152,7 @@ def main_menu():
         
         pg.display.update()
         clock.tick(FPS)
-        pg.display.set_caption("STEAM CHESS ENGINE")    
+        pg.display.set_caption("CHESS AI PLATFORM")    
 
 #Initialize the Game
 # main_menu()
