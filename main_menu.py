@@ -1,9 +1,9 @@
 import pygame as pg
-from menu import main_menu
+from menu import game_mode_selection
 
 # canvas for displaying menu
-window = (600, 600)
-screen=pg.display.set_mode(window)
+WINDOW = (600, 600)
+screen=pg.display.set_mode(WINDOW)
 font = pg.font.SysFont("Helvetica",50)
 
 # useful predefined Colours
@@ -40,12 +40,10 @@ def canvas_obj(obj_type = "text", obj_message = "", obj_size = 100,
         img = pg.transform.scale(pg.image.load(obj_loc), (obj_size, obj_size))
         
         if invert:
-            var = pg.PixelArray(img)
 
-            # replaces all black pixels in img with gray (for black pawn visibility
-            # on start menu)
-            var.replace((0, 0, 0), dark)
-            del var
+            # convert background image pixels to gray for visibility
+            # on main menu screen
+            pg.PixelArray(img).replace((0, 0, 0), dark)
         return img
 
 def toggle(text, loc, colour):
@@ -59,7 +57,9 @@ def toggle(text, loc, colour):
 
 
 # Main Menu
-def main():
+def offline_online_selection():
+
+    player = "white"
 
     title = canvas_obj(obj_type = "text", obj_message = "CHESS AI PLATFORM",
                        obj_size = 100)
@@ -114,14 +114,14 @@ def main():
             
             quit_colour = white
 
-            #main_menu()
-            #mode=""
-            #option=""
+            if mode == "offline":
+                game_mode_selection(mode, player)
 
         elif choice == "select side":
             if mode == choice:
                 side_text, pawn_loc, side_colour = toggle(side_text, pawn_loc, side_colour)
                 mode = None
+                player = side_text.replace("< ", "").replace(" >", "")
 
                 invert = True if side_text == "< Black >" else False
                 bg_pix = canvas_obj(obj_type  = "image", 
@@ -171,5 +171,5 @@ if __name__ == "__main__":
     pg.init()
 
     #Initialize the Game
-    main()
+    offline_online_selection()
     

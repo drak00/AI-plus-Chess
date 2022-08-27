@@ -1,13 +1,5 @@
-"""
-    This is the Offline menu. 
-    It has a single player, two players AI mode and back options.
-    You can select an option by double clicking on it.
-"""
 import pygame as pg
-from ai import ai_move, ai_reset
 from main import main
-import random
-import sys
 
 # Game Initialization
 pg.init()
@@ -22,6 +14,7 @@ def display_main(choice):
     """
         Link option To main board
     """
+    pg.mixer.pause()
     return main(choice)
 
 
@@ -48,11 +41,17 @@ FPS=30
 
 
 # Main Menu
-def main_menu():
+def game_mode_selection(mode, player):
  
     menu=True
     selected=""
     mode=""
+
+
+    player_start=player_format("SINGLE PLAYER",  75, white)
+    player2_start = player_format("TWO PLAYER", 75, white)
+    player_ai=player_format("AI MODE",  75, white)
+    player_quit=player_format("BACK",  75, white)
 
     while menu:
         for event in pg.event.get():
@@ -64,6 +63,8 @@ def main_menu():
             if event.type == pg.MOUSEBUTTONDOWN:
                 (mouseX, mouseY) = pg.mouse.get_pos()
                 a,b=mouseX,mouseY
+                print("values are {} and {}".format(a, b))
+
                 if (60 <= a <= 330) and (200<=b<=230):
                     if selected !="player1":
                         selected="player1"
@@ -87,13 +88,14 @@ def main_menu():
                         selected="quit"
                     elif selected =="quit":
                         mode="quit"
-                        
+
+                                        
         # Main Menu UI
         
         # screen.fill(yellow)
         title=player_format("CHESS AI PLATFORM", 100, yellow)
         name=pg.transform.scale(pg.image.load("images/ChessMenu.png"),(640,640)) #background image
-
+        
         #selections and event trigger
         if selected=="player1":
             player_start=player_format("SINGLE PLAYER",  75, green)
@@ -104,6 +106,7 @@ def main_menu():
                 player_start = player_format("SINGLE PLAYER", 75, white)
             
         if selected=="player2":
+            print("player2")
             player2_start=player_format("TWO PLAYERS",  75, green)
             if mode=="player2":
                 player2_start = player_format("TWO PLAYER", 75, brown)
@@ -111,6 +114,7 @@ def main_menu():
                 mode=""
                 player=""
         else:
+            print("entered else")
             player2_start = player_format("TWO PLAYERS", 75, white)  
 
         if selected=="aimode":
