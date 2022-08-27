@@ -1,11 +1,5 @@
 import pygame as pg
-from ai import ai_move, ai_reset
 from menu import main_menu
-import random
-import sys
-
-# Game Initialization
-pg.init()
 
 # canvas for displaying menu
 window = (600, 600)
@@ -17,7 +11,8 @@ white = pg.Color("ghostwhite")
 brown = (66,44,22)
 green = pg.Color("chartreuse")
 yellow = pg.Color("Peru")
-bg_color = pg.Color("chartreuse")
+dark = (90, 90, 90)
+darker = (3, 3, 3)
 red = (255,0,0)
 
 # Game Framerate
@@ -25,8 +20,9 @@ clock = pg.time.Clock()
 FPS=30
 
 
+# Helpers
 def canvas_obj(obj_type = "text", obj_message = "", obj_size = 100, 
-               obj_colour = yellow, obj_loc = None):
+               obj_colour = yellow, obj_loc = None, invert = False):
 
     """
         creates canvas object for pg window canvas
@@ -41,19 +37,29 @@ def canvas_obj(obj_type = "text", obj_message = "", obj_size = 100,
     if obj_type == "text":
         return font.render(obj_message, obj_size, obj_colour)
     elif obj_type == "image":
-        return pg.transform.scale(pg.image.load(obj_loc), (obj_size, obj_size))
+        img = pg.transform.scale(pg.image.load(obj_loc), (obj_size, obj_size))
+        
+        if invert:
+            var = pg.PixelArray(img)
 
-def toggle(text, loc):
+            # replaces all black pixels in img with gray (for black pawn visibility
+            # on start menu)
+            var.replace((0, 0, 0), dark)
+            del var
+        return img
+
+def toggle(text, loc, colour):
     """
         toggles black and white side selection text and image
     """
-    if (text, loc) == ("< White >", "images/pl.png"):
-        return ("< Black >", "images/pd.png")
+    if (text, loc, colour) == ("< White >", "images/pl.png", white):
+        return ("< Black >", "images/pd.png", darker)
     else:
-        return ("< White >", "images/pl.png")
+        return ("< White >", "images/pl.png", white)
+
 
 # Main Menu
-def menu():
+def main():
 
     title = canvas_obj(obj_type = "text", obj_message = "CHESS AI PLATFORM",
                        obj_size = 100)
@@ -66,7 +72,7 @@ def menu():
                           obj_loc = "images/pl.png",
                           obj_size = 60)
 
-    side_text, pawn_loc = ("< White >", "images/pl.png")
+    side_text, pawn_loc, side_colour = ("< White >", "images/pl.png", white)
  
     choice, mode = None, None
     pg.mixer.Sound.play(pg.mixer.Sound("audio/The-Soul-Chamber.wav"))
@@ -114,22 +120,26 @@ def menu():
 
         elif choice == "select side":
             if mode == choice:
-                side_text, pawn_loc = toggle(side_text, pawn_loc)
-                mode = None            
-                    
+                side_text, pawn_loc, side_colour = toggle(side_text, pawn_loc, side_colour)
+                mode = None
+
+                invert = True if side_text == "< Black >" else False
+                bg_pix = canvas_obj(obj_type  = "image", 
+                         obj_loc = "images/ChessMenu.png",
+                         obj_size = 640, invert = invert)
+
         elif choice == "quit":
             quit_colour = red
             if mode == choice:
                 pg.time.delay(500)
                 pg.quit()
+                quit()
         
-        print(side_text, pawn_loc)
-
         select_side_text = canvas_obj(obj_type = "text", obj_size = 75, 
-                                     obj_colour = yellow, obj_message = side_text)
+                                     obj_colour = side_colour, obj_message = side_text)
 
         select_side_pix = canvas_obj(obj_type = "image", obj_loc = pawn_loc,
-                                        obj_size = 100)
+                                        obj_size = 100, invert = False)
 
         offline_text  = canvas_obj(obj_type = "text", obj_size = 75, 
                                      obj_colour = colour_offline, obj_message = "OFFLINE")
@@ -154,7 +164,12 @@ def menu():
         clock.tick(FPS)
         pg.display.set_caption("CHESS AI PLATFORM")    
 
-#Initialize the Game
-menu()
-pg.quit()
-quit()
+
+if __name__ == "__main__":
+
+    # Game Initialization
+    pg.init()
+
+    #Initialize the Game
+    main()
+    
