@@ -7,7 +7,7 @@
 **AI+CHESS** is an open-source, easy-to-set-up educational platform with the vision of  implementing and understanding AI algorithms (Brute-force, Supervised, Unsupervised and Reinforcement learning) in the context of the beautiful game of chess. The chess logic and engine is written from scratch in python and the GUI is written with the pygame python library.
 
 
-### Features
+## Features
 
 *	GUI (with piece-moving/capture sounds) display resolution of 600 x600
 *	Voice commentary
@@ -20,7 +20,7 @@
 *	Efficient board evaluation function
 
 
-### Game Modes
+## Game Modes
 
 *	Human Vs Human
 *	AI Vs AI
@@ -70,7 +70,7 @@ This is the GUI displaying all aspects of the chess game and handling user input
 This implements the rules of the game and stores the state of the chess board, including its pieces and moves. It has two Classes `Game_state` and `Move`. Each Class has a specific function:
 
 
-### Game_state
+## Game_state
 
 * `self.board`: 8 X 8 dimensional array (Matrix of 8 rows and 8 columns ) i.e a list of lists. Each element of the Matrix  is a string of two characters representing the chess pieces in the order "type" + "colour".. light pawn = “pl” dark pawn = “pd” and empty square = "  " double empty space.
 *	`get_pawn_moves`, `get_rook_moves`, `get_knight_moves`, `get_queen_moves`, `get_king_moves` and `get_bishop_moves` : this functions Calculates all possible moves for a given color (light or dark) and appends them to a list. This includes all types of chess moves, capture, castling and enpassant
@@ -79,7 +79,7 @@ This implements the rules of the game and stores the state of the chess board, i
 *	`get_all_possible_moves`: this gives naive possible moves of pieces on the board without taking checks into account
 *	`get_valid_moves`: gives the valid piece moves on the board while considering potential checks
 
-### Move:
+## Move:
 
 A Move class abstracting all parameters needed for moving chess pieces on the board
 *	`self.start_row`: row location of piece to be moved
