@@ -116,6 +116,7 @@ def offline_online_selection():
 
             if mode == "offline":
                 game_mode_selection(mode, player)
+                mode = None
 
         elif choice == "select side":
             if mode == choice:

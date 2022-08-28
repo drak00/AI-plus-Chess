@@ -41,11 +41,13 @@ FPS=30
 
 
 # Main Menu
-def game_mode_selection(mode, player):
+def game_mode_selection(manner, player):
  
     menu=True
     selected=""
     mode=""
+
+    print(manner, player)
 
 
     player_start=player_format("SINGLE PLAYER",  75, white)
@@ -63,7 +65,6 @@ def game_mode_selection(mode, player):
             if event.type == pg.MOUSEBUTTONDOWN:
                 (mouseX, mouseY) = pg.mouse.get_pos()
                 a,b=mouseX,mouseY
-                print("values are {} and {}".format(a, b))
 
                 if (60 <= a <= 330) and (200<=b<=230):
                     if selected !="player1":
@@ -106,7 +107,6 @@ def game_mode_selection(mode, player):
                 player_start = player_format("SINGLE PLAYER", 75, white)
             
         if selected=="player2":
-            print("player2")
             player2_start=player_format("TWO PLAYERS",  75, green)
             if mode=="player2":
                 player2_start = player_format("TWO PLAYER", 75, brown)
@@ -114,7 +114,6 @@ def game_mode_selection(mode, player):
                 mode=""
                 player=""
         else:
-            print("entered else")
             player2_start = player_format("TWO PLAYERS", 75, white)  
 
         if selected=="aimode":
@@ -136,8 +135,6 @@ def game_mode_selection(mode, player):
                 player=""
                 menu=False
                 
-       
-    
                  
         else:
             player_quit = player_format("BACK", 75, white)

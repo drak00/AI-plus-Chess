@@ -1,11 +1,6 @@
 # This is the main chess game engine that implements the rules of the game
 # and stores the state of the the chess board, including its pieces and moves
 
-import pyttsx3
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
-
 class Game_state():
 
     def __init__(self):
