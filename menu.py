@@ -8,7 +8,7 @@ pg.init()
 screen_width=600
 screen_height=600
 screen=pg.display.set_mode((screen_width, screen_height))
-font = pg.font.SysFont("Helvetica",75)
+font = pg.font.SysFont("Helvetica",50)
 #
 def display_main(choice):
     """
@@ -33,7 +33,6 @@ blue=(0, 0, 255)
 yellow=pg.Color("Peru")
 bg_color=pg.Color("chartreuse")
 red=(255,0,0)
-font = pg.font.SysFont("Liberation", 50)
  
 # Game Framerate
 clock = pg.time.Clock()
@@ -94,7 +93,7 @@ def game_mode_selection(manner, player):
         # Main Menu UI
         
         # screen.fill(yellow)
-        title=player_format("CHESS AI PLATFORM", 100, yellow)
+        title=player_format("AI + CHESS", 100, yellow)
         name=pg.transform.scale(pg.image.load("images/ChessMenu.png"),(640,640)) #background image
         
         #selections and event trigger
@@ -153,7 +152,7 @@ def game_mode_selection(manner, player):
         
         pg.display.update()
         clock.tick(FPS)
-        pg.display.set_caption("CHESS AI PLATFORM")    
+        pg.display.set_caption("A CHESS AI PLATFORM")    
 
 #Initialize the Game
 # main_menu()

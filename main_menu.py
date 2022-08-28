@@ -163,7 +163,7 @@ def offline_online_selection():
         
         pg.display.update()
         clock.tick(FPS)
-        pg.display.set_caption("CHESS AI PLATFORM")    
+        pg.display.set_caption("A CHESS AI PLATFORM")    
 
 
 if __name__ == "__main__":
