@@ -707,7 +707,7 @@ class Move():
     # map columns to files (revers of files to columns)
     cols_to_files = {col: file for file, col in files_to_cols.items()}
  
-    mute=True
+    mute=False
     
     def __init__(self, start_sq, end_sq, board):
         """
