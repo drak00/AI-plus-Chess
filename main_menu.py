@@ -61,7 +61,7 @@ def offline_online_selection():
 
     player = "white"
 
-    title = canvas_obj(obj_type = "text", obj_message = "CHESS AI PLATFORM",
+    title = canvas_obj(obj_type = "text", obj_message = "AI + CHESS",
                        obj_size = 100)
 
     bg_pix = canvas_obj(obj_type  = "image", 
@@ -75,7 +75,7 @@ def offline_online_selection():
     side_text, pawn_loc, side_colour = ("< White >", "images/pl.png", white)
  
     choice, mode = None, None
-    pg.mixer.Sound.play(pg.mixer.Sound("audio/The-Soul-Chamber.wav"))
+    pg.mixer.Sound.play(pg.mixer.Sound("audio/What-So-Not-Touched.wav"))
 
     while True:
         for event in pg.event.get():
