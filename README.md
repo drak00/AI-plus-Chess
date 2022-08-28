@@ -1,51 +1,57 @@
 ![Chess Board AI Mode](/misc/Chess.gif)\
 
-# STEAM CHESS ENGINE
+# AI+CHESS
 
 ## DESCRIPTION
 
-**STEAM CHESS ENGINE** (named after Steamledge), is a Chess engine focused on Artificial Intelligence written in Python (using python 3.7.7 and pygame 1.9.6).  The engine has five files `main_menu.py`, `menu.py`, `main.py`, `engine.py` and `ai.py`.
+**AI+CHESS** is an open-source, easy-to-set-up educational platform with the vision of  implementing and understanding AI algorithms (Brute-force, Supervised, Unsupervised and Reinforcement learning) in the context of the beautiful game of chess. The chess logic and engine is written from scratch in python and the GUI is written with the pygame python library.
+
 
 ### Features
 
-*	GUI using pygame with a display resolution of 600 x600
-*	Sounds for both piece moves and piece captures
-*	Voice commentary for both moves, stalemate and checkmate
+*	GUI (with piece-moving/capture sounds) display resolution of 600 x600
+*	Voice commentary
 *	Square highlighting
-*	Interactive menu for easy access to each mode
-*	AI mode
-*	Game playback after checkmate or stale (Human vs Human mode only)
+*	Game mode selection menus
+*	AI Vs AI mode
+*	Game playback after checkmate or stale (Human vs Human mode currently)
 *	Minimax algorithm w/ Alpha-beta pruning.
 *	Move ordering based off heuristics (captures, promotions, e.t.c)
 *	Efficient board evaluation function
+
 
 ### Game Modes
 
 *	Human Vs Human
 *	AI Vs AI
 
+
+## COMING SOON:
+
+* Online mode
+* Stronger ML-based AI
+* Human vs AI mode
+
+
 # CODE DESCRIPTION
 
 Composed of five files:
-The `main_menu.py` is the main menu of the game, where user chooses between offline and online (in progress) modes
-The `menu.py` serves as an interface between the `main_menu.py` and `main.py`, connecting both files and providing the user with options to the various game modes available
-The `main.py` file is the GUI of the engine using pygame to display the chess board, chess pieces as well as the game simulation. 
-The `engine.py` creates the chess objects (board, pieces, moves e.t.c) and their functionalities.
-The `ai.py` programs our AI bot. below is a detail description of each file
+The `main_menu.py` Selects White or Black player as well as offline or online modes (online mode in the works)
+The `menu.py` Selects AI mode or human mode
+The `main.py` Chess GUI using pygame
+The `engine.py` Creates the chess objects (board, pieces, moves e.t.c) and their game logics.
+The `ai.py` Simplistic mini-max  AI bot. below is a detail description of each file
 
 
 ## main_menu.py (GUI)
 
-This is the file to be run to start steam-chess. It uses the pygame module to display the menu window
-*	`option_format`: displays the option to choose from
-*	`menu`: functions that  displays the whole windows, captures events by user and links user to the menu 
+Implements the first game menu with player and mode selections.
+
 
 ## menu.py (GUI)
 
-This links the `main_menu.py` with `main.py` (The chess board). it provides options on the various game modes to choose from.
-*	`display_main`: This function displays the main board (`main.py`) with the appropriate mode selected by the user (Human vs Human or AI vs AI)
-*	`player_format`: adds options to prompt users choice
-*	`main_menu`: displays the menu window, captures user events and links to main
+Implements the second menu from the main_menu with game mode selection and returning to main-menu T
+
 
 ## main.py (GUI)
 
@@ -58,9 +64,11 @@ This is the GUI displaying all aspects of the chess game and handling user input
 *	`animate`: creates moving animations for chess pieces:
 *	`get_chess_notation`: makes the voice commentary of moves, checkmate and stalemate
 
+
 ## engine.py (Heart of the Chess Engine)
 
 This implements the rules of the game and stores the state of the chess board, including its pieces and moves. It has two Classes `Game_state` and `Move`. Each Class has a specific function:
+
 
 ### Game_state
 
@@ -81,6 +89,7 @@ A Move class abstracting all parameters needed for moving chess pieces on the bo
 *	`self.piece_moved`: actual piece moved
 *	`self.piece_captured`: opponent piece if any on the destination square
 
+
 ## ai.py (AI Bot(s))
 
 Included in the `ai.py` is the Minimax functions, which utilizes the MiniMax algorithm to evaluate board states. The MiniMax algorithm provided comes with alpha-beta pruning, move ordering. Some of the functions are:
@@ -92,38 +101,32 @@ Included in the `ai.py` is the Minimax functions, which utilizes the MiniMax alg
 *	`update_pieces_dictionaries`: This updates light_pieces and dark_pieces during the hidden simulation in the minimax algorithm. It creates a copy of the dictionary to be used by the minimax during tree search for best move.
 *	`ai_light_move` and `ai_dark_move`: this serves as a plug for the ai to make moves generated using the minimax algorithm on the board. It also updates the light_pieces and dark_pieces dictionary
 *	`ai_move`: determines the turn for both team's AI also saves a running memory of the board state with moves and captures
-*	`ai_reset`: resets the light pieces and dark pieces dictionaries when AI mode is activated/deactivated (in case moves were made outside AI mode)
+*	`ai_reset`: resets the light pieces and dark pieces dictionaries when AI mode is activated/deactivated (just in case moves were made outside AI mode)
 
-## HOW TO PLAY
 
-### Installation:
+## INSTALLATION GUIDE
 
 *	Clone/Download and extract repo in a folder on your system
 *	Create and activate an environment
 
 	- __Linux__ or __Mac__:
 	```
-	conda create -n chess python=3
-	source activate chess
+    python3 -m venv chess
+	source chess/bin/activate
 	```
 	- __Windows__:
 	```
 	conda create --name chess python=3
 	activate chess
 	```
-*	Install pygame from within chess environment
-	`pip install pygame`
-*	Install pyttsx3  from within chess environment
-	`pip install pyttsx3`
+*	Install dependecies from within chess environment
+	`pip install -r requirements.txt`
+
 *	Start game by running the following command:
-- __Linux__ or __Mac__:
-```
-py main_menu.py
-```
-- __Windows__:
-````
-python main_menu.py
-````
+    - __Linux__,  __Mac__, __windows__:
+    ```
+    python main_menu.py
+    ```
 
 ## USER INPUTS
 
@@ -134,8 +137,4 @@ python main_menu.py
 *	Press "M" to mute commentary during game play
 *	Press "P" after end of game (`stalemate` or `checkmate`) to playback the entire game move by move. press "N" to toggle next move and "B" for previous move
 
-## LIMITATIONS:
 
-*	The AI sometimes finds it hard to make checkmates at sufficiently complex end-game scenarios. This can be overcome by providing a separate group of piece-square tables for end-games
-*	Minimax search depth is currently set to 3 (higher search values take more than 10 seconds per move)
-*	No Human Vs AI mode
