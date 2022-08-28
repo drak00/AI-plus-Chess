@@ -7,7 +7,7 @@
 **AI+CHESS** is an open-source, easy-to-set-up educational platform with the vision of  implementing and understanding AI algorithms (Brute-force, Supervised, Unsupervised and Reinforcement learning) in the context of the beautiful game of chess. The chess logic and engine is written from scratch in python and the GUI is written with the pygame python library.
 
 
-## Features
+## FEATUTRES
 
 *	GUI (with piece-moving/capture sounds) display resolution of 600 x600
 *	Voice commentary
@@ -20,7 +20,7 @@
 *	Efficient board evaluation function
 
 
-## Game Modes
+## GAME MODES
 
 *	Human Vs Human
 *	AI Vs AI
