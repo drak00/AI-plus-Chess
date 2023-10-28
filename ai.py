@@ -5,6 +5,7 @@
 import random
 from math import inf
 from engine import Move
+
 # dictionary of light pieces on the board (keys = "row,col"; values = chess piece eg "kl")
 light_pieces = {}
 # dictionary of dark pieces on the board (keys = "row,col"; values = chess piece eg "kl")
