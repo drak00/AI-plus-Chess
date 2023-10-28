@@ -1,148 +1,176 @@
 import pygame as pg
-from ai import ai_move, ai_reset
-from menu import main_menu
-import random
-import sys
+from menu import game_mode_selection
 
-# Game Initialization
-pg.init()
+# canvas for displaying menu
+WINDOW = (600, 600)
+screen=pg.display.set_mode(WINDOW)
+font = pg.font.SysFont("Helvetica",50)
 
-# menu Resolution
-screen_width=600
-screen_height=600
-screen=pg.display.set_mode((screen_width, screen_height))
-font = pg.font.SysFont("Helvetica",75)
+# useful predefined Colours
+white = pg.Color("ghostwhite")
+brown = (66,44,22)
+green = pg.Color("chartreuse")
+yellow = pg.Color("Peru")
+dark = (90, 90, 90)
+darker = (3, 3, 3)
+red = (255,0,0)
 
-def option_format(message, player_size, player_color):
-	"""
-		Add Menu Options
-	"""
-	new_option=font.render(message, 0, player_color)
-	return new_option
-# Colors
-white=pg.Color("ghostwhite")
-brown=(66,44,22)
-green=pg.Color("chartreuse")
-blue=(0, 0, 255)
-yellow=pg.Color("Peru")
-bg_color=pg.Color("chartreuse")
-red=(255,0,0)
-font = pg.font.SysFont("Liberation", 50)
- 
 # Game Framerate
 clock = pg.time.Clock()
 FPS=30
 
 
+# Helpers
+def canvas_obj(obj_type = "text", obj_message = "", obj_size = 100, 
+               obj_colour = yellow, obj_loc = None, invert = False):
+
+    """
+        creates canvas object for pg window canvas
+        supported objects:
+            * image
+            * text
+
+        obj_loc ==> path to image
+
+    """
+
+    if obj_type == "text":
+        return font.render(obj_message, obj_size, obj_colour)
+    elif obj_type == "image":
+        img = pg.transform.scale(pg.image.load(obj_loc), (obj_size, obj_size))
+        
+        if invert:
+
+            # convert background image pixels to gray for visibility
+            # on main menu screen
+            pg.PixelArray(img).replace((0, 0, 0), dark)
+        return img
+
+def toggle(text, loc, colour):
+    """
+        toggles black and white side selection text and image
+    """
+    if (text, loc, colour) == ("< White >", "images/pl.png", white):
+        return ("< Black >", "images/pd.png", darker)
+    else:
+        return ("< White >", "images/pl.png", white)
+
+
 # Main Menu
-def menu():
+def offline_online_selection():
+
+    player = "white"
+
+    title = canvas_obj(obj_type = "text", obj_message = "AI + CHESS",
+                       obj_size = 100)
+
+    bg_pix = canvas_obj(obj_type  = "image", 
+                         obj_loc = "images/ChessMenu.png",
+                         obj_size = 640)
+
+    pawn_pix = canvas_obj(obj_type = "image", 
+                          obj_loc = "images/pl.png",
+                          obj_size = 60)
+
+    side_text, pawn_loc, side_colour = ("< White >", "images/pl.png", white)
  
-	run=True
-	selected=""
-	mode=""
+    choice, mode = None, None
+    pg.mixer.Sound.play(pg.mixer.Sound("audio/What-So-Not-Touched.wav"))
 
-	while run:
-		for event in pg.event.get():
-			if event.type==pg.QUIT:
-				pg.quit()
-				quit()
+    while True:
+        for event in pg.event.get():
+            if event.type==pg.QUIT:
+                pg.quit()
 
-		   #selecting menu Items
-			if event.type == pg.MOUSEBUTTONDOWN:
-				(mouseX, mouseY) = pg.mouse.get_pos()
-				a,b=mouseX,mouseY
-				if (60 <= a <= 330) and (200<=b<=230):
-					if selected !="offline":
-						selected="offline"
-					elif selected =="offline":
-						mode="offline"
-						   
-				elif (60 <= a <= 300) and (300<=b<=330):
-					if selected !="online":
-						selected="online"
-					elif selected =="online":
-						mode="online"
-						
-				elif (60 <= a <= 200) and (400<=b<=430):
-					if selected !="side":
-						selected="side"
-					elif selected =="side":
-						mode="side"
-						 
-				elif (460 <= a <= 550) and (500<=b<=530):
-					if selected !="quit":
-						selected="quit"
-					elif selected =="quit":
-						mode="quit"
-						
-		# Main Menu UI
-		# screen.fill(yellow)
-		title=option_format("STEAM CHESS ENGINE", 100, yellow)
-		name=pg.transform.scale(pg.image.load("images/menu3.png"),(640,640)) #quitground image
-		pic=pg.transform.scale(pg.image.load("images/pl.png"),(60,60))
+           # Navigate menu
+            if event.type == pg.MOUSEBUTTONDOWN:
+                a, b  = pg.mouse.get_pos()
 
-		#selections and event trigger
-		if selected=="offline":
-			option_start=option_format("OFFLINE",  75, green)
-			if mode=="offline":
-				option_start = option_format("OFFLINE", 75, brown)
-				main_menu()
-				mode=""
-				option=""	
+                if (60 <= a <= 330) and (200<= b <=230):
+                    mode = choice if choice == "select side" else None
+                    choice = "select side"
+                                               
+                elif (60 <= a <= 300) and (300<= b <=330):
+                    mode = choice if choice == "offline" else None
+                    choice = "offline"
+                        
+                elif (60 <= a <= 300) and (400<= b <=430):
+                    mode = choice if choice == "online" else None
+                    choice = "online"
 
-		else:
-			option_start = option_format("OFFLINE", 75, white)
-			
-		if selected=="online":
-			online_start=option_format("ONLINE",  75, green)
-			if mode=="online":
-				online_start = option_format("ONLINE", 75, brown)
-				mode=""
-				option=""
-		else:
-			online_start = option_format("ONLINE", 75, white)  
+                elif (460 <= a <= 550) and (500<= b <=530):
+                    mode = choice if choice == "quit" else None
+                    choice = "quit"
+        
+        
+        if choice not in  ["select side", "quit"] and\
+        mode not in  ["select side", "quit"]:
 
-		if selected=="side":
-			if mode!="side":
-				option_side=option_format("< DARK >",  75, (0,0,0))
-				pic=pg.transform.scale(pg.image.load("images/pd.png"),(60,60))
+            colour_offline = brown if mode == "offline" else\
+                    green if choice == "offline" else white
 
-			elif mode=="side":
-				option_side = option_format("< LIGHT >", 75, white)
-				pic=pg.transform.scale(pg.image.load("images/pl.png"),(60,60))
-				selected=""
-				mode=""
-				
-		else:
-			option_side = option_format("< LIGHT >", 75, white) 
-	
-		if selected=="quit":
-			option_quit=option_format("QUIT",  75, red)
-			if mode=="quit":
-				pg.time.delay(500)
-				quit()   
-		else:
-			option_quit = option_format("QUIT", 75, white)
+            colour_online = brown if mode == "online" else\
+                    green if choice == "online" else white
+            
+            quit_colour = white
 
-		   
- 
-	   
-		# Main Menu option
+            if mode == "offline":
+                game_mode_selection(mode, player)
+                mode = None
 
-		screen.blit(name, (0,1))
-		screen.blit(pic, (230,380))  
-		screen.blit(title, ( 60 , 30))
-		screen.blit(option_start, (60, 200))
-		screen.blit(online_start, (60, 300))
-		screen.blit(option_side, (60, 400))
-		screen.blit(option_quit, (462, 500))
-		
-		
-		pg.display.update()
-		clock.tick(FPS)
-		pg.display.set_caption("STEAM CHESS ENGINE")	
+        elif choice == "select side":
+            if mode == choice:
+                side_text, pawn_loc, side_colour = toggle(side_text, pawn_loc, side_colour)
+                mode = None
+                player = side_text.replace("< ", "").replace(" >", "")
 
-#Initialize the Game
-menu()
-pg.quit()
-quit()
+                invert = True if side_text == "< Black >" else False
+                bg_pix = canvas_obj(obj_type  = "image", 
+                         obj_loc = "images/ChessMenu.png",
+                         obj_size = 640, invert = invert)
+
+        elif choice == "quit":
+            quit_colour = red
+            if mode == choice:
+                pg.time.delay(500)
+                pg.quit()
+                quit()
+        
+        select_side_text = canvas_obj(obj_type = "text", obj_size = 75, 
+                                     obj_colour = side_colour, obj_message = side_text)
+
+        select_side_pix = canvas_obj(obj_type = "image", obj_loc = pawn_loc,
+                                        obj_size = 100, invert = False)
+
+        offline_text  = canvas_obj(obj_type = "text", obj_size = 75, 
+                                     obj_colour = colour_offline, obj_message = "OFFLINE")
+
+        online_text  = canvas_obj(obj_type = "text", obj_size = 75, 
+                                     obj_colour = colour_online, obj_message = "ONLINE")
+
+        
+        quit_text = canvas_obj(obj_type = "text", obj_message = "QUIT",
+                              obj_size = 75, obj_colour = quit_colour)
+        
+        screen.blit(bg_pix, (0,1))
+        screen.blit(select_side_pix, (250,200))  
+        screen.blit(title, ( 60 , 30))
+        screen.blit(select_side_text, (60, 200))
+        screen.blit(offline_text, (60, 300))
+        screen.blit(online_text, (60, 400))
+        screen.blit(quit_text, (462, 500))
+        
+        
+        pg.display.update()
+        clock.tick(FPS)
+        pg.display.set_caption("A CHESS AI PLATFORM")    
+
+
+if __name__ == "__main__":
+
+    # Game Initialization
+    pg.init()
+
+    #Initialize the Game
+    offline_online_selection()
+    

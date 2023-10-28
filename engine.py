@@ -33,8 +33,8 @@ class Game_state():
 
         self.light_to_move = True  # True = light's turn to play; False = dark's turn to play
         self.move_log = []        # keeps a log of all moves made withing a game
-        self.en_passant = [] 	  # flags possible en-passant moves
-        self.castling = [] 		  # flags possible casling moves
+        self.en_passant = []      # flags possible en-passant moves
+        self.castling = []        # flags possible casling moves
         self.move_piece = {"p": self.get_pawn_moves, "r": self.get_rook_moves,
                            "q": self.get_queen_moves, "k": self.get_king_moves,
                            "b": self.get_bishop_moves, "n": self.get_knight_moves}
@@ -53,6 +53,8 @@ class Game_state():
         self.dark_king_side_castle = True
         # dark queen side castle available (king and left rook not moved)
         self.dark_queen_side_castle = True
+        
+    
 
     def get_pawn_moves(self, r, c, moves):
         """
@@ -255,7 +257,7 @@ class Game_state():
         self.board[move.start_row][move.start_col] = "  "
         self.board[move.end_row][move.end_col] = move.piece_moved
         # if self.en_passant and not look_ahead_mode:
-        # 	print(self.en_passant)
+        #   print(self.en_passant)
         # handles en-passant moves
         if not look_ahead_mode and move in self.en_passant:
             if self.light_to_move:
@@ -521,12 +523,18 @@ class Game_state():
 
             # interactive
             if not look_ahead_mode:
-                print("Reversing", last_move.get_chess_notation())
+                print("Reversing",last_move.get_chess_notation())
+                if Move.mute==True:
+                    engine.say("reversing"+last_move.get_chess_notation())
+                    engine.runAndWait()
 
             #last_move.piece_captured = "  "
 
         else:
             print("All undone!")
+            if Move.mute==True:
+                engine.say("All undone!")
+                engine.runAndWait()
 
     def get_valid_moves(self):
         """
@@ -698,7 +706,9 @@ class Move():
 
     # map columns to files (revers of files to columns)
     cols_to_files = {col: file for file, col in files_to_cols.items()}
-
+ 
+    mute=False
+    
     def __init__(self, start_sq, end_sq, board):
         """
                 A Move class abstracting all parameters needed
@@ -721,6 +731,12 @@ class Move():
         self.piece_captured = board[self.end_row][self.end_col]
         self.en_passant_captured = None  # piece captured during en-passant
         self.castling_rook = None  # rook castled during castling
+        #mute commentary
+        
+  
+    def convert_letters_to_words(self,letter):
+        letter_to_word = {"b":"bishop", "k":"king", "q":"queen", "p":"pawn", "n": "knight", "r":"rook", "none":"none"}
+        return letter_to_word[letter]
 
     def get_chess_notation(self):
         """
@@ -732,26 +748,28 @@ class Move():
                 return parameter(s)
                 commentary (string)
         """
-
+        
+        piece_name=self.convert_letters_to_words(self.piece_moved[0])
+        
         if self.en_passant_captured:
-            return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
-                "(" + self.en_passant_captured[0].upper() + " captured!)"
+            return piece_name + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+                "(" + self.convert_letters_to_words(self.en_passant_captured[0]) + " captured!)"
 
         elif not self.en_passant_captured and self.piece_captured != "  ":
-            return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
-                "(" + self.piece_captured[0].upper() + " captured!)"
+            return piece_name + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+                "(" + self.convert_letters_to_words(self.piece_captured[0]) + " captured!)"
 
         elif self.castling_rook:
-            return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
+            return piece_name + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
                 "(" + "Queen side castling!)" if self.end_col == 2 else "King side castling!)"
 
         else:
-            return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
+            return piece_name + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
                 self.get_rank_file(self.end_row, self.end_col)
 
         # return self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + self.get_rank_file(self.end_row, self.end_col) + \
-        # 	"(" + self.piece_captured[0].upper() + " captured!)" if self.piece_captured != "  " else self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
-        # 	self.get_rank_file(self.end_row, self.end_col)
+        #   "(" + self.piece_captured[0].upper() + " captured!)" if self.piece_captured != "  " else self.piece_moved[0].upper() + "(" + self.get_rank_file(self.start_row, self.start_col) + ") to " + \
+        #   self.get_rank_file(self.end_row, self.end_col)
 
     def get_rank_file(self, r, c):
         """

@@ -1,6 +1,6 @@
 """
-	LIGHT and DARK AI BOTS
-	Press 'A' on the keyboard to activate/deactivate AI mode (Light VS Dark)
+    LIGHT and DARK AI BOTS
+    Press 'A' on the keyboard to activate/deactivate AI mode (Light VS Dark)
 """
 import random
 from math import inf
@@ -17,6 +17,7 @@ piece_values = {
 }
 
 square_values = {
+
     "pl": [
         [55, 55, 55, 55, 55, 55, 55, 55],
         [50, 50, 50, 50, 50, 50, 50, 50],
@@ -322,7 +323,7 @@ def ai_light_move(gs):
     """
 
     ### TODO: edit to your unique algorithm (mini-max w/ pruning, etc) ###
-    ###		  Static evaluation of the board can be done with 'light_pieces' and 'dark_pieces' dictionaries ###
+    ###       Static evaluation of the board can be done with 'light_pieces' and 'dark_pieces' dictionaries ###
 
     light_move = None
     move = minimax(gs, 3)[0]  # Move as decided by minimax
@@ -370,7 +371,7 @@ def ai_dark_move(gs):
     """
 
     ### TODO: edit to your unique algorithm (mini-max w/ pruning, etc) ###
-    ###		  Static evaluation of the board can be done with 'light_pieces' and 'dark_pieces' dictionaries ###
+    ###       Static evaluation of the board can be done with 'light_pieces' and 'dark_pieces' dictionaries ###
     dark_move = None
     move = minimax(gs, 2)[0]  # Move as decided by minimax
 
@@ -392,9 +393,9 @@ def ai_dark_move(gs):
 
         # # remove pieces captured from light_piece dictionary for faster static board evaluation in your mini-max algorithm rewrite
         # if dark_move.piece_captured != "  " and not dark_move.en_passant_captured:
-        # 	light_pieces.pop("{},{}".format(dark_move.end_row, dark_move.end_col))
+        #   light_pieces.pop("{},{}".format(dark_move.end_row, dark_move.end_col))
         # elif dark_move.en_passant_captured:
-        # 	light_pieces.pop("{},{}".format(dark_move.end_row+1, dark_move.end_col if gs.light_to_move else dark_move.end_row-1, dark_move.end_col))
+        #   light_pieces.pop("{},{}".format(dark_move.end_row+1, dark_move.end_col if gs.light_to_move else dark_move.end_row-1, dark_move.end_col))
     else:
         if gs.is_in_check():
             gs.check_mate = True
